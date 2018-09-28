@@ -5,7 +5,7 @@
 \title{FRTCI.interact}
 \usage{
 FRTCI.interact(Y, Z, W, X, test.stat, B, gamma, grid.gamma, grid.size, return.matrix,
-verbose, ...)
+n.cores, verbose, ...)
 }
 \arguments{
 \item{Y}{Observed outcome vector}
@@ -16,19 +16,21 @@ verbose, ...)
 
 \item{X}{Additional pre-treatment covariates to adjust for in estimation, but not to interact with treatment.}
 
-\item{test.stat}{Test statistic function to use on the data.}
+\item{test.stat}{Test statistic function to use on the data. Default is shifted Kolmogorov-Smirnov statistic.}
 
-\item{B}{Number of permutations to take.}
+\item{B}{Number of permutations to take. Default is 500.}
 
-\item{gamma}{How wide of a CI to make around tau-hat for search}
+\item{gamma}{How wide of a CI to make around tau-hat for search. Default is 0.0001.}
 
-\item{grid.gamma}{Parameter to govern where the grid points are sampled. Bigger values means more samples towards the estimated tau-hat.}
+\item{grid.gamma}{Parameter to govern where the grid points are sampled.  Bigger values means more samples towards the estimated tau-hat. Default is 100*gamma.}
 
-\item{grid.size}{Number of points in the grid.}
+\item{grid.size}{Number of points in the grid. Default is 151.}
 
-\item{return.matrix}{TRUE means give back the matrix of all the imputed statistics. FALSE do not.}
+\item{return.matrix}{Whether to return the matrix of all the imputed statistics.  Default is FALSE.}
 
-\item{verbose}{TRUE means print out progress bar when fitting and other diagnostics.}
+\item{n.cores}{Number of cores to use to parallelize permutation step. Default is 1.}
+
+\item{verbose}{Whether to print out progress bar when fitting and other diagnostics. Default is TRUE.}
 
 \item{...}{Extra arguments passed to the generate.permutations function (and the test.stat function).}
 }

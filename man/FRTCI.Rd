@@ -5,28 +5,30 @@
 \title{FRTCI}
 \usage{
 FRTCI(Y, Z, test.stat, B, gamma, grid.gamma, grid.size,
-te.vec, return.matrix, verbose, ...)
+te.vec, return.matrix, n.cores, verbose, ...)
 }
 \arguments{
 \item{Y}{Observed outcome vector}
 
 \item{Z}{Treatment assigment vector (1=Tx, 0=Co)}
 
-\item{test.stat}{Test statistic function to use on the data.}
+\item{test.stat}{Test statistic function to use on the data. Default is shifted Kolmogorov-Smirnov statistic.}
 
-\item{B}{Number of permutations to take.}
+\item{B}{Number of permutations to take. Default is 500.}
 
-\item{gamma}{How wide of a CI to make around tau-hat for search}
+\item{gamma}{How wide of a CI to make around tau-hat for search. Default is 0.0001.}
 
-\item{grid.gamma}{Parameter to govern where the grid points are sampled.  Bigger values means more samples towards the estimated tau-hat.}
+\item{grid.gamma}{Parameter to govern where the grid points are sampled.  Bigger values means more samples towards the estimated tau-hat. Default is 100*gamma.}
 
-\item{grid.size}{Number of points in the grid.}
+\item{grid.size}{Number of points in the grid. Default is 151.}
 
-\item{te.vec}{Vector of taus to examine if you want to override generating ones automatically.}
+\item{te.vec}{Vector of taus to examine if you want to override generating ones automatically. Default is NULL.}
 
-\item{return.matrix}{TRUE means give back the matrix of all the imputed statistics.  FALSE do not.}
+\item{return.matrix}{Whether to return the matrix of all the imputed statistics.  Default is FALSE.}
 
-\item{verbose}{TRUE means print out progress bar when fitting and other diagnostics.}
+\item{n.cores}{Number of cores to use to parallelize permutation step. Default is 1.}
+
+\item{verbose}{Whether to print out progress bar when fitting and other diagnostics. Default is TRUE.}
 
 \item{...}{Extra arguments passed to the generate.permutations function (and the test.stat function).}
 }
@@ -38,10 +40,8 @@ the plug-in p-value, and other information on the test.
 Conduct the FRT CI Method on passed data
 }
 \examples{
-\dontrun{
 Z <- rep(c(0, 1), 100)
 tau <- 4
 Y <- ifelse(Z, rnorm(100, tau), rnorm(100, 0))
-tst <- FRTCI(Y, Z)
-}
+tst <- FRTCI(Y, Z, B = 50, grid.size = 50)
 }

@@ -6,7 +6,7 @@ Date: 2018-09-27
 Authors@R: c(
   person("Ben", "Fifield", email = "benfifield@gmail.com", role = c("aut", "cre"))
   ) 
-Description: FRTCI implements methods developed by Ding, Feller, and Miratrix (2016)
+Description: This package implements methods developed by Ding, Feller, and Miratrix (2016)
     ''Randomization Inference for Treatment Effect Variation'', for validly testing
     whether there is unexplained variation in treatment effects across observations.
     The package includes wrapper functions implementing the proposed methods, as well
@@ -15,6 +15,9 @@ License: GPL (>= 3)
 Imports:
     quantreg,
     plyr,
-    mvtnorm
+    mvtnorm,
+    foreach,
+    parallel,
+    doParallel
 BugReports: https://github.com/bfifield/FRTCI/issues
 RoxygenNote: 6.0.1

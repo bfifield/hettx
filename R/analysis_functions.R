@@ -54,11 +54,11 @@ get.p.value <- function( tst ) {
 #'
 #' @param x An object of class \code{FRTCI.test}
 #' @param true.tau The true value of tau, if known. Default is NULL.
-#' @param xlab X-axis label
-#' @param ylab Y-axis label
-#' @param true.tau.col Color to plot true tau value, if provided
-#' @param plot.envelope Plot envelope around tested values of tau. Default is TRUE
-#' @param ci.line.col Color to plot confidence interval around estimated treatment effect
+#' @param xlab X-axis label. Default is tau.
+#' @param ylab Y-axis label. Default is "p-value".
+#' @param true.tau.col Color to plot true tau value, if provided. Default is red.
+#' @param plot.envelope Plot envelope around tested values of tau. Default is TRUE.
+#' @param ci.line.col Color to plot confidence interval around estimated treatment effect. Default is blue.
 #' @param ... Further arguments to be passed to \code{print.FRTCI.test()}
 #'
 #' @export

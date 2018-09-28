@@ -116,21 +116,30 @@ get.testing.grid = function( Y, Z, W, X=NULL, gamma=0.0001, grid.size=150 ) {
 
 ## Utility function used by FRTCI and FRTCI.interact to actually generate the 
 ## permutations.  Don't use directly.
-generate.permutations = function( Y, Z, test.stat, Y0.mat, Y1.mat, B, get.z.star=NULL, verbose = TRUE, ... ) {
+generate.permutations = function( Y, Z, test.stat, Y0.mat, Y1.mat, B, n.cores, get.z.star=NULL, verbose = TRUE, ... ) {
     
     ## SET UP STORAGE MATRICES
     n.te.vec <- ncol(Y0.mat)
-    ks.mat <- matrix(NA, nrow = B, ncol = n.te.vec)
     
     ## CALCULATE OBSERVED TEST STATISTICS
     ks.obs <- test.stat( Y, Z, ... )
-    
+
     if ( verbose ) {
         pb <- txtProgressBar(min = 0, max = B, style = 3)
     }
     
+    ## DECLARE PARALLEL ENVIRONMENT
+    if(n.cores == 1){
+        '%oper%' <- foreach::'%do%'
+    }else { 
+        '%oper%' <- foreach::'%dopar%'
+        cl <- makePSOCKcluster(n.cores, outfile="")
+        registerDoParallel(cl)
+        on.exit(stopCluster(cl))
+    }
+
     ## RANDOMIZATION DISTRIBUTION
-    for(b in 1:B){
+    ks.mat <- foreach(b = 1:B, .combine = "rbind") %oper% {
         if ( verbose ) {
             setTxtProgressBar(pb, b)
         }
@@ -153,8 +162,9 @@ generate.permutations = function( Y, Z, test.stat, Y0.mat, Y1.mat, B, get.z.star
                              ks.star
                          })  
         
-        ks.mat[b,] <- as.numeric(ci.out)
+        return(as.numeric(ci.out))
     }
+    
     if ( verbose ) {
         close(pb)
     }

@@ -11,15 +11,15 @@
 
 \item{true.tau}{The true value of tau, if known. Default is NULL.}
 
-\item{xlab}{X-axis label}
+\item{xlab}{X-axis label. Default is tau.}
 
-\item{ylab}{Y-axis label}
+\item{ylab}{Y-axis label. Default is "p-value".}
 
-\item{true.tau.col}{Color to plot true tau value, if provided}
+\item{true.tau.col}{Color to plot true tau value, if provided. Default is red.}
 
-\item{plot.envelope}{Plot envelope around tested values of tau. Default is TRUE}
+\item{plot.envelope}{Plot envelope around tested values of tau. Default is TRUE.}
 
-\item{ci.line.col}{Color to plot confidence interval around estimated treatment effect}
+\item{ci.line.col}{Color to plot confidence interval around estimated treatment effect. Default is blue.}
 
 \item{...}{Further arguments to be passed to \code{print.FRTCI.test()}}
 }

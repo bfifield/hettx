@@ -1,6 +1,6 @@
 #' Conduct the FRT CI Method of Ding, Feller, and Miratrix (2016, JRSS-B)
 #'
-#' \code{FRTCI} implements methods developed by Ding, Feller, and Miratrix (2016)
+#' This package implements methods developed by Ding, Feller, and Miratrix (2016)
 #' ''Randomization Inference for Treatment Effect Variation'', for validly testing
 #' whether there is unexplained variation in treatment effects across observations.
 #' The package includes wrapper functions impelmenting the proposed methods, as well
