@@ -62,13 +62,13 @@ get.tau.vector = function( Y, Z, X = NULL, gamma=0.001, grid.size=21, grid.gamma
 ## Calculate a set of different models for effects based on a linear model of W, controlling
 ## for X (and W).  These models all correspond to estimated nusiance parameters beta.
 ## Each possible beta gives a collection of different models of effects.
-                                        #
+##
 ## I.e., estimate the coefficients a, d for
 ## Y ~ a Z + b X + c W + d W:Z
-                                        #
+##
 ## Then for each model, calculate individual imputed treatment effects for all observations and the
 ## associated science tables of imputed potential outcomes.
-                                        #
+##
 ## @param  Y, Z, X, W: outcome, treatment assignment, covariates, and treatment varying covariates
 ##                  X and W can be the same for a fully interacted linear model.
 ## @return
