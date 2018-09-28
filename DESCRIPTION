@@ -1,0 +1,19 @@
+Package: FRTCI
+Type: Package
+Title: Conduct the FRT CI Method of Ding, Feller, and Miratrix (2016, JRSS-B)
+Version: 0.0.1
+Date: 2018-09-27
+Authors@R: c(
+  person("Ben", "Fifield", email = "benfifield@gmail.com", role = c("aut", "cre"))
+  ) 
+Description: FRTCI implements methods developed by Ding, Feller, and Miratrix (2016)
+    ''Randomization Inference for Treatment Effect Variation'', for validly testing
+    whether there is unexplained variation in treatment effects across observations.
+    The package includes wrapper functions implementing the proposed methods, as well
+    as helper functions for analyzing and visualizing the results of the test.
+License: GPL (>= 3)
+Imports:
+    quantreg,
+    plyr,
+    mvtnorm
+RoxygenNote: 6.0.1
