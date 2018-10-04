@@ -179,6 +179,6 @@ FRTCI.interact <- function( Y, Z, W, X=NULL, test.stat = SKS.stat.int.cov, B=500
                    B=B, gamma=gamma, ks.mat=ks.mat,
                    W=W, X=X ),
               
-              class = "FRTCI.test")
+              class = "FRTCI.interact.test")
 }
 
