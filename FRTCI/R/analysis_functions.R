@@ -25,11 +25,11 @@ print.FRTCI.test = function( x, ... ) {
     cat( "\tB = ", x$B, "\tgamma = ", x$gamma, "\n" )
     
     if ( !is.null( x$W ) ) {
-        cat( "\tCorrected for", paste( colnames(x$W), sep=", " ) )        
+        cat( "\tCorrected for", paste( colnames(x$W), sep=", " ), "\n" )        
     }
 
     if ( !is.null( x$X ) ) {
-        cat( "\tAdjusted for", paste( colnames(x$X), sep=", " ) )        
+        cat( "\tAdjusted for", paste( colnames(x$X), sep=", " ), "\n" )        
     }
     
     
