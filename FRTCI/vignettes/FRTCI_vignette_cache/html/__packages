@@ -1,0 +1,12 @@
+base
+plyr
+MASS
+FRTCI
+mvtnorm
+tidyverse
+ggplot2
+tibble
+tidyr
+readr
+purrr
+dplyr
