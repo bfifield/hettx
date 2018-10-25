@@ -19,5 +19,5 @@ Imports:
     foreach,
     parallel,
     doParallel
-BugReports: https://github.com/bfifield/FRTCI/issues
+BugReports: https://github.com/bfifield/detect_heteffects/issues
 RoxygenNote: 6.0.1
