@@ -2,9 +2,7 @@
 
 S3method(plot,FRTCI.test)
 S3method(print,FRTCI.test)
-export(FRTCI)
-export(FRTCI.interact)
-export(FRTplug)
+export(fishpidetect)
 importFrom(doParallel,registerDoParallel)
 importFrom(foreach,"%do%")
 importFrom(foreach,"%dopar%")
