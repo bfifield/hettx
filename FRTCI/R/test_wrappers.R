@@ -63,6 +63,9 @@ fishpidetect <- function(Y, Z, W = NULL, X = NULL, plugin = FALSE, tau.hat = NUL
     if(length(unique(Z)) > 2){
         stop("You have more than two unique values in your treatment assignment vector.")
     }
+    if(length(Y) != length(Z)){
+        stop("Y and Z must be the same length.")
+    }
 
     ## Class checks on Y and Z
     if(!inherits(Y, "numeric")){
@@ -102,6 +105,9 @@ fishpidetect <- function(Y, Z, W = NULL, X = NULL, plugin = FALSE, tau.hat = NUL
         if(any(unq.check == 1)){
             stop("You have some columns in W with no variation.")
         }
+        if(nrow(W) != length(Y)){
+            stop("W must have as many observations as Y.")
+        }
     }
     if(!is.null(X)){
         if(!inherits(X, "data.frame") | !inherits(X, "matrix")){
@@ -114,6 +120,9 @@ fishpidetect <- function(Y, Z, W = NULL, X = NULL, plugin = FALSE, tau.hat = NUL
         unq.check <- apply(X, 2, function(x){length(unique(x))})
         if(any(unq.check == 1)){
             stop("You have some columns in X with no variation.")
+        }
+        if(nrow(X) != length(Y)){
+            stop("X must have as many observations as Y.")
         }
     }
 
