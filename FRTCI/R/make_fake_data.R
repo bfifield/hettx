@@ -4,8 +4,8 @@
 ##
 ## Miratrix, 2014
 
-library( plyr )
-library( MASS )
+## library( plyr )
+## library( MASS )
 
 
 
@@ -35,6 +35,7 @@ library( MASS )
 #'
 #' @return List of elements of data (not data frame)
 #' @export
+#' @importFrom MASS mvrnorm
 make.linear.data = function( n, gamma.vec = c( 1, 2, 2, 1 ),
                              gamma2.vec = NULL,
                              beta.vec = c(-1,-1,1),
@@ -65,7 +66,7 @@ make.linear.data = function( n, gamma.vec = c( 1, 2, 2, 1 ),
         mu=rep(3, NC)
     }
 
-    X = MASS::mvrnorm( n, mu = mu, Sigma = sig )
+    X = mvrnorm( n, mu = mu, Sigma = sig )
     if ( quad ) {
             X2 = ( sweep( X, 2, STATS=mu, FUN="-" ) )^2
     }
@@ -210,31 +211,31 @@ make.randomized.compliance.dat = function( n, p = 0.6, science.table.generator =
 ##
 ##########################################################################################
 
-if ( FALSE ) {
+## if ( FALSE ) {
 
-    dat = make.linear.data( 10 )
-    dat
-    str(dat)
-
-
-    dat = make.skew.data( 500 )
-    hist( dat$Y.0 )
-    hist( dat$Y.1 )
-    plot( Y.1 - Y.0 ~ Y.0, data=dat )
-    par(mfrow=c(1,1) )
-    plot( data.frame( dat$X ) )
+##     dat = make.linear.data( 10 )
+##     dat
+##     str(dat)
 
 
-    make.randomized.dat( 10 )
-    dt = make.randomized.dat( 10, as.data.frame=TRUE )
-    str( dt )
+##     dat = make.skew.data( 500 )
+##     hist( dat$Y.0 )
+##     hist( dat$Y.1 )
+##     plot( Y.1 - Y.0 ~ Y.0, data=dat )
+##     par(mfrow=c(1,1) )
+##     plot( data.frame( dat$X ) )
 
-    dt = make.randomized.dat( 10, as.data.frame=TRUE, include.POs = FALSE)
-    dt
+
+##     make.randomized.dat( 10 )
+##     dt = make.randomized.dat( 10, as.data.frame=TRUE )
+##     str( dt )
+
+##     dt = make.randomized.dat( 10, as.data.frame=TRUE, include.POs = FALSE)
+##     dt
 
 
-    make.randomized.dat( 10, gamma.vec=c(1,1,1,1,1,1), beta.vec=c(1,-1,1) )
+##     make.randomized.dat( 10, gamma.vec=c(1,1,1,1,1,1), beta.vec=c(1,-1,1) )
 
-}
+## }
 
 
