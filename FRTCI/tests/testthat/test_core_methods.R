@@ -1,6 +1,3 @@
-library( testthat )
-library(FRTCI)
-
 context("Core methods")
 
 test_that("FRTCI Runs", {
@@ -10,7 +7,7 @@ test_that("FRTCI Runs", {
   grid.size = 11
 
   # Test for ideosyncratic treatment effect variation without covariates
-  tst = FRTCI(ToyData$Y, ToyData$Z, B=B, test.stat=SKS.stat, grid.size = grid.size, verbose=FALSE)
+  tst = fishpidetect(ToyData$Y, ToyData$Z, B=B, grid.size = grid.size, verbose=FALSE)
 
   expect_false( is.null( tst ) )
   expect_is( tst, "FRTCI.test" )
@@ -23,17 +20,17 @@ test_that( "Example code from documentation, copied over", {
 
   B <- 20
   grid.size = 51
-  tst = FRTCI(Y, Z, ToyData, B=B, test.stat=SKS.stat, grid.size = grid.size)
+  tst = fishpidetect(ToyData$Y, ToyData$Z, B=B, grid.size = grid.size)
   tst
-
-  tst = FRTplug(Y, Z, ToyData, B=B, test.stat=SKS.stat, grid.size = grid.size)
+  plot( tst )
+  
+  tst = fishpidetect(ToyData$Y, ToyData$Z, plugin = TRUE)
 
   lmW <- lm( Y ~ x1, ToyData )
   W1 <- model.matrix(lmW)[,-1]
-  tst <- FRTCI.interact( Y, Z, W=W1, data=ToyData, B=B )
+  tst <- fishpidetect(ToyData$Y, ToyData$Z, W=as.matrix(W1), B=B )
   tst
 
-  plot.FRTCI.curve( tst )
 })
 
 

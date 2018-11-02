@@ -94,7 +94,7 @@ fishpidetect <- function(Y, Z, W = NULL, X = NULL, plugin = FALSE, tau.hat = NUL
         warning("Adjusting for existing heterogeneity but treatment effect vector provided, ignoring provided treatment effect vector.")
     }
     if(!is.null(W)){
-        if(!inherits(W, "data.frame") | !inherits(W, "matrix")){
+        if(!inherits(W, "data.frame") & !inherits(W, "matrix")){
             stop("W must be either a data frame or a matrix.")
         }
         na.check <- apply(W, 2, function(x){sum(is.na(x))})

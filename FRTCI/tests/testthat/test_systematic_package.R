@@ -1,5 +1,3 @@
-library(FRTCI)
-
 context("Systematic estimation methods")
 
 test_that("estimate oracle", {

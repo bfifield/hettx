@@ -4,10 +4,12 @@
 \alias{coef.RI.regression.result}
 \title{Extract coefficients of a fit RI regression model.}
 \usage{
-\method{coef}{RI.regression.result}(x)
+\method{coef}{RI.regression.result}(object, ...)
 }
 \arguments{
-\item{x}{A RI.regression.result object.}
+\item{object}{A RI.regression.result object.}
+
+\item{...}{Unused}
 }
 \description{
 Extract coefficients of a fit RI regression model.

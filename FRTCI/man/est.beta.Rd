@@ -2,10 +2,7 @@
 % Please edit documentation in R/systematic_estimation_library.R
 \name{est.beta}
 \alias{est.beta}
-\title{Estimate Systematic Treatment Effect Variation
-
-Estimate our treatment effect model given by the formula "~ X"
-Will do the different estimators listed in our paper given the 'method' flag}
+\title{Estimate Systematic Treatment Effect Variation}
 \usage{
 est.beta(Yobs, Z, formula, control.formula = NULL, data, method = c("RI",
   "OLS"), empirical.Sxx = FALSE)
@@ -24,6 +21,10 @@ est.beta(Yobs, Z, formula, control.formula = NULL, data, method = c("RI",
 \item{method}{RI or OLS.  method=OLS is shorthand for setting the empirical.Sxx variable to TRUE, nothing more.}
 
 \item{empirical.Sxx}{Estimate seperate Sxx for treatment and control if TRUE, use known Sxx if not.}
+}
+\description{
+Estimate our treatment effect model given by the formula "~ X"
+Will do the different estimators listed in our paper given the 'method' flag
 }
 \seealso{
 print.RI.regression.result

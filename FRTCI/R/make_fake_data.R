@@ -36,6 +36,7 @@
 #' @return List of elements of data (not data frame)
 #' @export
 #' @importFrom MASS mvrnorm
+#' @importFrom stats cov median model.matrix pchisq pnorm quantile rexp rnorm sd
 make.linear.data = function( n, gamma.vec = c( 1, 2, 2, 1 ),
                              gamma2.vec = NULL,
                              beta.vec = c(-1,-1,1),

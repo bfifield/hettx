@@ -115,7 +115,7 @@ calc.beta.oracle = function( Y1, Y0, Z, formula, data, method=c("RI","OLS") ) {
 
 
 
-#' @title Estimate Systematic Treatment Effect Variation
+#' Estimate Systematic Treatment Effect Variation
 #'
 #' Estimate our treatment effect model given by the formula "~ X"
 #' Will do the different estimators listed in our paper given the 'method' flag
@@ -709,11 +709,12 @@ is.RI.regression.result = function( x ) {
 }
 
 #' Extract coefficients of a fit RI regression model.
-#' @param x A RI.regression.result object.
+#' @param object A RI.regression.result object.
+#' @param ... Unused
 #'
 #' @export
-coef.RI.regression.result = function( x ) {
-    x$beta.hat
+coef.RI.regression.result = function( object, ... ) {
+    object$beta.hat
 }
 
 
@@ -842,6 +843,7 @@ plot.RI.R2.result = function( x, main=paste( "R2 for Het Tx (", x$type, ")", sep
 #' @param Z  Treatment assignment vector
 #' @param data  Dataframe with variables listed in formula and control.formula
 #' @export
+#' @importFrom moments kurtosis
 variance.ratio.test = function(Yobs, Z, data= NULL)
 {
   if (!is.null( data ) ) {
@@ -856,7 +858,7 @@ variance.ratio.test = function(Yobs, Z, data= NULL)
 
   log.varR = log(var(Y1)/var(Y0))
 
-  asy.se   = sqrt(  (moments::kurtosis(Y1) - 1)/N1 + (moments::kurtosis(Y0) - 1)/N0   )
+  asy.se   = sqrt(  (kurtosis(Y1) - 1)/N1 + (kurtosis(Y0) - 1)/N0   )
 
   pvalue   = as.numeric((1 - pnorm(abs(log.varR), 0, asy.se)))
 
