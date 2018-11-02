@@ -21,3 +21,4 @@ Imports:
     doParallel
 BugReports: https://github.com/bfifield/detect_heteffects/issues
 RoxygenNote: 6.0.1
+Suggests: testthat
