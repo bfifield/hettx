@@ -197,8 +197,12 @@ FRTCI <- function(Y, Z, X = NULL, test.stat = SKS.stat, B=500,
         if ( grid.size %% 2 == 0 ) {
             grid.size <- grid.size+1
         }
-        
-        te.vec <- get.tau.vector( Y, Z, X, gamma=gamma, grid.size=grid.size, grid.gamma=grid.gamma )
+
+        if( is.null(X) ){
+            te.vec <- get.tau.vector( Y, Z, gamma=gamma, grid.size=grid.size, grid.gamma=grid.gamma )
+        }else{
+            te.vec <- get.tau.vector( Y, Z, X, gamma=gamma, grid.size=grid.size, grid.gamma=grid.gamma )
+        }
     } else {
         grid.size = length( te.vec )
     }
@@ -245,7 +249,7 @@ FRTCI <- function(Y, Z, X = NULL, test.stat = SKS.stat, B=500,
 
 ## Test using plug-in sample average treatment effect
 FRTplug <- function( Y, Z, test.stat=SKS.stat, tau.hat=mean(Y[Z == 1]) - mean(Y[Z == 0]), ... ){
-    mth = FRTCI( Y, Z, test.stat, te.vec=c(tau.hat), n.cores = 1, ...)
+    mth = FRTCI( Y, Z, test.stat=test.stat, te.vec=c(tau.hat), n.cores = 1, ...)
     mth$method = paste( "FRT Plug-in Test for Tx Effect Heterogeneity with ", substitute(test.stat), sep="" )
     mth
 }
