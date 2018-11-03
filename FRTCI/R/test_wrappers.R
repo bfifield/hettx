@@ -81,9 +81,6 @@ fishpidetect <- function(Y, Z, W = NULL, X = NULL, plugin = FALSE, tau.hat = NUL
     }
 
     ## Class and input checks on W and X
-    if(is.null(W) & !is.null(X)){
-        stop("You have provided an argument for W but not for X, not controlling for any existing treatment effect heterogeneity.")
-    }
     if(plugin & !is.null(W)){
         warning("Running plug-in test but covariates provided for W, will not adjust for existing heterogeneity.")
     }
@@ -94,8 +91,14 @@ fishpidetect <- function(Y, Z, W = NULL, X = NULL, plugin = FALSE, tau.hat = NUL
         warning("Adjusting for existing heterogeneity but treatment effect vector provided, ignoring provided treatment effect vector.")
     }
     if(!is.null(W)){
-        if(!inherits(W, "data.frame") & !inherits(W, "matrix")){
-            stop("W must be either a data frame or a matrix.")
+        if(!(identical(WSKS.t, test.stat) | identical(SKS.pool.t, test.stat))){
+            if(!(inherits(W, "data.frame") | inherits(W, "matrix"))){
+                stop("W must be either a data frame or a matrix.")
+            }
+        }else{
+            if(!inherits(W, "factor")){
+                stop("If using SKS.pool.t or WSKS.t as test statistics, W must be a factor vector.")
+            }
         }
         na.check <- apply(W, 2, function(x){sum(is.na(x))})
         if(any(na.check > 0)){
@@ -110,7 +113,7 @@ fishpidetect <- function(Y, Z, W = NULL, X = NULL, plugin = FALSE, tau.hat = NUL
         }
     }
     if(!is.null(X)){
-        if(!inherits(X, "data.frame") | !inherits(X, "matrix")){
+        if(!(inherits(X, "data.frame") | inherits(X, "matrix"))){
             stop("X must be either a data frame or a matrix.")
         }
         na.check <- apply(X, 2, function(x){sum(is.na(x))})
@@ -128,25 +131,31 @@ fishpidetect <- function(Y, Z, W = NULL, X = NULL, plugin = FALSE, tau.hat = NUL
 
     ## Checks on functions
     no.adj.funs <- c(KS.stat, SKS.stat, rq.stat)
-    adj.funs <- c(SKS.stat.cov.pool, SKS.stat.cov, SKS.stat.int.cov.pool,
-                  SKS.stat.int.cov, SKS.stat.cov.rq, rq.stat.cond.cov,
-                  rq.stat.uncond.cov, WSKS.t, SKS.pool.t)
-    if(is.null(W)){
+    adj.funs <- c(SKS.stat.cov.pool, SKS.stat.cov, SKS.stat.cov.rq, rq.stat.cond.cov, rq.stat.uncond.cov)
+    adj.int.funs <- c(SKS.stat.int.cov.pool, SKS.stat.int.cov, WSKS.t, SKS.pool.t)
+    if(is.null(W) & is.null(X)){
         store.test <- rep(NA, length(no.adj.funs))
         for(i in 1:length(no.adj.funs)){
             store.test[i] <- identical(no.adj.funs[[i]], test.stat)
         }
         if(!any(store.test)){
-            stop("You have provided an invalid test statistic. Must provide one of KS.stat, SKS.stat, or rq.stat.")
+            stop("You have provided an invalid test statistic when not adjusting for covariates or specifying interactions. Must provide one of KS.stat, SKS.stat, or rq.stat.")
         }
-    }else{
+    }else if(is.null(W)){
         store.test <- rep(NA, length(adj.funs))
         for(i in 1:length(adj.funs)){
             store.test[i] <- identical(adj.funs[[i]], test.stat)
         }
         if(!any(store.test)){
-            stop("You have provided an invalid test statistic. Must provide one of SKS.stat.cov.pool, SKS.stat.cov, SKS.stat.int.cov.pool,
-                  SKS.stat.int.cov, SKS.stat.cov.rq, rq.stat.cond.cov, rq.stat.uncond.cov, t.WSKS, or t.SKS.pool.")
+            stop("You have provided an invalid test statistic when adjusting for covariates X but not specifying interactions. Must provide one of SKS.stat.cov.pool, SKS.stat.cov, SKS.stat.cov.rq, rq.stat.cond.cov, or rq.stat.uncond.cov.")
+        }
+    }else{
+        store.test <- rep(NA, length(adj.int.funs))
+        for(i in 1:length(adj.int.funs)){
+            store.test[i] <- identical(adj.int.funs[[i]], test.stat)
+        }
+        if(!any(store.test)){
+            stop("You have provided an invalid test statistic when specifying interactions W. Must provide one of SKS.stat.int.cov.pool, SKS.stat.int.cov, WSKS.t, or SKS.pool.t.")
         }
     }
     
@@ -158,8 +167,8 @@ fishpidetect <- function(Y, Z, W = NULL, X = NULL, plugin = FALSE, tau.hat = NUL
             tau.hat <- mean(Y[Z == 1]) - mean(Y[Z == 0])
         }
         fpi_out <- FRTplug(Y = Y, Z = Z, test.stat = test.stat, tau.hat = tau.hat, ...)
-    }else if(is.null(W)){ ## FRTCI
-        fpi_out <- FRTCI(Y = Y, Z = Z, test.stat = test.stat, B = B, gamma = gamma,
+    }else if(is.null(W)){ ## FRTCI - with or without adjusting
+        fpi_out <- FRTCI(Y = Y, Z = Z, X = X, test.stat = test.stat, B = B, gamma = gamma,
                          grid.gamma = grid.gamma, grid.size = grid.size,
                          te.vec = te.vec, return.matrix = return.matrix,
                          n.cores = n.cores, verbose = verbose, ...)
@@ -176,7 +185,7 @@ fishpidetect <- function(Y, Z, W = NULL, X = NULL, plugin = FALSE, tau.hat = NUL
 }
 
 ## Test sweeping over range of plausibe taus for conservative p-value
-FRTCI <- function(Y, Z, test.stat = SKS.stat, B=500, 
+FRTCI <- function(Y, Z, X = NULL, test.stat = SKS.stat, B=500, 
                   gamma=0.0001, grid.gamma=100*gamma, 
                   grid.size=151,
                   te.vec=NULL, return.matrix=FALSE,
@@ -189,7 +198,7 @@ FRTCI <- function(Y, Z, test.stat = SKS.stat, B=500,
             grid.size <- grid.size+1
         }
         
-        te.vec <- get.tau.vector( Y, Z, gamma=gamma, grid.size=grid.size, grid.gamma=grid.gamma )
+        te.vec <- get.tau.vector( Y, Z, X, gamma=gamma, grid.size=grid.size, grid.gamma=grid.gamma )
     } else {
         grid.size = length( te.vec )
     }
@@ -200,8 +209,12 @@ FRTCI <- function(Y, Z, test.stat = SKS.stat, B=500,
     ## IMPUTE MISSING POTENTIAL OUTCOMES
     Y1.mat <- sapply(te.vec, function(te) ifelse(Z, Y, Y + te) )
     Y0.mat <- sapply(te.vec, function(te) ifelse(Z, Y - te, Y) )
-    
-    res <- generate.permutations( Y, Z=Z, test.stat=test.stat, Y0.mat=Y0.mat, Y1.mat=Y1.mat, B=B, n.cores, verbose=verbose, ... )
+
+    if( is.null(X) ){
+        res <- generate.permutations( Y, Z=Z, test.stat=test.stat, Y0.mat=Y0.mat, Y1.mat=Y1.mat, B=B, n.cores, verbose=verbose, ... )
+    }else{
+        res <- generate.permutations( Y, Z=Z, test.stat=test.stat, Y0.mat=Y0.mat, Y1.mat=Y1.mat, B=B, n.cores, verbose=verbose, X=X, ... )
+    }
     
     ci.p = res$ci.p + gamma
     
@@ -274,6 +287,6 @@ FRTCI.interact <- function( Y, Z, W, X=NULL, test.stat = SKS.stat.int.cov, B=500
                    B=B, gamma=gamma, ks.mat=ks.mat,
                    W=W, X=X ),
               
-              class = "FRTCI.interact.test")
+              class = "FRTCI.test")
 }
 

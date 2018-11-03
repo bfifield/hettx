@@ -367,10 +367,6 @@ rq.stat.uncond.cov <- function(Y, Z, X, rq.pts = seq(0.1, 0.9, by = 0.1))
 #' @return The value of the test.
 #' @export
 WSKS.t <- function( Y, Z, W ) {
-
-    if(!inherits(W, "factor")){
-        stop("W must be a vector of class factor.")
-    }
     
     dd = ddply( data.frame(Y=Y,Z=Z,W=W), "W", summarize, 
                t.sks = SKS.stat( Y, Z ),
@@ -394,10 +390,6 @@ WSKS.t <- function( Y, Z, W ) {
 #' @return The value of the test.
 #' @export
 SKS.pool.t <- function( Y, Z, W ) {
-
-    if(!inherits(W, "factor")){
-        stop("W must be a vector of class factor.")
-    }    
     
     dat <- data.frame( Y=Y, Z=Z, W=W )
     mns = ddply( dat, .(W, Z), summarize, mean=mean(Y) )

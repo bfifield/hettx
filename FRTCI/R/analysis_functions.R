@@ -34,8 +34,8 @@ print.FRTCI.test = function( x, ... ) {
     
     
 }
-
-## Give confidence bounds (from monte carlo simulation error) for the p-values returned by a test
+ 
+# Give confidence bounds (from monte carlo simulation error) for the p-values returned by a test
 get.p.value <- function( tst ) {
     cnts = (tst$ci.p - tst$gamma) * tst$B
     bts = sapply( cnts, function( cnt ) {
