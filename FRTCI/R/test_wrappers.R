@@ -44,7 +44,7 @@ globalVariables('b')
 #' @importFrom parallel makePSOCKcluster stopCluster
 #' @importFrom doParallel registerDoParallel
 fishpidetect <- function(Y, Z, W = NULL, X = NULL, plugin = FALSE, tau.hat = NULL,
-                         test.stat = ifelse(is.null(W), SKS.stat, SKS.stat.int.cov),
+                         test.stat = ifelse( is.null(W) & is.null(X), SKS.stat, ifelse( is.null(W), SKS.stat.cov, SKS.stat.int.cov ) ),
                          te.vec = NULL,
                          B = 500, gamma = 0.0001, grid.gamma = 100*gamma,
                          grid.size = 151, return.matrix = FALSE,
