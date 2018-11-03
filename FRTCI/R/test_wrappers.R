@@ -10,7 +10,7 @@ globalVariables('b')
 #'
 #' @param Y  Observed outcome vector
 #' @param Z  Treatment assigment vector 
-#' @param W Additional pre-treatment covariates to interact with T to increase precision of treatment effect estimate. Default is NULL.
+#' @param W Additional pre-treatment covariates to interact with T to define linear model of treatment effects. Default is NULL.
 #' @param X Additional pre-treatment covariates to adjust for in estimation, but not to interact with treatment. Default is NULL.
 #' @param plugin Whether to calculate the plug-in p-value without sweeping over range of possible treatment effect magnitudes. Default is FALSE.
 #' @param tau.hat The value of the plug-in treatment effect. Default is sample average treatment effect.
@@ -130,7 +130,7 @@ fishpidetect <- function(Y, Z, W = NULL, X = NULL, plugin = FALSE, tau.hat = NUL
     no.adj.funs <- c(KS.stat, SKS.stat, rq.stat)
     adj.funs <- c(SKS.stat.cov.pool, SKS.stat.cov, SKS.stat.int.cov.pool,
                   SKS.stat.int.cov, SKS.stat.cov.rq, rq.stat.cond.cov,
-                  rq.stat.uncond.cov, t.WSKS, t.SKS.pool)
+                  rq.stat.uncond.cov, WSKS.t, SKS.pool.t)
     if(is.null(W)){
         store.test <- rep(NA, length(no.adj.funs))
         for(i in 1:length(no.adj.funs)){

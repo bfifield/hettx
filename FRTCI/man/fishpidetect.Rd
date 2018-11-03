@@ -12,7 +12,7 @@ B, gamma, grid.gamma, grid.size, return.matrix, n.cores, verbose, ...)
 
 \item{Z}{Treatment assigment vector}
 
-\item{W}{Additional pre-treatment covariates to interact with T to increase precision of treatment effect estimate. Default is NULL.}
+\item{W}{Additional pre-treatment covariates to interact with T to define linear model of treatment effects. Default is NULL.}
 
 \item{X}{Additional pre-treatment covariates to adjust for in estimation, but not to interact with treatment. Default is NULL.}
 

@@ -1,6 +1,17 @@
-## Calculate classic (not shifted) KS statistic
-## Code modified version of R's ks.test 
-## If tau passed, Y1 will be shifted by tau.
+#' KS.stat
+#'
+#' Calculate classic (not shifted) KS statistic, code modified version of R's ks.test.
+#' If tau passed, Y1 will be shifted by tau.
+#'
+#' @usage KS.stat(Y, Z, tau, alternative)
+#'
+#' @param Y Observed outcome vector
+#' @param Z Treatment assigment vector
+#' @param tau Value of treatment effect for shifting Y1. Default is NULL (Y1 not shifted).
+#' @param alternative Direction of test ("two.sided", "less", "greater")
+#'
+#' @return The value of the test.
+#' @export
 KS.stat <- function( Y, Z, tau = NULL, alternative = c("two.sided", "less", "greater") ) {
     x = Y[Z==1]
     y = Y[Z==0]
@@ -23,9 +34,19 @@ KS.stat <- function( Y, Z, tau = NULL, alternative = c("two.sided", "less", "gre
     STATISTIC
 }
 
-
-## Shifted kolmogorov-smirnov statistic
-## Calculate KS distance between Y0 and Y1 shifted by estimated tau.
+#' SKS.stat
+#' 
+#' Shifted kolmogorov-smirnov statistic. Calculate KS distance between Y0 and Y1
+#' shifted by sample tau.
+#'
+#' @usage SKS.stat(Y, Z)
+#'
+#' @param Y Observed outcome vector
+#' @param Z Treatment assigment vector
+#'
+#' @return The value of the test.
+#'
+#' @export
 SKS.stat <- function(Y, Z)
 {
     Y1 = Y[Z==1]
@@ -45,11 +66,22 @@ SKS.stat <- function(Y, Z)
     
 }
 
-
-## Shifted kolmogorov-smirnov statistic with covariates
-## to increase precision.
-##
-## This is the test statistic used in the JRSS B Paper.
+#' SKS.stat.cov.pool
+#' 
+#' Shifted kolmogorov-smirnov statistic with covariates
+#' to increase precision.
+#'
+#' This is the test statistic used Ding, Feller, and Miratrix (2016), JRSS-B.
+#'
+#' @usage SKS.stat.cov.pool(Y, Z, X)
+#'
+#' @param Y  Observed outcome vector
+#' @param Z  Treatment assigment vector 
+#' @param X Additional pre-treatment covariates to adjust for in estimation, but not to interact with treatment. Default is NULL.
+#'
+#' @return The value of the test.
+#'
+#' @export
 SKS.stat.cov.pool <- function(Y, Z, X)
 {
     this.lm <- lm(Y ~ Z + X)
@@ -66,12 +98,21 @@ SKS.stat.cov.pool <- function(Y, Z, X)
     return(max(abs(difference)))
 }
 
-
-## Shifted kolmogorov-smirnov statistic with covariates
-## with model for outcomes calculated on control group only.
-## This avoids "splitting" the treatment variation between tx 
-## and co groups.  
-## We recommend this method over the "pool" method.
+#' SKS.stat.cov
+#' 
+#' Shifted kolmogorov-smirnov statistic with covariates
+#' with model for outcomes calculated on control group only.
+#' This avoids "splitting" the treatment variation between tx 
+#' and co groups.  
+#' We recommend this method over the "pool" method.
+#'
+#' @usage SKS.stat.cov(Y, Z, X)
+#'
+#' @inheritParams SKS.stat.cov.pool
+#'
+#' @return The value of the test.
+#'
+#' @export
 SKS.stat.cov <- function(Y, Z, X)
 {
     this.lm <- lm(Y ~ X, subset = Z == 0)
@@ -92,20 +133,31 @@ SKS.stat.cov <- function(Y, Z, X)
     return(max(abs(difference)))
 }
 
-
-## Shifted kolmogorov-smirnov statistic with a linear treatment
-## effect model defined by W
-##
-## This will attempt to remove any systematic variation corresponding
-## to W and then return a SKS statistic on the residuals to measure
-## any variation "left over".
-##
-## X are _additional_ covariates to adjust for beyond those involved
-## in treatment effect model.  It will automatically ajust for W as
-## well.  Do not put a covariate in for both X and W.
-##
-## For use in the FRTCI.interact method
-## This is the test statistic used in the JRSS B Paper.
+#' SKS.stat.int.cov.pool
+#'
+#' Shifted kolmogorov-smirnov statistic with a linear treatment
+#' effect model defined by W
+#'
+#' This will attempt to remove any systematic variation corresponding
+#' to W and then return a SKS statistic on the residuals to measure
+#' any variation "left over".
+#'
+#' X are _additional_ covariates to adjust for beyond those involved
+#' in treatment effect model.  It will automatically adjust for W as
+#' well.  Do not put a covariate in for both X and W.
+#'
+#' This is the test statistic used in Ding, Feller, and Miratrix (2016), JRSS-B.
+#'
+#' @usage SKS.stat.int.cov.pool(Y, Z, W, X)
+#'
+#' @param Y  Observed outcome vector
+#' @param Z  Treatment assigment vector
+#' @param W Additional pre-treatment covariates to interact with T to define linear model of treatment effects. 
+#' @param X Additional pre-treatment covariates to adjust for in estimation, but not to interact with treatment. Default is NULL.
+#'
+#' @return The value of the test.
+#'
+#' @export
 SKS.stat.int.cov.pool <- function( Y, Z, W, X=NULL )
 { 
     if ( !is.null( X ) ) {
@@ -126,27 +178,33 @@ SKS.stat.int.cov.pool <- function( Y, Z, W, X=NULL )
     return(max(abs(difference)))
 }
 
-
-
-## Shifted kolmogorov-smirnov statistic with a linear treatment
-## effect model defined by W
-##
-## This will attempt to remove any systematic variation corresponding
-## to W and then return a SKS statistic on the residuals to measure
-## any variation "left over".
-##
-## X are _additional_ covariates to adjust for beyond those involved
-## in treatment effect model.  It will automatically ajust for W as
-## well.  Do not put a covariate in for both X and W.
-##
-## For use in the FRTCI.interact method
-## This is the test statistic used in the JRSS B Paper.
-##
-## This method first adjusts for baseline and then models treatment effect
-## on the residuals to not split treatment effects.
-##
-## For use in the FRTCI.interact method.
-## We recommend this method over the "pool" method.
+#' SKS.stat.int.cov
+#' 
+#' Shifted kolmogorov-smirnov statistic with a linear treatment
+#' effect model defined by W
+#'
+#' This will attempt to remove any systematic variation corresponding
+#' to W and then return a SKS statistic on the residuals to measure
+#' any variation "left over".
+#'
+#' X are _additional_ covariates to adjust for beyond those involved
+#' in treatment effect model.  It will automatically ajust for W as
+#' well.  Do not put a covariate in for both X and W.
+#'
+#' This is the test statistic used in Ding, Feller, and Miratrix (2016), JRSS-B.
+#'
+#' This method first adjusts for baseline and then models treatment effect
+#' on the residuals to not split treatment effects.
+#'
+#' We recommend this method over the "pool" method.
+#'
+#' @usage SKS.stat.int.cov(Y, Z, W, X)
+#'
+#' @inheritParams SKS.stat.int.cov.pool
+#'
+#' @return The value of the test.
+#'
+#' @export
 SKS.stat.int.cov <- function( Y, Z, W, X=NULL )
 { 
     ## First wipe out Y0 predicted by X via linear model
@@ -179,8 +237,16 @@ SKS.stat.int.cov <- function( Y, Z, W, X=NULL )
 ## Other possible test statistics
 ##
 
-
-## Shifted kolmogorov-smirnov statistic with covariates and rq
+#' SKS.stat.cov.rq
+#' 
+#' Shifted kolmogorov-smirnov statistic with covariates and rq.
+#'
+#' @usage SKS.stat.cov.rq(Y, Z, X)
+#'
+#' @inheritParams SKS.stat.cov.pool
+#'
+#' @return The value of the test.
+#' @export
 SKS.stat.cov.rq <- function(Y, Z, X)
 {
 
@@ -192,10 +258,24 @@ SKS.stat.cov.rq <- function(Y, Z, X)
     
 }
 
-
-## Kolmogorov-smirnov statistic via quantile regression with covariates
+#' rq.stat
+#' 
+#' Kolmogorov-smirnov statistic via quantile regression with covariates
+#'
+#' @usage rq.stat(Y, Z, rq.pts)
+#'
+#' @param Y  Observed outcome vector
+#' @param Z  Treatment assigment vector
+#' @param rq.pts Sequence of quantile points at which to evaluate the test. Default is seq(.1, .9, by = .1). Should not go beyond 0 and 1.
+#'
+#' @return The value of the test.
+#' @export
 rq.stat <- function(Y, Z, rq.pts = seq(0.1, 0.9, by = 0.1))
 {
+
+    if(min(rq.pts) <= 0 | max(rq.pts) >= 1){
+        stop("All values of rq.pts must be strictly greater than 0 and strictly less than 1.")
+    }
     
     this.lm <- lm(Y ~ Z)
     this.rq <- rq(Y ~ Z, tau = rq.pts)
@@ -205,11 +285,26 @@ rq.stat <- function(Y, Z, rq.pts = seq(0.1, 0.9, by = 0.1))
     
 }
 
-
-## Kolmogorov-smirnov statistic via quantile regression with covariates
-## Conditional approach; see Koenker and Xiao (2002)
+#' rq.stat.cond.cov
+#' 
+#' Kolmogorov-smirnov statistic via quantile regression with covariates
+#' Conditional approach; see Koenker and Xiao (2002)
+#'
+#' @usage rq.stat.cond.cov(Y, Z, X, rq.pts)
+#'
+#' @param Y  Observed outcome vector
+#' @param Z  Treatment assigment vector
+#' @param X Additional pre-treatment covariates to adjust for in estimation, but not to interact with treatment. 
+#' @param rq.pts Sequence of quantile points at which to evaluate the test. Default is seq(.1, .9, by = .1). Should not go beyond 0 and 1.
+#'
+#' @return The value of the test.
+#' @export
 rq.stat.cond.cov <- function(Y, Z, X, rq.pts = seq(0.1, 0.9, by = 0.1))
 {
+
+    if(min(rq.pts) <= 0 | max(rq.pts) >= 1){
+        stop("All values of rq.pts must be strictly greater than 0 and strictly less than 1.")
+    }
     
     this.lm <- lm(Y ~ Z + X)
     this.rq <- rq(Y ~ Z + X, tau = rq.pts)
@@ -220,11 +315,23 @@ rq.stat.cond.cov <- function(Y, Z, X, rq.pts = seq(0.1, 0.9, by = 0.1))
 }
 
 
-
-## Kolmogorov-smirnov statistic via quantile regression with covariates
-## Unconditional approach; see Firpo (2007)
+#' rq.stat.uncond.cov
+#' 
+#' Kolmogorov-smirnov statistic via quantile regression with covariates
+#' Unconditional approach; see Firpo (2007)
+#'
+#' @usage rq.stat.uncond.cov(Y, Z, X, rq.pts)
+#'
+#' @inheritParams rq.stat.cond.cov
+#'
+#' @return The value of the test.
+#' @export
 rq.stat.uncond.cov <- function(Y, Z, X, rq.pts = seq(0.1, 0.9, by = 0.1))
 {
+
+    if(min(rq.pts) <= 0 | max(rq.pts) >= 1){
+        stop("All values of rq.pts must be strictly greater than 0 and strictly less than 1.")
+    }
     
     ## propensity score model
     this.glm <- glm(Z ~ X, family = binomial(link = logit))
@@ -247,26 +354,53 @@ rq.stat.uncond.cov <- function(Y, Z, X, rq.pts = seq(0.1, 0.9, by = 0.1))
 ## JRSS B Paper.
 ##
 
-## Weighted average of the group-level SKS statistics
-## @param W is a factor or categorical covariate of some sort.
-t.WSKS = function( Y, Z, W ) {
+#' WSKS.t
+#'
+#' Weighted average of the group-level SKS statistics
+#'
+#' @usage WSKS.t(Y, Z, W)
+#'
+#' @param Y Observed outcome vector
+#' @param Z Treatment assigment vector
+#' @param W A a factor or categorical covariate.
+#'
+#' @return The value of the test.
+#' @export
+WSKS.t <- function( Y, Z, W ) {
+
+    if(!inherits(W, "factor")){
+        stop("W must be a vector of class factor.")
+    }
     
     dd = ddply( data.frame(Y=Y,Z=Z,W=W), "W", summarize, 
                t.sks = SKS.stat( Y, Z ),
                n.k = length(Y) )
     n = length(Y)
-    sum( dd$t.sks * dd$n.k / n )
+    return( sum( dd$t.sks * dd$n.k / n ) )
 }
 
+#' SKS.pool.t
+#' 
+#' Subtract off group level treatment effect estimates and then look
+#' at KS statistic on residuals.  
+#'
+#' Distinct from the interacted lm in that the control units are not
+#' shifted and centered with respect to eachother.
+#'
+#' @usage SKS.pool.t(Y, Z, W)
+#'
+#' @inheritParams WSKS.t
+#'
+#' @return The value of the test.
+#' @export
+SKS.pool.t <- function( Y, Z, W ) {
 
-## Subtract off group level treatment effect estimates and then look
-## at KS statistic on residuals.  
-##
-## Distinct from the interacted lm in that the control units are not
-## shifted and centered with respect to eachother.
-t.SKS.pool = function( Y, Z, W ) {    
+    if(!inherits(W, "factor")){
+        stop("W must be a vector of class factor.")
+    }    
+    
     dat <- data.frame( Y=Y, Z=Z, W=W )
     mns = ddply( dat, .(W, Z), summarize, mean=mean(Y) )
     taus = with( mns, mean[Z==1] - mean[Z==0] )
-    KS.stat( dat$Y - dat$Z*taus[dat$W], dat$Z )
+    return( KS.stat( dat$Y - dat$Z*taus[dat$W], dat$Z ) )
 }
