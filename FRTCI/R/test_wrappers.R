@@ -100,16 +100,30 @@ fishpidetect <- function(Y, Z, W = NULL, X = NULL, plugin = FALSE, tau.hat = NUL
                 stop("If using SKS.pool.t or WSKS.t as test statistics, W must be a factor vector.")
             }
         }
-        na.check <- apply(W, 2, function(x){sum(is.na(x))})
+        if(!inherits(W, "factor")){
+            na.check <- apply(W, 2, function(x){sum(is.na(x))})
+        }else{
+            na.check <- sum(is.na(W))
+        }
         if(any(na.check > 0)){
             stop("You have NAs in your W matrix.")
         }
-        unq.check <- apply(W, 2, function(x){length(unique(x))})
+        if(!inherits(W, "factor")){
+            unq.check <- apply(W, 2, function(x){length(unique(x))})
+        }else{
+            unq.check <- length(unique(W))
+        }
         if(any(unq.check == 1)){
             stop("You have some columns in W with no variation.")
         }
-        if(nrow(W) != length(Y)){
-            stop("W must have as many observations as Y.")
+        if(!inherits(W, "factor")){
+            if(nrow(W) != length(Y)){
+                stop("W must have as many observations as Y.")
+            }
+        }else{
+            if(length(W) != length(Y)){
+                stop("W must have as many observations as Y.")
+            }
         }
     }
     if(!is.null(X)){
@@ -132,7 +146,8 @@ fishpidetect <- function(Y, Z, W = NULL, X = NULL, plugin = FALSE, tau.hat = NUL
     ## Checks on functions
     no.adj.funs <- c(KS.stat, SKS.stat, rq.stat)
     adj.funs <- c(SKS.stat.cov.pool, SKS.stat.cov, SKS.stat.cov.rq, rq.stat.cond.cov, rq.stat.uncond.cov)
-    adj.int.funs <- c(SKS.stat.int.cov.pool, SKS.stat.int.cov, WSKS.t, SKS.pool.t)
+    adj.int.funs <- c(SKS.stat.int.cov.pool, SKS.stat.int.cov)
+    int.funs <- c(WSKS.t, SKS.pool.t)
     if(is.null(W) & is.null(X)){
         store.test <- rep(NA, length(no.adj.funs))
         for(i in 1:length(no.adj.funs)){
@@ -149,13 +164,22 @@ fishpidetect <- function(Y, Z, W = NULL, X = NULL, plugin = FALSE, tau.hat = NUL
         if(!any(store.test)){
             stop("You have provided an invalid test statistic when adjusting for covariates X but not specifying interactions. Must provide one of SKS.stat.cov.pool, SKS.stat.cov, SKS.stat.cov.rq, rq.stat.cond.cov, or rq.stat.uncond.cov.")
         }
+    }else if(is.null(X)){
+        just.int.funs <- c(adj.int.funs, int.funs)
+        store.test <- rep(NA, length(just.int.funs))
+        for(i in 1:length(just.int.funs)){
+            store.test[i] <- identical(just.int.funs[[i]], test.stat)
+        }
+        if(!any(store.test)){
+            stop("You have provided an invalid test statistic when specifying interactions W but not adjusting for covariates. Must provide one of SKS.stat.int.cov.pool, SKS.stat.int.cov, WSKS.t, or SKS.pool.t.")
+        }
     }else{
         store.test <- rep(NA, length(adj.int.funs))
         for(i in 1:length(adj.int.funs)){
             store.test[i] <- identical(adj.int.funs[[i]], test.stat)
         }
         if(!any(store.test)){
-            stop("You have provided an invalid test statistic when specifying interactions W. Must provide one of SKS.stat.int.cov.pool, SKS.stat.int.cov, WSKS.t, or SKS.pool.t.")
+            stop("You have provided an invalid test statistic when specifying interactions W but and adjusting for covariates X. Must provide one of SKS.stat.int.cov.pool or SKS.stat.int.cov.")
         }
     }
     
@@ -267,8 +291,12 @@ FRTCI.interact <- function( Y, Z, W, X=NULL, test.stat = SKS.stat.int.cov, B=500
     te.grid = grid.info$te.grid
     Y1.mat <- grid.info$Y1.mat
     Y0.mat <- grid.info$Y0.mat
-    
-    res <- generate.permutations( Y, Z, test.stat, Y0.mat, Y1.mat, B=B, n.cores=n.cores, verbose=verbose, X=X, W=W, ... )
+
+    if( is.null(X) ){
+        res <- generate.permutations( Y, Z, test.stat, Y0.mat, Y1.mat, B=B, n.cores=n.cores, verbose=verbose, W=W, ... )
+    }else{
+        res <- generate.permutations( Y, Z, test.stat, Y0.mat, Y1.mat, B=B, n.cores=n.cores, verbose=verbose, X=X, W=W, ... )
+    }
     
     t = res$ks.obs
     ci.p = res$ci.p + gamma
