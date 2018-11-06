@@ -70,12 +70,18 @@ fishpidetect <- function(formula, data,
         stop("The formula argument must be of the form outcome ~ treatment.")
     }
     main.vars <- get.vars(formula)
+    if(any(!(main.vars %in% colnames(data)))){
+        stop("Some variables in formula are not present in your data.")
+    }
     
     if(!is.null(interaction.formula)){
         if(length(lhs.vars(interaction.formula)) != 0){
             stop("Do not provide an outcome variable in interaction.formula.")
         }
         interaction.vars <- get.vars(interaction.formula)
+        if(any(!(interaction.vars %in% colnames(data)))){
+            stop("Some variables in interaction.formula are not present in your data.")
+        }
         if(any(main.vars %in% interaction.vars)){
             stop("Either your outcome variable or your treatment variable is present in your interaction formula.")
         }
@@ -88,6 +94,9 @@ fishpidetect <- function(formula, data,
             stop("Do not provide an outcome variable in control.formula.")
         }
         control.vars <- get.vars(control.formula)
+        if(any(!(control.vars %in% colnames(data)))){
+            stop("Some variables in control.formula are not present in your data.")
+        }
         if(any(main.vars %in% interaction.vars)){
             stop("Either your outcome variable or your treatment variable is present in your control formula.")
         }
@@ -114,12 +123,12 @@ fishpidetect <- function(formula, data,
     Y <- data[,main.vars[1]]
     Z <- data[,main.vars[2]]
     if(!is.null(interaction.formula)){
-        W <- data[,interaction.vars]
+        W <- as.matrix(data[,interaction.vars])
     }else{
         W <- NULL
     }
     if(!is.null(control.formula)){
-        X <- data[,control.vars]
+        X <- as.matrix(data[,control.vars])
     }else{
         X <- NULL
     }
@@ -141,8 +150,8 @@ fishpidetect <- function(formula, data,
     }
 
     ## Class and input checks on W and X
-    if(plugin & !is.null(W)){
-        warning("Running plug-in test but covariates provided for W, will not adjust for existing heterogeneity.")
+    if(plugin & !is.null(interaction.formula)){
+        warning("Running plug-in test but covariates provided for interaction.formula, will not adjust for specified heterogeneity.")
     }
     if(plugin & is.null(tau.hat)){
         cat("Using plug-in test with no argument passed to tau.hat, will estimate from the data.\n")
@@ -151,14 +160,11 @@ fishpidetect <- function(formula, data,
         warning("Adjusting for existing heterogeneity but treatment effect vector provided, ignoring provided treatment effect vector.")
     }
     if(!is.null(W)){
-        if(!(identical(WSKS.t, test.stat) | identical(SKS.pool.t, test.stat))){
-            if(!(inherits(W, "data.frame") | inherits(W, "matrix"))){
-                stop("W must be either a data frame or a matrix.")
+        if(identical(WSKS.t, test.stat) | identical(SKS.pool.t, test.stat)){
+            if(ncol(W) > 1){
+                stop("Can only adjust for a single (categorical) covariate when using WSKS.t or SKS.pool.t as test statistics.")
             }
-        }else{
-            if(!inherits(W, "factor")){
-                stop("If using SKS.pool.t or WSKS.t as test statistics, W must be a factor vector.")
-            }
+            W <- as.factor(W)
         }
         if(!inherits(W, "factor")){
             unq.check <- apply(W, 2, function(x){length(unique(x))})
@@ -166,7 +172,7 @@ fishpidetect <- function(formula, data,
             unq.check <- length(unique(W))
         }
         if(any(unq.check == 1)){
-            stop("You have some columns in W with no variation.")
+            stop("Some variables specified for the interaction model in interaction.formula have no variation.")
         }
     }
     if(!is.null(X)){
@@ -175,7 +181,7 @@ fishpidetect <- function(formula, data,
         }
         unq.check <- apply(X, 2, function(x){length(unique(x))})
         if(any(unq.check == 1)){
-            stop("You have some columns in X with no variation.")
+            stop("Some variables specified for adjustment in control.formula have no variation.")
         }
     }
 
@@ -198,7 +204,7 @@ fishpidetect <- function(formula, data,
             store.test[i] <- identical(adj.funs[[i]], test.stat)
         }
         if(!any(store.test)){
-            stop("You have provided an invalid test statistic when adjusting for covariates X but not specifying interactions. Must provide one of SKS.stat.cov.pool, SKS.stat.cov, SKS.stat.cov.rq, rq.stat.cond.cov, or rq.stat.uncond.cov.")
+            stop("You have provided an invalid test statistic when adjusting for covariates in control.formula but not specifying interactions. Must provide one of SKS.stat.cov.pool, SKS.stat.cov, SKS.stat.cov.rq, rq.stat.cond.cov, or rq.stat.uncond.cov.")
         }
     }else if(is.null(X)){
         just.int.funs <- c(adj.int.funs, int.funs)
@@ -207,7 +213,7 @@ fishpidetect <- function(formula, data,
             store.test[i] <- identical(just.int.funs[[i]], test.stat)
         }
         if(!any(store.test)){
-            stop("You have provided an invalid test statistic when specifying interactions W but not adjusting for covariates. Must provide one of SKS.stat.int.cov.pool, SKS.stat.int.cov, WSKS.t, or SKS.pool.t.")
+            stop("You have provided an invalid test statistic when specifying interactions in interaction.formula but not adjusting for covariates. Must provide one of SKS.stat.int.cov.pool, SKS.stat.int.cov, WSKS.t, or SKS.pool.t.")
         }
     }else{
         store.test <- rep(NA, length(adj.int.funs))
@@ -215,7 +221,7 @@ fishpidetect <- function(formula, data,
             store.test[i] <- identical(adj.int.funs[[i]], test.stat)
         }
         if(!any(store.test)){
-            stop("You have provided an invalid test statistic when specifying interactions W but and adjusting for covariates X. Must provide one of SKS.stat.int.cov.pool or SKS.stat.int.cov.")
+            stop("You have provided an invalid test statistic when specifying interactions in interaction.formula and adjusting for covariates in control.formula. Must provide one of SKS.stat.int.cov.pool or SKS.stat.int.cov.")
         }
     }
     
