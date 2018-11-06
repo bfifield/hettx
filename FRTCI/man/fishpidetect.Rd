@@ -4,17 +4,18 @@
 \alias{fishpidetect}
 \title{fishpidetect}
 \usage{
-fishpidetect(Y, Z, W, X, plugin, tau.hat, test.stat, te.vec,
-B, gamma, grid.gamma, grid.size, return.matrix, n.cores, verbose, ...)
+fishpidetect(formula, data, interaction.formula, control.formula,
+plugin, tau.hat, test.stat, te.vec, B, gamma, grid.gamma, grid.size,
+return.matrix, na.rm, n.cores, verbose, ...)
 }
 \arguments{
-\item{Y}{Observed outcome vector}
+\item{formula}{An object of class formula, as in lm(), such as Y ~ Z with only the treatment variable on the right-hand side.}
 
-\item{Z}{Treatment assigment vector}
+\item{data}{A data.frame, tbl_df, or data.table with the input data.}
 
-\item{W}{Additional pre-treatment covariates to interact with T to define linear model of treatment effects. Default is NULL.}
+\item{interaction.formula}{A right-sided formula with pre-treatment covariates to model treatment effects for on the right hand side, such as ~ x1 + x2 + x3. Defaultis NULL (no interactions modeled)}
 
-\item{X}{Additional pre-treatment covariates to adjust for in estimation, but not to interact with treatment. Default is NULL.}
+\item{control.formula}{A right-sided formula with pre-treatment covariates to adjust for on the right hand side, such as ~ x1 + x2 + x3. Default is NULL (no variables adjusted for)}
 
 \item{plugin}{Whether to calculate the plug-in p-value without sweeping over range of possible treatment effect magnitudes. Default is FALSE.}
 
@@ -34,6 +35,8 @@ B, gamma, grid.gamma, grid.size, return.matrix, n.cores, verbose, ...)
 
 \item{return.matrix}{Whether to return the matrix of all the imputed statistics.  Default is FALSE.}
 
+\item{na.rm}{A logical flag indicating whether to list-wise delete missing data. The function will report an error if missing data exist. Default is FALSE.}
+
 \item{n.cores}{Number of cores to use to parallelize permutation step. Default is 1.}
 
 \item{verbose}{Whether to print out progress bar when fitting and other diagnostics. Default is TRUE.}
@@ -52,5 +55,6 @@ Fisherian permutation inference methods.
 Z <- rep(c(0, 1), 100)
 tau <- 4
 Y <- ifelse(Z, rnorm(100, tau), rnorm(100, 0))
-tst <- fishpidetect(Y, Z, B = 50, grid.size = 50)
+df <- data.frame(Y=Y, Z=Z)
+tst <- fishpidetect(Y ~ Z, df, B = 50, grid.size = 50)
 }
