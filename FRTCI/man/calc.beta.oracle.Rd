@@ -4,20 +4,19 @@
 \alias{calc.beta.oracle}
 \title{Calculate systematic effects model with full potential outcomes}
 \usage{
-calc.beta.oracle(Y1, Y0, Z, formula, data, method = c("RI", "OLS"))
+calc.beta.oracle(formula, data, interaction.formula, method = c("RI", "OLS"),
+  na.rm = FALSE)
 }
 \arguments{
-\item{Y1}{Full list of Y(1)}
+\item{formula}{An object of class formula, as in lm(), such as Y(1) + Y(0) ~ Z with only the treatment variable on the right-hand side and the variables indicating the outcome under treatment and the outcome under control on the left-hand-side.}
 
-\item{Y0}{Full list of Y(0)}
+\item{data}{A data.frame, tbl_df, or data.table with the input data.}
 
-\item{Z}{Realized treatment assignment}
-
-\item{formula}{Formula for the covariates X}
-
-\item{data}{Dataframe with covariates}
+\item{interaction.formula}{A right-sided formula with pre-treatment covariates to model treatment effects for on the right hand side, such as ~ x1 + x2 + x3.}
 
 \item{method}{RI or OLS.}
+
+\item{na.rm}{A logical flag indicating whether to list-wise delete missing data. The function will report an error if missing data exist. Default is FALSE.}
 }
 \description{
 Calculate the actual beta for our sample using the full
