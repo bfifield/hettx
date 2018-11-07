@@ -20,7 +20,7 @@ scat = function( str, ... ) {
 #'
 #' Not useful for observed data as it relys on complete knowledge of all potential outcomes.
 #'
-#' @param formula An object of class formula, as in lm(), such as Y(1) + Y(0) ~ Z with only the treatment variable on the right-hand side and the variables indicating the outcome under treatment and the outcome under control on the left-hand-side.
+#' @param formula An object of class formula, as in lm(), such as Y(1) + Y(0) ~ Z with only the treatment variable on the right-hand side and the variables indicating the outcome under treatment and the outcome under control on the left-hand-side. The first variable on the left-hand-side will be treated as the outcome under treatment, and the second variable on the right-hand-side will be treated as the outcome under control.
 #' @param data A data.frame, tbl_df, or data.table with the input data.
 #' @param interaction.formula A right-sided formula with pre-treatment covariates to model treatment effects for on the right hand side, such as ~ x1 + x2 + x3. 
 #' @param method   RI or OLS.

@@ -8,7 +8,7 @@ calc.beta.oracle(formula, data, interaction.formula, method = c("RI", "OLS"),
   na.rm = FALSE)
 }
 \arguments{
-\item{formula}{An object of class formula, as in lm(), such as Y(1) + Y(0) ~ Z with only the treatment variable on the right-hand side and the variables indicating the outcome under treatment and the outcome under control on the left-hand-side.}
+\item{formula}{An object of class formula, as in lm(), such as Y(1) + Y(0) ~ Z with only the treatment variable on the right-hand side and the variables indicating the outcome under treatment and the outcome under control on the left-hand-side. The first variable on the left-hand-side will be treated as the outcome under treatment, and the second variable on the right-hand-side will be treated as the outcome under control.}
 
 \item{data}{A data.frame, tbl_df, or data.table with the input data.}
 

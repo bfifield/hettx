@@ -4,23 +4,21 @@ test_that("estimate oracle", {
 
   df = make.randomized.dat( 100, beta.vec=c(-1,-1,1) )
 
-  orc = calc.beta.oracle( Y.1, Y.0, Z,  ~ A + B, data=df )
+  orc = calc.beta.oracle(Y.1 + Y.0 ~ Z,  ~ A + B, data=df )
   expect_equivalent( coef( orc ), c(-1, -1, 1) )
   coef( orc )
 
-  ess = est.beta( Yobs, Z,  ~ A + B, data=df )
+  ess = est.beta( Yobs ~ Z,  ~ A + B, data=df )
   coef( ess )
 
   df2 = df[c("A","B","Yobs","Z") ]
   names(df2) = c( "AA", "BB", "myY", "myZ" )
-  rs = est.beta( myY, myZ, myY ~ AA + BB, data=df2 )
+  rs = est.beta( myY ~ myZ, ~ AA + BB, data=df2 )
   coef( rs )
 
   expect_equivalent( coef( ess ), coef( rs ) )
 
 } )
-
-
 
 test_that( "OLS estimation corresponds to lm", {
 
@@ -32,11 +30,39 @@ test_that( "OLS estimation corresponds to lm", {
   M0
 
   # same in our wrapper.  Sanity check
-  M.ols = est.beta( Yobs, Z, Yobs ~ A + B, data=df, method="OLS" )
+  M.ols = est.beta( Yobs ~ Z, ~ A + B, data=df, method="OLS" )
   M.ols
 
   expect_equivalent( coef( M.ols ), coef(M0)[4:6] )
 
+} )
+
+test_that( "Main methods work", {
+
+    df = make.randomized.dat( 100, beta.vec=c(-1,-1,1) )
+
+    ## calc.beta.oracle
+    tst = calc.beta.oracle(Y.1 + Y.0 ~ Z, data = df, interaction.formula = ~ A + B,
+                           method = "RI")
+    tst = calc.beta.oracle(Y.1 + Y.0 ~ Z, data = df, interaction.formula = ~ A + B,
+                           method = "OLS")
+
+    ## calc.beta
+    tst = est.beta(Yobs ~ Z, data = df, interaction.formula = ~ A, method = "RI")
+    tst = est.beta(Yobs ~ Z, data = df, interaction.formula = ~ A,
+                   control.formula = ~ B + C, method = "RI")
+    tst = est.beta(Yobs ~ Z, data = df, interaction.formula = ~ A, method = "OLS")
+    tst = est.beta(Yobs ~ Z, data = df, interaction.formula = ~ A,
+                   control.formula = ~ B + C, method = "OLS")
+
+    ## calc.beta.LATE
+    df = make.randomized.compliance.dat( 100 )
+
+    tst = est.beta.LATE(Yobs ~ D | Z, data = df, interaction.formula = ~ A + B,
+                        method = "RI")
+    tst = est.beta.LATE(Yobs ~ D | Z, data = df, interaction.formula = ~ A + B,
+                        method = "2SLS")
+    
 } )
 
 
