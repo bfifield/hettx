@@ -521,8 +521,10 @@ est.beta.LATE = function(formula, data, interaction.formula, method=c("RI", "2SL
     }
 
     ## Main formula
-    if(grepl("|", as.character(formula))){
-        formula <- as.formula(gsub("[>|]", "+", as.character(formula)))
+    formula.char <- paste( deparse(formula), collapse=" " )
+    formula.char <- gsub( "\\s+", " ", formula.char, perl=FALSE )
+    if(grepl("|", formula.char)){
+        formula <- as.formula(gsub("[>|]", "+", formula.char))
     }else{
         stop("The formula must be of the form outcome ~ treatment | instrument.")
     }
