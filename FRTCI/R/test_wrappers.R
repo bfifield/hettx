@@ -196,7 +196,7 @@ fishpidetect <- function(formula, data,
             store.test[i] <- identical(no.adj.funs[[i]], test.stat)
         }
         if(!any(store.test)){
-            stop("You have provided an invalid test statistic when not adjusting for covariates or specifying interactions. Must provide one of KS.stat, SKS.stat, or rq.stat.")
+            stop("You have provided an invalid test statistic when not adjusting for covariates or specifying interactions. Must provide one of KS.stat, SKS.stat, or rq.stat. Please see test.stat.info() for more information.")
         }
     }else if(is.null(W)){
         store.test <- rep(NA, length(adj.funs))
@@ -204,7 +204,7 @@ fishpidetect <- function(formula, data,
             store.test[i] <- identical(adj.funs[[i]], test.stat)
         }
         if(!any(store.test)){
-            stop("You have provided an invalid test statistic when adjusting for covariates in control.formula but not specifying interactions. Must provide one of SKS.stat.cov.pool, SKS.stat.cov, SKS.stat.cov.rq, rq.stat.cond.cov, or rq.stat.uncond.cov.")
+            stop("You have provided an invalid test statistic when adjusting for covariates in control.formula but not specifying interactions. Must provide one of SKS.stat.cov.pool, SKS.stat.cov, SKS.stat.cov.rq, rq.stat.cond.cov, or rq.stat.uncond.cov. Please see test.stat.info() for more information.")
         }
     }else if(is.null(X)){
         just.int.funs <- c(adj.int.funs, int.funs)
@@ -213,7 +213,7 @@ fishpidetect <- function(formula, data,
             store.test[i] <- identical(just.int.funs[[i]], test.stat)
         }
         if(!any(store.test)){
-            stop("You have provided an invalid test statistic when specifying interactions in interaction.formula but not adjusting for covariates. Must provide one of SKS.stat.int.cov.pool, SKS.stat.int.cov, WSKS.t, or SKS.pool.t.")
+            stop("You have provided an invalid test statistic when specifying interactions in interaction.formula but not adjusting for covariates. Must provide one of SKS.stat.int.cov.pool, SKS.stat.int.cov, WSKS.t, or SKS.pool.t. Please see test.stat.info() for more information.")
         }
     }else{
         store.test <- rep(NA, length(adj.int.funs))
@@ -221,7 +221,7 @@ fishpidetect <- function(formula, data,
             store.test[i] <- identical(adj.int.funs[[i]], test.stat)
         }
         if(!any(store.test)){
-            stop("You have provided an invalid test statistic when specifying interactions in interaction.formula and adjusting for covariates in control.formula. Must provide one of SKS.stat.int.cov.pool or SKS.stat.int.cov.")
+            stop("You have provided an invalid test statistic when specifying interactions in interaction.formula and adjusting for covariates in control.formula. Must provide one of SKS.stat.int.cov.pool or SKS.stat.int.cov. Please see test.stat.info() for more information.")
         }
     }
     
