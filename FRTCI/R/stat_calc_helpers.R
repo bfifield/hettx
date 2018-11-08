@@ -1,6 +1,6 @@
 #' test.stat.info
 #'
-#' A list of test statistics, and information on use cases when each is appropriate.
+#' A list of test statistics for fishpidetect(), and information on use cases when each is appropriate.
 #'
 #' @usage test.stat.info()
 #'

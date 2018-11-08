@@ -7,5 +7,5 @@
 test.stat.info()
 }
 \description{
-A list of test statistics, and information on use cases when each is appropriate.
+A list of test statistics for fishpidetect(), and information on use cases when each is appropriate.
 }
