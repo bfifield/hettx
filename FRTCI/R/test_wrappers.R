@@ -85,7 +85,7 @@ fishpidetect <- function(Y, Z, W = NULL, X = NULL, plugin = FALSE, tau.hat = NUL
         warning("Running plug-in test but covariates provided for W, will not adjust for existing heterogeneity.")
     }
     if(plugin & is.null(tau.hat)){
-        cat("Using plug-in test with no argument passed to tau.hat, will estimate from the data.\n")
+        warning("Using plug-in test with no argument passed to tau.hat, will estimate tau.hat from the data.\n")
     }
     if(!is.null(te.vec) & !is.null(W)){
         warning("Adjusting for existing heterogeneity but treatment effect vector provided, ignoring provided treatment effect vector.")
@@ -190,7 +190,7 @@ fishpidetect <- function(Y, Z, W = NULL, X = NULL, plugin = FALSE, tau.hat = NUL
         if(is.null(tau.hat)){
             tau.hat <- mean(Y[Z == 1]) - mean(Y[Z == 0])
         }
-        fpi_out <- FRTplug(Y = Y, Z = Z, test.stat = test.stat, tau.hat = tau.hat, ...)
+        fpi_out <- FRTplug(Y = Y, Z = Z, test.stat = test.stat, tau.hat = tau.hat, verbose= verbose, ...)
     }else if(is.null(W)){ ## FRTCI - with or without adjusting
         fpi_out <- FRTCI(Y = Y, Z = Z, X = X, test.stat = test.stat, B = B, gamma = gamma,
                          grid.gamma = grid.gamma, grid.size = grid.size,
