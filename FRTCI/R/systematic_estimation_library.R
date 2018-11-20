@@ -9,6 +9,32 @@ scat = function( str, ... ) {
     cat( sprintf( str, ... ) )
 }
 
+est.beta = function( formula, data, interaction.formula, control.formula=NULL,
+                    method=c("RI","OLS","2SLS"),
+                    empirical.Sxx = FALSE, na.rm = FALSE){
+
+    ## Check formula
+    formula.char <- paste( deparse(formula), collapse=" " )
+    if(length(lhs.vars(formula)) == 2){
+        eb.out <- calc.beta.oracle(formula=formula, data=data,
+                                   interaction.formula=interaction.formula,
+                                   method=method, na.rm=na.rm)
+    }else if(grepl("|", formula.char)){
+        eb.out <- est.beta.LATE(formula=formula, data=data,
+                                interaction.formula=interaction.formula,
+                                method=method, na.rm=na.rm)
+    }else if(length(lhs.vars(formula)) == 1 | length(rhs.vars(formula)) == 1){
+        eb.out <- est.beta.ITT(formula=formula, data=data,
+                               interaction.formula=interaction.formula,
+                               control.formula=control.formula,
+                               method=method, empirical.Sxx=empirical.Sxx,
+                               na.rm=na.rm)
+    }else{
+        stop("")
+    }
+    return(eb.out)
+}
+
 
 #' Calculate systematic effects model with full potential outcomes
 #'
@@ -171,10 +197,10 @@ calc.beta.oracle = function( formula, data, interaction.formula, method=c("RI","
 #'
 #' @export
 #' @seealso print.RI.regression.result
-est.beta = function( formula, data, interaction.formula, control.formula=NULL,
-                    method = c( "RI", "OLS" ),
-                    empirical.Sxx = FALSE,
-                    na.rm = FALSE) {
+est.beta.ITT = function( formula, data, interaction.formula, control.formula=NULL,
+                        method = c( "RI", "OLS" ),
+                        empirical.Sxx = FALSE,
+                        na.rm = FALSE) {
 
     method = match.arg(method)
     if ( method == "OLS" ) {
