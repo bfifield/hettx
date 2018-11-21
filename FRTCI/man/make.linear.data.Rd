@@ -45,3 +45,4 @@ of synthetic potential outcomes.
 \item \code{make.skew.data}: Generate dataset with a skew
 }}
 
+\concept{data_generators}

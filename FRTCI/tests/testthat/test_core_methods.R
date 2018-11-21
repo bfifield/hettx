@@ -44,6 +44,14 @@ test_that( "Variance ratio test works", {
 })
 
 
+test_that( "get.p.value works", {
+  data( ToyData )
+  tst <- fishpidetect(Y ~ Z, data = ToyData, interaction.formula = ~ x1, B=10, verbose=FALSE )
+  pv = get.p.value( tst )
+  expect_equal( length( pv ), 4 )
+})
+
+
 test_that( "Every non-rq test statistic works", {
 
     data(ToyData)

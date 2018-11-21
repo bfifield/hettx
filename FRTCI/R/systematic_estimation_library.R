@@ -332,11 +332,10 @@ est.beta = function( formula, data, interaction.formula, control.formula=NULL,
         gamma1.hat = Sxx.inv %*% S1x.hat
         gamma0.hat = Sxx.inv %*% S0x.hat
     }
-	gamma1.hat = as.numeric( gamma1.hat )
-	gamma0.hat = as.numeric( gamma0.hat )
+	  gamma1.hat = as.numeric( gamma1.hat )
+	  gamma0.hat = as.numeric( gamma0.hat )
 
-
-	#' residuals
+	  #' residuals
     e1       = Y1 - as.vector(X1%*%gamma1.hat)
     e0       = Y0 - as.vector(X0%*%gamma0.hat)
 
