@@ -4,23 +4,23 @@
 \alias{est.beta}
 \title{Estimate Systematic Treatment Effect Variation}
 \usage{
-est.beta(Yobs, Z, formula, control.formula = NULL, data, method = c("RI",
-  "OLS"), empirical.Sxx = FALSE)
+est.beta(formula, data, interaction.formula, control.formula = NULL,
+  method = c("RI", "OLS"), empirical.Sxx = FALSE, na.rm = FALSE)
 }
 \arguments{
-\item{Yobs}{Outcome}
+\item{formula}{An object of class formula, as in lm(), such as Y ~ Z with only the treatment variable on the right-hand side.}
 
-\item{Z}{Treatment assignment vector}
+\item{data}{A data.frame, tbl_df, or data.table with the input data.}
 
-\item{formula}{Formula describing what variables to model treatment effect for.}
+\item{interaction.formula}{A right-sided formula with pre-treatment covariates to model treatment effects for on the right hand side, such as ~ x1 + x2 + x3.}
 
-\item{control.formula}{Formula for what variables to adjust for.  If we have a control formula, we adjust}
-
-\item{data}{Dataframe with variables listed in formula and control.formula}
+\item{control.formula}{A right-sided formula with pre-treatment covariates to adjust for on the right hand side, such as ~ x1 + x2 + x3. Default is NULL (no variables adjusted for). Default is NULL}
 
 \item{method}{RI or OLS.  method=OLS is shorthand for setting the empirical.Sxx variable to TRUE, nothing more.}
 
 \item{empirical.Sxx}{Estimate seperate Sxx for treatment and control if TRUE, use known Sxx if not.}
+
+\item{na.rm}{A logical flag indicating whether to list-wise delete missing data. The function will report an error if missing data exist. Default is FALSE.}
 }
 \description{
 Estimate our treatment effect model given by the formula "~ X"

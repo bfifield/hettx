@@ -10,7 +10,6 @@ vignette: >
 ---
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-library( plyr )
 library( mvtnorm )
 library( tidyverse )
 library( FRTCI )
@@ -55,6 +54,7 @@ library( FRTCI )
 We begin with exploring a toy dataset with `r nrow( ToyData )` observations that we included with the package for illustration. `ToyData` has an outcome, four covariates, and a treatment indicator. For these data we also know the true individual treatment effects.  
 
 ```{r, echo=TRUE}
+data( ToyData )
 head( ToyData )
 td = gather( ToyData, x1, x2, x3, x4, key="X", value="value" )
 td = gather( td, Y, tau, key="outcome", value="value2" )
@@ -106,83 +106,66 @@ grid.size = 21
 The basic test for ideosyncratic treatment effect variation is as follows (with no adjustment for covariates):
 
 ```{r, echo=TRUE, cache=TRUE}
-tst1 = FRTCI( Y=ToyData$Y, Z=ToyData$Z, B=B, grid.size = grid.size, verbose=FALSE )
+tst1 = fishpidetect( Y ~ Z, data=ToyData, B=B, grid.size = grid.size, verbose=FALSE )
 print( tst1 )
 ```
 
-We can also pass a dataframe for clarity.  This call is the same as above, up to simulation error:
-```{r, echo=TRUE, cache=TRUE}
-tst1b = FRTCI( Y, Z, data=ToyData, B=B, grid.size = grid.size, verbose=FALSE )
-```
 
 
 # Adjusting for covariates
 
 We can increase the power by adjusting for covariates. Please note that we do not include any interaction terms at this point.
 
-We first generate a matrix to hand to the linear regression function. This will convert factors to dummy variables as needed. For continuous variables we could just `cbind()` the variables of interest to make a matrix.  We recommend `model.matrix()` as it is more general.
+We specify a `control.formula` which will be used to generate a matrix to hand to the linear regression function. This will convert factors to dummy variables as needed.
 
 ```{r, echo=TRUE, cache=TRUE}
-Xfull <- model.matrix(Y ~ 0 + x1 + x2 + x3 + x4, data=ToyData )
-
-# get points to check in the confidence interval
-te.vec = get.tau.vector( Y=ToyData$Y, Z=ToyData$Z, X=Xfull, grid.size=grid.size )
-
-# do permutation test for all these points and maximize
-tst2 = FRTCI( Y=ToyData$Y, Z=ToyData$Z, B=B, te.vec = te.vec, test.stat=SKS.stat.cov, 
-              X=Xfull, verbose=FALSE )
+tst2 = fishpidetect( Y ~ Z, data=ToyData, control.formula = ~ x1 + x2 + x3 + x4, B=B, test.stat=SKS.stat.cov, 
+              verbose=FALSE )
 print( tst2 )
 ```
 
 Let's explore how the results might differ when non-treatment covariates are used.
 
 ```{r, echo=TRUE, cache=TRUE}
-cat( "Adjusting just using the non-treatment related covariates\n" )
-X34 <- model.matrix( Y ~ 0 + x3 + x4, data=ToyData )
-
-te.vec = get.tau.vector( Y=ToyData$Y, Z=ToyData$Z, X=X34, grid.size = grid.size )
-
-tst2b = FRTCI( Y=ToyData$Y, Z=ToyData$Z, B=B, te.vec = te.vec, test.stat=SKS.stat.cov, 
-               X=X34, verbose=FALSE )
+tst2b = fishpidetect( Y ~ Z, data=ToyData, control.formula = ~ x3 + x4, B=B, test.stat=SKS.stat.cov, 
+              verbose=FALSE )
 print( tst2b )
 ```
 
 We can compare to when we correct for some useless covariates not related to outcome.
 
 ```{r, echo=TRUE, cache=TRUE}
-N = length(ToyData$Y)
-Xfake = matrix( rnorm( N ), nrow=N )
-
-tst1b = FRTCI( Y=ToyData$Y, Z=ToyData$Z, B=B, test.stat=SKS.stat.cov, X=Xfake,
-               grid.size = grid.size, verbose=FALSE )
+N = nrow(ToyData)
+ToyData$Xfake = rnorm( N )
+tst1b = fishpidetect( Y ~ Z, data=ToyData, control.formula = ~ Xfake, B=B, test.stat=SKS.stat.cov, 
+              verbose=FALSE )
 print( tst1b )
 ```
 
 
 ## Ideosyncratic variation beyond systematic variation
 
-To test for ideosyncratic variation beyond systematic, we use the `FRTCI.interact` method.
+To test for ideosyncratic variation beyond systematic, we pass an `interaction.formula` to the method.
 
-We first test for ideosyncratic variation beyond x1 (and we should get high p-value). We first make a design matrix for the covariates we want to model an effect for, then we pass this along with the original Y and Z to our method.
+We first test for ideosyncratic variation beyond x1 (and we should get high $p$-value).
 
 ```{r ideo_beyond_systematic, echo=TRUE, cache=TRUE}
 B = 20 
 
-W1 <- model.matrix(Y ~ 0 + x1, data=ToyData)
-
-tst3a1 <- FRTCI.interact( Y=ToyData$Y, Z=ToyData$Z, W=W1, B=B, verbose=FALSE )
+tst3a1 = fishpidetect( Y ~ Z, data=ToyData, interaction.formula = ~ x1, B=B, test.stat=SKS.stat.int.cov, 
+              verbose=FALSE )
 print( tst3a1 )
 ```
 
 Include additional terms to increase power.  We are correcting for x3 and x4.
 ```{r, echo=TRUE, cache=TRUE}
-tst3a2 <- FRTCI.interact( Y=ToyData$Y, Z=ToyData$Z, W=W1, X=X34, B=B, verbose=FALSE )
+tst3a2 <- fishpidetect.interact( Y=ToyData$Y, Z=ToyData$Z, W=W1, X=X34, B=B, verbose=FALSE )
 print( tst3a2 )
 ```
 
 For comparison, we next include all terms.
 ```{r, echo=TRUE, cache=TRUE}
-tst3a2b <- FRTCI.interact( Y=ToyData$Y, Z=ToyData$Z, W=W1, X=Xfull, B=B, verbose=FALSE )
+tst3a2b <- fishpidetect.interact( Y=ToyData$Y, Z=ToyData$Z, W=W1, X=Xfull, B=B, verbose=FALSE )
 print( tst3a2b )
 ```
 
@@ -195,7 +178,7 @@ Start testing for variation beyond x1 and x2.
 ```{r beyond_x1_x2, echo=TRUE, cache=TRUE}
 W12 <- model.matrix( Y ~ 0 + x1 + x2, data=ToyData )
 
-tst3b <- FRTCI.interact( Y=ToyData$Y, Z=ToyData$Z, W=W12, B=B, verbose=FALSE )
+tst3b <- fishpidetect.interact( Y=ToyData$Y, Z=ToyData$Z, W=W12, B=B, verbose=FALSE )
 print( tst3b)
 ```
 
@@ -203,7 +186,7 @@ print( tst3b)
 Continue to test for ideosyncratic variation beyond x1 and x2, adjusting for x3 and x4. Note that you should still get high p-value.
 
 ```{r, echo=TRUE}
-tst3c <- FRTCI.interact( Y=ToyData$Y, Z=ToyData$Z, W=W12, X=X34, B=B, verbose=FALSE )
+tst3c <- fishpidetect.interact( Y=ToyData$Y, Z=ToyData$Z, W=W12, X=X34, B=B, verbose=FALSE )
 print( tst3c )
 ```
 
@@ -213,7 +196,7 @@ Finally, test for ideosyncratic variation beyond all covariates, even irrelevant
 ```{r full_correction, echo=TRUE, cache=TRUE}
 Wfull <- model.matrix( Y ~ 0 + x1 + x2 + x3 + x4, data=ToyData)
 
-tst3d <- FRTCI.interact( Y=ToyData$Y, Z=ToyData$Z, W=Wfull, B=B, verbose=FALSE )
+tst3d <- fishpidetect.interact( Y=ToyData$Y, Z=ToyData$Z, W=Wfull, B=B, verbose=FALSE )
 print( tst3d )
 ```
 

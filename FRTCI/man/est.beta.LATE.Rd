@@ -4,20 +4,19 @@
 \alias{est.beta.LATE}
 \title{Estimate systematic effects in presence of noncompliance}
 \usage{
-est.beta.LATE(Z, D, Yobs, formula, data, method = c("RI", "2SLS"))
+est.beta.LATE(formula, data, interaction.formula, method = c("RI", "2SLS"),
+  na.rm = TRUE)
 }
 \arguments{
-\item{Z}{Treatment assignment vector}
+\item{formula}{An object of class formula, as in lm(), such as Y ~ D | Z with only the endogenous variable (D) and the instrument (Z) on the right-hand side separated by a vertical bar (|).}
 
-\item{D}{treatment received}
+\item{data}{A data.frame, tbl_df, or data.table with the input data.}
 
-\item{Yobs}{Outcome}
+\item{interaction.formula}{A right-sided formula with pre-treatment covariates to model treatment effects for on the right hand side, such as ~ x1 + x2 + x3.}
 
-\item{formula}{Formula describing what variables to model treatment effect for.}
+\item{method}{RI or 2SLS.}
 
-\item{data}{Dataframe with variables listed in formula and control.formula}
-
-\item{method}{RI or OLS.  method=OLS is shorthand for setting the empirical.Sxx variable to TRUE, nothing more.}
+\item{na.rm}{A logical flag indicating whether to list-wise delete missing data. The function will report an error if missing data exist. Default is FALSE.}
 }
 \description{
 Estimate a model of effects for compliers under exclusion restriction for

@@ -20,20 +20,61 @@ scat = function( str, ... ) {
 #'
 #' Not useful for observed data as it relys on complete knowledge of all potential outcomes.
 #'
-#' @param Y1 Full list of Y(1)
-#' @param Y0 Full list of Y(0)
-#' @param Z Realized treatment assignment
-#' @param formula  Formula for the covariates X
-#' @param data  Dataframe with covariates
+#' @param formula An object of class formula, as in lm(), such as Y(1) + Y(0) ~ Z with only the treatment variable on the right-hand side and the variables indicating the outcome under treatment and the outcome under control on the left-hand-side. The first variable on the left-hand-side will be treated as the outcome under treatment, and the second variable on the right-hand-side will be treated as the outcome under control.
+#' @param data A data.frame, tbl_df, or data.table with the input data.
+#' @param interaction.formula A right-sided formula with pre-treatment covariates to model treatment effects for on the right hand side, such as ~ x1 + x2 + x3. 
 #' @param method   RI or OLS.
+#' @param na.rm A logical flag indicating whether to list-wise delete missing data. The function will report an error if missing data exist. Default is FALSE.
 #' @export
 #' @seealso make.randomized.dat
-calc.beta.oracle = function( Y1, Y0, Z, formula, data, method=c("RI","OLS") ) {
+calc.beta.oracle = function( formula, data, interaction.formula, method=c("RI","OLS"), na.rm = FALSE ) {
 
-    Y1 = eval( substitute( Y1 ), data )
-    Y0 = eval( substitute( Y0 ), data )
+    ## ---------------------------
+    ## Get variables from formulas
+    ## and check formulas
+    ## ---------------------------
+    if(any(class(data) %in% c("tbl_df", "data.table", "data.frame"))) {
+        data <- as.data.frame(data)
+    }else{
+        stop("The input data must be of class tbl_df, data.table, or data.frame.")
+    }
 
-    X = model.matrix( formula, data )
+    if(length(lhs.vars(formula)) != 2 | length(rhs.vars(formula)) != 1){
+        stop("The formula argument must be of the form treated_outcome + control_outcome ~ treatment.")
+    }
+    main.vars <- get.vars(formula)
+    if(any(!(main.vars %in% colnames(data)))){
+        stop("Some variables in formula are not present in your data.")
+    }
+
+    ## Interaction formula
+    if(length(lhs.vars(interaction.formula)) != 0){
+        stop("Do not provide an outcome variable in interaction.formula.")
+    }
+    interaction.vars <- get.vars(interaction.formula)
+    if(any(!(interaction.vars %in% colnames(data)))){
+        stop("Some variables in interaction.formula are not present in your data.")
+    }
+    if(any(main.vars %in% interaction.vars)){
+        stop("Either your outcome variable or your treatment variable is present in your interaction formula.")
+    }
+
+    ## NA handling
+    vars <- c(main.vars, interaction.vars)
+    if(na.rm == TRUE){
+        data <- na.omit(data[,vars])
+    }else{
+        if(sum(is.na(data[,vars])) > 0){
+            stop("You have missing values in your input data. Either set na.rm = TRUE or check your input data for missingness.")
+        }
+    }
+
+    ## Extract data
+    Y1 <- data[,main.vars[1]]
+    Y0 <- data[,main.vars[2]]
+    Z <- data[,main.vars[3]]
+    X <- model.matrix(interaction.formula, data)
+
     stopifnot( nrow(X) == length( Y1 ) )
     stopifnot( nrow(X) == length( Y0 ) )
 
@@ -120,19 +161,20 @@ calc.beta.oracle = function( Y1, Y0, Z, formula, data, method=c("RI","OLS") ) {
 #' Estimate our treatment effect model given by the formula "~ X"
 #' Will do the different estimators listed in our paper given the 'method' flag
 #'
-#' @param Yobs  Outcome
-#' @param Z  Treatment assignment vector
-#' @param formula   Formula describing what variables to model treatment effect for.
-#' @param control.formula  Formula for what variables to adjust for.  If we have a control formula, we adjust
-#' @param data  Dataframe with variables listed in formula and control.formula
+#' @param formula An object of class formula, as in lm(), such as Y ~ Z with only the treatment variable on the right-hand side.
+#' @param data A data.frame, tbl_df, or data.table with the input data.
+#' @param interaction.formula A right-sided formula with pre-treatment covariates to model treatment effects for on the right hand side, such as ~ x1 + x2 + x3. 
+#' @param control.formula A right-sided formula with pre-treatment covariates to adjust for on the right hand side, such as ~ x1 + x2 + x3. Default is NULL (no variables adjusted for). Default is NULL
 #' @param method RI or OLS.  method=OLS is shorthand for setting the empirical.Sxx variable to TRUE, nothing more.
 #' @param empirical.Sxx    Estimate seperate Sxx for treatment and control if TRUE, use known Sxx if not.
+#' @param na.rm A logical flag indicating whether to list-wise delete missing data. The function will report an error if missing data exist. Default is FALSE.
 #'
 #' @export
 #' @seealso print.RI.regression.result
-est.beta = function( Yobs, Z, formula, control.formula=NULL, data,
-					method = c( "RI", "OLS" ),
-					empirical.Sxx = FALSE ) {
+est.beta = function( formula, data, interaction.formula, control.formula=NULL,
+                    method = c( "RI", "OLS" ),
+                    empirical.Sxx = FALSE,
+                    na.rm = FALSE) {
 
     method = match.arg(method)
     if ( method == "OLS" ) {
@@ -142,10 +184,72 @@ est.beta = function( Yobs, Z, formula, control.formula=NULL, data,
     # if we have a control formula, we adjust
     adjust.Stx = !is.null( control.formula )
 
-    # Get our data loaded into our environment
-    Yobs = eval( substitute( Yobs ), data )
-    Z = eval( substitute( Z ), data )
-    X = model.matrix( formula, data )
+    ## -------------------------
+    ## Set up data with formulas
+    ## -------------------------
+    ## Data to data.frame
+    if(any(class(data) %in% c("tbl_df", "data.table", "data.frame"))) {
+        data <- as.data.frame(data)
+    }else{
+        stop("The input data must be of class tbl_df, data.table, or data.frame.")
+    }
+
+    ## Main formula
+    if(length(lhs.vars(formula)) != 1 | length(rhs.vars(formula)) != 1){
+        stop("The formula argument must be of the form outcome ~ treatment.")
+    }
+    main.vars <- get.vars(formula)
+    if(any(!(main.vars %in% colnames(data)))){
+        stop("Some variables in formula are not present in your data.")
+    }
+
+    ## Interaction formula
+    if(length(lhs.vars(interaction.formula)) != 0){
+        stop("Do not provide an outcome variable in interaction.formula.")
+    }
+    interaction.vars <- get.vars(interaction.formula)
+    if(any(!(interaction.vars %in% colnames(data)))){
+        stop("Some variables in interaction.formula are not present in your data.")
+    }
+    if(any(main.vars %in% interaction.vars)){
+        stop("Either your outcome variable or your treatment variable is present in your interaction formula.")
+    }
+
+    ## Control formula
+    if(!is.null(control.formula)){
+        if(length(lhs.vars(control.formula)) != 0){
+            stop("Do not provide an outcome variable in control.formula.")
+        }
+        control.vars <- get.vars(control.formula)
+        if(any(!(control.vars %in% colnames(data)))){
+            stop("Some variables in control.formula are not present in your data.")
+        }
+        if(any(main.vars %in% interaction.vars)){
+            stop("Either your outcome variable or your treatment variable is present in your control formula.")
+        }
+        if(!is.null(interaction.formula)){
+            if(any(control.vars %in% interaction.vars)){
+                stop("You have variables in your interaction formula that are also present in your control formula.")
+            }
+        }
+    }else{
+        control.vars <- NULL
+    }
+
+    ## NA handling
+    vars <- c(main.vars, interaction.vars, control.vars)
+    if(na.rm == TRUE){
+        data <- na.omit(data[,vars])
+    }else{
+        if(sum(is.na(data[,vars])) > 0){
+            stop("You have missing values in your input data. Either set na.rm = TRUE or check your input data for missingness.")
+        }
+    }
+
+    ## Extract data
+    Yobs <- data[,main.vars[1]]
+    Z <- data[,main.vars[2]]
+    X <- model.matrix(interaction.formula, data)
 
     # Make sure our data is all of right dimension and form
     stopifnot( is.numeric( Yobs ) )
@@ -181,7 +285,7 @@ est.beta = function( Yobs, Z, formula, control.formula=NULL, data,
     # Calculate sample covariance between components of Y(1)X and also for components of Y(0)X
     if ( adjust.Stx ) {
         # We will use additional control variables for increased precision.
-        W = model.matrix( control.formula, data )
+        W = model.matrix(control.formula, data)
         stopifnot( nrow( W ) == nrow( X ) )
         J = ncol( W )
 
@@ -393,18 +497,71 @@ R2.ITT = function( RI.result, rho.step=0.05 ) {
 #' Estimate a model of effects for compliers under exclusion restriction for
 #' never- and always-takers and under monotonicity.
 #'
-#' @inheritParams est.beta
-#' @param D treatment received
+#' @param formula An object of class formula, as in lm(), such as Y ~ D | Z with only the endogenous variable (D) and the instrument (Z) on the right-hand side separated by a vertical bar (|).
+#' @param data A data.frame, tbl_df, or data.table with the input data.
+#' @param interaction.formula A right-sided formula with pre-treatment covariates to model treatment effects for on the right hand side, such as ~ x1 + x2 + x3.
+#' @param method RI or 2SLS.
+#' @param na.rm A logical flag indicating whether to list-wise delete missing data. The function will report an error if missing data exist. Default is FALSE.
 #' @export
 #'
+#' @importFrom stats as.formula
+#'
 #' @seealso est.beta
-est.beta.LATE = function( Z, D, Yobs, formula, data, method=c( "RI", "2SLS" ) ) {
+est.beta.LATE = function(formula, data, interaction.formula, method=c("RI", "2SLS"), na.rm = TRUE){
     method = match.arg( method )
 
-    Yobs = eval( substitute( Yobs ), data )
-    Z = as.numeric( eval( substitute( Z ), data ) )
-    X = model.matrix( formula, data )
-    D = as.numeric( eval( substitute( D ), data ) )
+    ## -------------------------
+    ## Set up data with formulas
+    ## -------------------------
+    ## Data to data.frame
+    if(any(class(data) %in% c("tbl_df", "data.table", "data.frame"))) {
+        data <- as.data.frame(data)
+    }else{
+        stop("The input data must be of class tbl_df, data.table, or data.frame.")
+    }
+
+    ## Main formula
+    formula.char <- paste( deparse(formula), collapse=" " )
+    formula.char <- gsub( "\\s+", " ", formula.char, perl=FALSE )
+    if(grepl("|", formula.char)){
+        formula <- as.formula(gsub("[>|]", "+", formula.char))
+    }else{
+        stop("The formula must be of the form outcome ~ treatment | instrument.")
+    }
+    if(length(lhs.vars(formula)) != 1 | length(rhs.vars(formula)) != 2){
+        stop("The formula argument must be of the form outcome ~ treatment | instrument.")
+    }
+    main.vars <- get.vars(formula)
+    if(any(!(main.vars %in% colnames(data)))){
+        stop("Some variables in formula are not present in your data.")
+    }
+
+    ## Interaction formula
+    if(length(lhs.vars(interaction.formula)) != 0){
+        stop("Do not provide an outcome variable in interaction.formula.")
+    }
+    interaction.vars <- get.vars(interaction.formula)
+    if(any(!(interaction.vars %in% colnames(data)))){
+        stop("Some variables in interaction.formula are not present in your data.")
+    }
+    if(any(main.vars %in% interaction.vars)){
+        stop("Either your outcome variable or your treatment variable is present in your interaction formula.")
+    }
+
+    ## NA handling
+    vars <- c(main.vars, interaction.vars)
+    if(na.rm == TRUE){
+        data <- na.omit(data[,vars])
+    }else{
+        if(sum(is.na(data[,vars])) > 0){
+            stop("You have missing values in your input data. Either set na.rm = TRUE or check your input data for missingness.")
+        }
+    }
+
+    Yobs = data[,main.vars[1]]
+    D = data[,main.vars[2]]
+    Z = data[,main.vars[3]]
+    X = model.matrix(interaction.formula, data)
 
     stopifnot( is.numeric( Yobs ) )
     stopifnot( is.numeric( Z ) )

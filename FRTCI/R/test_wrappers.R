@@ -5,13 +5,14 @@ globalVariables('b')
 #'
 #' Test for systematic treatment effect heterogeneity using
 #' Fisherian permutation inference methods.
-#' @usage fishpidetect(Y, Z, W, X, plugin, tau.hat, test.stat, te.vec,
-#' B, gamma, grid.gamma, grid.size, return.matrix, n.cores, verbose, ...)
+#' @usage fishpidetect(formula, data, interaction.formula, control.formula,
+#' plugin, tau.hat, test.stat, te.vec, B, gamma, grid.gamma, grid.size,
+#' return.matrix, na.rm, n.cores, verbose, ...)
 #'
-#' @param Y  Observed outcome vector
-#' @param Z  Treatment assigment vector 
-#' @param W Additional pre-treatment covariates to interact with T to define linear model of treatment effects. Default is NULL.
-#' @param X Additional pre-treatment covariates to adjust for in estimation, but not to interact with treatment. Default is NULL.
+#' @param formula An object of class formula, as in lm(), such as Y ~ Z with only the treatment variable on the right-hand side.
+#' @param data A data.frame, tbl_df, or data.table with the input data.
+#' @param interaction.formula A right-sided formula with pre-treatment covariates to model treatment effects for on the right hand side, such as ~ x1 + x2 + x3. Defaultis NULL (no interactions modeled)
+#' @param control.formula A right-sided formula with pre-treatment covariates to adjust for on the right hand side, such as ~ x1 + x2 + x3. Default is NULL (no variables adjusted for)
 #' @param plugin Whether to calculate the plug-in p-value without sweeping over range of possible treatment effect magnitudes. Default is FALSE.
 #' @param tau.hat The value of the plug-in treatment effect. Default is sample average treatment effect.
 #' @param test.stat  Test statistic function to use on the data. Default is shifted Kolmogorov-Smirnov statistic.
@@ -21,6 +22,7 @@ globalVariables('b')
 #' @param grid.gamma Parameter to govern where the grid points are sampled.  Bigger values means more samples towards the estimated tau-hat. Default is 100*gamma.
 #' @param grid.size Number of points in the grid. Default is 151.
 #' @param return.matrix  Whether to return the matrix of all the imputed statistics.  Default is FALSE.
+#' @param na.rm A logical flag indicating whether to list-wise delete missing data. The function will report an error if missing data exist. Default is FALSE.
 #' @param n.cores Number of cores to use to parallelize permutation step. Default is 1.
 #' @param verbose  Whether to print out progress bar when fitting and other diagnostics. Default is TRUE.
 #' @param ... Extra arguments passed to the generate.permutations function and test.stat functions.
@@ -32,10 +34,11 @@ globalVariables('b')
 #' Z <- rep(c(0, 1), 100)
 #' tau <- 4
 #' Y <- ifelse(Z, rnorm(100, tau), rnorm(100, 0))
-#' tst <- fishpidetect(Y, Z, B = 50, grid.size = 50)
+#' df <- data.frame(Y=Y, Z=Z)
+#' tst <- fishpidetect(Y ~ Z, df, B = 50, grid.size = 50)
 #' @export
 #' @importFrom graphics abline lines plot rug
-#' @importFrom stats binom.test binomial coef confint ecdf glm lm lowess predict qchisq qnorm var vcov
+#' @importFrom stats binom.test binomial coef confint ecdf glm lm lowess predict qchisq qnorm var vcov na.omit
 #' @importFrom utils setTxtProgressBar txtProgressBar
 #' @importFrom quantreg rq
 #' @importFrom plyr ddply summarize .
@@ -43,30 +46,96 @@ globalVariables('b')
 #' @importFrom foreach "%do%" "%dopar%" foreach
 #' @importFrom parallel makePSOCKcluster stopCluster
 #' @importFrom doParallel registerDoParallel
-fishpidetect <- function(Y, Z, W = NULL, X = NULL, plugin = FALSE, tau.hat = NULL,
+#' @importFrom formula.tools get.vars lhs.vars rhs.vars
+fishpidetect <- function(formula, data,
+                         interaction.formula = NULL, control.formula = NULL,
+                         plugin = FALSE, tau.hat = NULL,
                          test.stat = ifelse( is.null(W) & is.null(X), SKS.stat, ifelse( is.null(W), SKS.stat.cov, SKS.stat.int.cov ) ),
                          te.vec = NULL,
                          B = 500, gamma = 0.0001, grid.gamma = 100*gamma,
-                         grid.size = 151, return.matrix = FALSE,
+                         grid.size = 151, return.matrix = FALSE, na.rm = FALSE,
                          n.cores = 1, verbose = TRUE, ...){
+
+    ## ---------------------------
+    ## Get variables from formulas
+    ## and check formulas
+    ## ---------------------------
+    if(any(class(data) %in% c("tbl_df", "data.table", "data.frame"))) {
+        data <- as.data.frame(data)
+    }else{
+        stop("The input data must be of class tbl_df, data.table, or data.frame.")
+    }
+    
+    if(length(lhs.vars(formula)) != 1 | length(rhs.vars(formula)) != 1){
+        stop("The formula argument must be of the form outcome ~ treatment.")
+    }
+    main.vars <- get.vars(formula)
+    if(any(!(main.vars %in% colnames(data)))){
+        stop("Some variables in formula are not present in your data.")
+    }
+    
+    if(!is.null(interaction.formula)){
+        if(length(lhs.vars(interaction.formula)) != 0){
+            stop("Do not provide an outcome variable in interaction.formula.")
+        }
+        interaction.vars <- get.vars(interaction.formula)
+        if(any(!(interaction.vars %in% colnames(data)))){
+            stop("Some variables in interaction.formula are not present in your data.")
+        }
+        if(any(main.vars %in% interaction.vars)){
+            stop("Either your outcome variable or your treatment variable is present in your interaction formula.")
+        }
+    }else{
+        interaction.vars <- NULL
+    }
+
+    if(!is.null(control.formula)){
+        if(length(lhs.vars(control.formula)) != 0){
+            stop("Do not provide an outcome variable in control.formula.")
+        }
+        control.vars <- get.vars(control.formula)
+        if(any(!(control.vars %in% colnames(data)))){
+            stop("Some variables in control.formula are not present in your data.")
+        }
+        if(any(main.vars %in% interaction.vars)){
+            stop("Either your outcome variable or your treatment variable is present in your control formula.")
+        }
+        if(!is.null(interaction.formula)){
+            if(any(control.vars %in% interaction.vars)){
+                stop("You have variables in your interaction formula that are also present in your control formula.")
+            }
+        }
+    }else{
+        control.vars <- NULL
+    }
+
+    ## NA handling
+    vars <- c(main.vars, interaction.vars, control.vars)
+    if(na.rm == TRUE){
+        data <- na.omit(data[,vars])
+    }else{
+        if(sum(is.na(data[,vars])) > 0){
+            stop("You have missing values in your input data. Either set na.rm = TRUE or check your input data for missingness.")
+        }
+    }
+
+    ## Extract data
+    Y <- data[,main.vars[1]]
+    Z <- data[,main.vars[2]]
+    if(!is.null(interaction.formula)){
+        W <- as.matrix(data[,interaction.vars])
+    }else{
+        W <- NULL
+    }
+    if(!is.null(control.formula)){
+        X <- as.matrix(data[,control.vars])
+    }else{
+        X <- NULL
+    }
     
     ## ------------------------
     ## Run checks on input data
     ## ------------------------
-    ## NA and length checks on Y and Z
-    if(sum(is.na(Y)) > 0){
-        stop("You have NAs in your outcome vector.")
-    }
-    if(sum(is.na(Z)) > 0){
-        stop("You have NAs in your treatment assignment vector.")
-    }
-    if(length(unique(Z)) > 2){
-        stop("You have more than two unique values in your treatment assignment vector.")
-    }
-    if(length(Y) != length(Z)){
-        stop("Y and Z must be the same length.")
-    }
-
     ## Class checks on Y and Z
     if(!inherits(Y, "numeric")){
         stop("Y must be a numeric vector.")
@@ -81,8 +150,8 @@ fishpidetect <- function(Y, Z, W = NULL, X = NULL, plugin = FALSE, tau.hat = NUL
     }
 
     ## Class and input checks on W and X
-    if(plugin & !is.null(W)){
-        warning("Running plug-in test but covariates provided for W, will not adjust for existing heterogeneity.")
+    if(plugin & !is.null(interaction.formula)){
+        warning("Running plug-in test but covariates provided for interaction.formula, will not adjust for specified heterogeneity.")
     }
     if(plugin & is.null(tau.hat)){
         warning("Using plug-in test with no argument passed to tau.hat, will estimate tau.hat from the data.\n")
@@ -91,22 +160,11 @@ fishpidetect <- function(Y, Z, W = NULL, X = NULL, plugin = FALSE, tau.hat = NUL
         warning("Adjusting for existing heterogeneity but treatment effect vector provided, ignoring provided treatment effect vector.")
     }
     if(!is.null(W)){
-        if(!(identical(WSKS.t, test.stat) | identical(SKS.pool.t, test.stat))){
-            if(!(inherits(W, "data.frame") | inherits(W, "matrix"))){
-                stop("W must be either a data frame or a matrix.")
+        if(identical(WSKS.t, test.stat) | identical(SKS.pool.t, test.stat)){
+            if(ncol(W) > 1){
+                stop("Can only adjust for a single (categorical) covariate when using WSKS.t or SKS.pool.t as test statistics.")
             }
-        }else{
-            if(!inherits(W, "factor")){
-                stop("If using SKS.pool.t or WSKS.t as test statistics, W must be a factor vector.")
-            }
-        }
-        if(!inherits(W, "factor")){
-            na.check <- apply(W, 2, function(x){sum(is.na(x))})
-        }else{
-            na.check <- sum(is.na(W))
-        }
-        if(any(na.check > 0)){
-            stop("You have NAs in your W matrix.")
+            W <- as.factor(W)
         }
         if(!inherits(W, "factor")){
             unq.check <- apply(W, 2, function(x){length(unique(x))})
@@ -114,32 +172,16 @@ fishpidetect <- function(Y, Z, W = NULL, X = NULL, plugin = FALSE, tau.hat = NUL
             unq.check <- length(unique(W))
         }
         if(any(unq.check == 1)){
-            stop("You have some columns in W with no variation.")
-        }
-        if(!inherits(W, "factor")){
-            if(nrow(W) != length(Y)){
-                stop("W must have as many observations as Y.")
-            }
-        }else{
-            if(length(W) != length(Y)){
-                stop("W must have as many observations as Y.")
-            }
+            stop("Some variables specified for the interaction model in interaction.formula have no variation.")
         }
     }
     if(!is.null(X)){
         if(!(inherits(X, "data.frame") | inherits(X, "matrix"))){
             stop("X must be either a data frame or a matrix.")
         }
-        na.check <- apply(X, 2, function(x){sum(is.na(x))})
-        if(any(na.check > 0)){
-            stop("You have NAs in your X matrix.")
-        }
         unq.check <- apply(X, 2, function(x){length(unique(x))})
         if(any(unq.check == 1)){
-            stop("You have some columns in X with no variation.")
-        }
-        if(nrow(X) != length(Y)){
-            stop("X must have as many observations as Y.")
+            stop("Some variables specified for adjustment in control.formula have no variation.")
         }
     }
 
@@ -154,7 +196,7 @@ fishpidetect <- function(Y, Z, W = NULL, X = NULL, plugin = FALSE, tau.hat = NUL
             store.test[i] <- identical(no.adj.funs[[i]], test.stat)
         }
         if(!any(store.test)){
-            stop("You have provided an invalid test statistic when not adjusting for covariates or specifying interactions. Must provide one of KS.stat, SKS.stat, or rq.stat.")
+            stop("You have provided an invalid test statistic when not adjusting for covariates or specifying interactions. Must provide one of KS.stat, SKS.stat, or rq.stat. Please see test.stat.info() for more information.")
         }
     }else if(is.null(W)){
         store.test <- rep(NA, length(adj.funs))
@@ -162,7 +204,7 @@ fishpidetect <- function(Y, Z, W = NULL, X = NULL, plugin = FALSE, tau.hat = NUL
             store.test[i] <- identical(adj.funs[[i]], test.stat)
         }
         if(!any(store.test)){
-            stop("You have provided an invalid test statistic when adjusting for covariates X but not specifying interactions. Must provide one of SKS.stat.cov.pool, SKS.stat.cov, SKS.stat.cov.rq, rq.stat.cond.cov, or rq.stat.uncond.cov.")
+            stop("You have provided an invalid test statistic when adjusting for covariates in control.formula but not specifying interactions. Must provide one of SKS.stat.cov.pool, SKS.stat.cov, SKS.stat.cov.rq, rq.stat.cond.cov, or rq.stat.uncond.cov. Please see test.stat.info() for more information.")
         }
     }else if(is.null(X)){
         just.int.funs <- c(adj.int.funs, int.funs)
@@ -171,7 +213,7 @@ fishpidetect <- function(Y, Z, W = NULL, X = NULL, plugin = FALSE, tau.hat = NUL
             store.test[i] <- identical(just.int.funs[[i]], test.stat)
         }
         if(!any(store.test)){
-            stop("You have provided an invalid test statistic when specifying interactions W but not adjusting for covariates. Must provide one of SKS.stat.int.cov.pool, SKS.stat.int.cov, WSKS.t, or SKS.pool.t.")
+            stop("You have provided an invalid test statistic when specifying interactions in interaction.formula but not adjusting for covariates. Must provide one of SKS.stat.int.cov.pool, SKS.stat.int.cov, WSKS.t, or SKS.pool.t. Please see test.stat.info() for more information.")
         }
     }else{
         store.test <- rep(NA, length(adj.int.funs))
@@ -179,7 +221,7 @@ fishpidetect <- function(Y, Z, W = NULL, X = NULL, plugin = FALSE, tau.hat = NUL
             store.test[i] <- identical(adj.int.funs[[i]], test.stat)
         }
         if(!any(store.test)){
-            stop("You have provided an invalid test statistic when specifying interactions W but and adjusting for covariates X. Must provide one of SKS.stat.int.cov.pool or SKS.stat.int.cov.")
+            stop("You have provided an invalid test statistic when specifying interactions in interaction.formula and adjusting for covariates in control.formula. Must provide one of SKS.stat.int.cov.pool or SKS.stat.int.cov. Please see test.stat.info() for more information.")
         }
     }
     

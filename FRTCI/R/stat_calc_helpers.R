@@ -1,3 +1,44 @@
+#' test.stat.info
+#'
+#' A list of test statistics for fishpidetect(), and information on use cases when each is appropriate.
+#'
+#' @usage test.stat.info()
+#'
+#' @export
+test.stat.info <- function(){
+    cat("
+## ---------------------------------------------
+## Available test statistics for fishpidetect():
+## ---------------------------------------------
+Test statistics when not adjusting for covariates or specifying interactions:
+\t1) KS.stat - Calculate classic (not shifted) KS statistic. If tau passed, Y1 will be shifted by tau.
+\t2) SKS.stat - Shifted KS statistic. Calculate KS distance between Y0 and Y1 shfited by tau.
+\t3) rq.stat - Classic KS statistic via quantile regression with covariates\n
+Test statistics when adjusting for covariates but not specifying interactions:
+\t1) SKS.stat.cov.pool - Shifted KS statistic with covariates to increase precision.
+\t2) SKS.stat.cov - Shifted KS statistic with covariates with model for outcomes calculated on control group only.
+\t   This avoids 'splitting' the treatment variation between treatment and control groups. We recommend this method
+\t   over the 'pool' method in SKS.stat.cov.pool.
+\t3) SKS.stat.cov.rq - Shifted KS statistic via quantile regression with covariates.
+\t4) rq.stat.cond.cov - KS statistic via quantile regression with covariates. Conditional approach; see Koenker
+\t    and Xiao (2002) for more information.
+\t5) rq.stat.uncond.cov - KS statistic via quantile regression with covariates. Unconditional approach; see
+\t    Firpo (2007) for more information.\n
+Test statistics when specifying interactions, with or without covariate adjustment:
+\t1) SKS.stat.int.cov.pool - Shifted KS statistic with a linear treatment effect model and optional covariate
+\t   adjustment. This will attempt to remove any systematic variation corresponding to the specified interaction
+\t   model and then return an SKS statistic on the residuals to measure any variation 'left over'. This is the
+\t   test statistic used in Ding, Feller, and Miratrix (2016), JRSS-B.
+\t2) SKS.stat.int.cov - Similar to SKS.stat.int.cov.pool, but this method first adjusts for baseline and then
+\t   models treatment effects on the residuals to not split treatment effects. We recommend this method over
+\t   the 'pool' method in SKS.stat.int.cov.pool.\n
+Test statistics when specifying interactions, without covariate adjustment:
+\t1) WSKS.t - Calculates the shifted KS statistic within each group specified in the interaction model, and
+\t   then aggregates together as a weighted average. Should be used when the interaction model is a single
+\t   categorical or factor covariate.
+\t2) SKS.pool.t - Subtract off group level treatment effect estimates and then look at KS statistic on residuals.
+\t   Should be used when the interaction model is a single categorical or factor covariate.\n")}
+
 #' KS.stat
 #'
 #' Calculate classic (not shifted) KS statistic, code modified version of R's ks.test.
