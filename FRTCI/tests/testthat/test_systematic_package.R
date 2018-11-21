@@ -76,7 +76,7 @@ test_that( "Main methods work", {
     tst = est.beta(Yobs ~ D | Z, data = df, interaction.formula = ~ A + B,
                    method = "2SLS")
     r2.tst <- R2(tst)
-    expect_equal( class( tst ), "RI.regression.result" )
+    expect_is( tst, "RI.regression.result" )
     
 } )
 
