@@ -391,7 +391,7 @@ est.beta.LATE <- function(formula, data, interaction.formula, method=c("RI", "2S
     ## Main formula
     formula.char <- paste( deparse(formula), collapse=" " )
     formula.char <- gsub( "\\s+", " ", formula.char, perl=FALSE )
-    if(grepl("|", formula.char)){
+    if(grepl("\\|", formula.char)){
         formula <- as.formula(gsub("[>|]", "+", formula.char))
     }else{
         stop("The formula must be of the form outcome ~ treatment | instrument.")
@@ -621,6 +621,7 @@ est.beta <- function( formula, data, interaction.formula, control.formula=NULL,
 
     ## Check formula
     formula.char <- paste( deparse(formula), collapse=" " )
+    method <- match.arg(method)
     if(length(lhs.vars(formula)) == 2){
         if(!is.null(control.formula)){
             cat("control.formula specified, ignoring for oracle estimation.\n")
@@ -628,8 +629,10 @@ est.beta <- function( formula, data, interaction.formula, control.formula=NULL,
         eb.out <- calc.beta.oracle(formula=formula, data=data,
                                    interaction.formula=interaction.formula,
                                    method=method, na.rm=na.rm)
-    }else if(grepl("|", formula.char)){
-        cat("control.formula specified, ignoring for LATE estimation.\n")
+    }else if(grepl("\\|", formula.char)){
+        if(!is.null(control.formula)){
+            cat("control.formula specified, ignoring for LATE estimation.\n")
+        }
         eb.out <- est.beta.LATE(formula=formula, data=data,
                                 interaction.formula=interaction.formula,
                                 method=method, na.rm=na.rm)
