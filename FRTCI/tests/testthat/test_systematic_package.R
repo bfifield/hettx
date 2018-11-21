@@ -43,25 +43,33 @@ test_that( "Main methods work", {
 
     ## calc.beta.oracle
     tst = est.beta(Y.1 + Y.0 ~ Z, data = df, interaction.formula = ~ A + B,
-                    method = "RI")
+                   method = "RI")
+    r2.tst <- R2(tst)
     tst = est.beta(Y.1 + Y.0 ~ Z, data = df, interaction.formula = ~ A + B,
                    method = "OLS")
+    r2.tst <- R2(tst)
 
     ## calc.beta
     tst = est.beta(Yobs ~ Z, data = df, interaction.formula = ~ A, method = "RI")
+    r2.tst <- R2(tst)
     tst = est.beta(Yobs ~ Z, data = df, interaction.formula = ~ A,
                    control.formula = ~ B + C, method = "RI")
+    r2.tst <- R2(tst)
     tst = est.beta(Yobs ~ Z, data = df, interaction.formula = ~ A, method = "OLS")
+    r2.tst <- R2(tst)
     tst = est.beta(Yobs ~ Z, data = df, interaction.formula = ~ A,
                    control.formula = ~ B + C, method = "OLS")
+    r2.tst <- R2(tst)
 
     ## calc.beta.LATE
     df = make.randomized.compliance.dat( 100 )
 
     tst = est.beta(Yobs ~ D | Z, data = df, interaction.formula = ~ A + B,
                    method = "RI")
+    r2.tst <- R2(tst)
     tst = est.beta(Yobs ~ D | Z, data = df, interaction.formula = ~ A + B,
                    method = "2SLS")
+    r2.tst <- R2(tst)
     
 } )
 

@@ -113,8 +113,8 @@ calc.beta.oracle <- function( formula, data, interaction.formula, method=c("RI",
                cov.beta.cons = SE.cons,
                tau.hat    = tau,
                epsilon    = epsilon,
-               e1         = e1,
-               e0         = e0,
+               e1         = as.vector( e1 ),
+               e0         = as.vector( e0 ),
                cov.tauX   = cov( tauX ),
                Sxx        = Sxx,
                chisq.stat = NA,
@@ -129,7 +129,7 @@ calc.beta.oracle <- function( formula, data, interaction.formula, method=c("RI",
     res$Z = Z
     res$tau = Y1-Y0
 
-    class( res ) = "RI.regression.result"
+    class( res ) = c("RI.regression.result", "RI.regression.result.oracle")
 
     res
 }
@@ -370,7 +370,7 @@ est.beta.ITT <- function( formula, data, interaction.formula, control.formula=NU
     res$Y = Yobs
     res$Z = Z
 
-    class( res ) = "RI.regression.result"
+    class( res ) = c("RI.regression.result", "RI.regression.result.ITT")
 
     return(res)
 }
@@ -588,13 +588,10 @@ est.beta.LATE <- function(formula, data, interaction.formula, method=c("RI", "2S
     res$method = paste( "LATE RI-", method, sep="" )
     res$call = match.call()
 
-    class( res ) = "RI.regression.result"
+    class( res ) = c("RI.regression.result", "RI.regression.result.LATE")
 
     return(res)
 }
-
-
-
 
 #' Calculate systematic effects model using LATE, ITT, or full potential outcomes.
 #'
@@ -649,15 +646,27 @@ est.beta <- function( formula, data, interaction.formula, control.formula=NULL,
     
 }
 
-#' using the OLS output to bound the R2 measure
+#' Bounds the R2 measure using OLS output for ITT from est.beta, and bounds R2 measure for compliers using LATE estimation from est.beta. 
 #'
-#' @param RI.result  RI regression result (from est.beta, e.g.,) to process.
-#' @param rho.step  Grid size for sensitivity analysis on values of rho.
+#' @usage R2(est.beta, rho.step)
+#'
+#' @param est.beta The output from `est.beta()`. Either an estimate of overall systematic effect variation, or systematic effect variation for compliers.
+#' @param rho.step Grid size for sensitivity analysis on values of rho. Default is 0.05
 #'
 #' @export
 #'
 #' @return RI.R2.result object.
 #' @seealso print.RI.R2.result
+R2 <- function( est.beta, rho.step=0.05 ) {
+    stopifnot( is.RI.regression.result(est.beta) )
+    if( inherits(est.beta, "RI.regression.result.LATE") ){
+        r2 <- R2.LATE(RI.result=est.beta, rho.step=rho.step)
+    }else{
+        r2 <- R2.ITT(RI.result=est.beta, rho.step=rho.step)
+    }
+    return(r2)
+}
+
 R2.ITT <- function( RI.result, rho.step=0.05 ) {
     stopifnot( is.RI.regression.result(RI.result) )
 
@@ -705,12 +714,6 @@ R2.ITT <- function( RI.result, rho.step=0.05 ) {
     } )
 }
 
-#' using the LATE estimation output to bound the R2 measures for compliers, etc.
-#'
-#' @inheritParams R2.ITT
-#'
-#' @export
-#' @seealso R2.ITT
 R2.LATE <- function( RI.result, rho.step=0.05 ) {
 
     with( RI.result, {
