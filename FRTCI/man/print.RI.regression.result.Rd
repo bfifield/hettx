@@ -4,8 +4,8 @@
 \alias{print.RI.regression.result}
 \title{Print out result of systematic treatment effect estimation.}
 \usage{
-\method{print}{RI.regression.result}(x, digits = max(3L,
-  getOption("digits") - 3L), ...)
+\method{print}{RI.regression.result}(x, digits = max(3L, getOption("digits") -
+  3L), ...)
 }
 \arguments{
 \item{x}{Result from est.beta}

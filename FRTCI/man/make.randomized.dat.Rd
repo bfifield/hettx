@@ -4,9 +4,8 @@
 \alias{make.randomized.dat}
 \title{Make fake data for simulations}
 \usage{
-make.randomized.dat(n, p = 0.6,
-  science.table.generator = make.linear.data, include.POs = TRUE,
-  as.data.frame = TRUE, ...)
+make.randomized.dat(n, p = 0.6, science.table.generator = make.linear.data,
+  include.POs = TRUE, as.data.frame = TRUE, ...)
 }
 \arguments{
 \item{n}{Sample size}

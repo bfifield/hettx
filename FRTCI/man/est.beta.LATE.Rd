@@ -4,8 +4,8 @@
 \alias{est.beta.LATE}
 \title{Estimate systematic effects in presence of noncompliance}
 \usage{
-est.beta.LATE(formula, data, interaction.formula, method = c("RI",
-  "2SLS"), na.rm = TRUE)
+est.beta.LATE(formula, data, interaction.formula, method = c("RI", "2SLS"),
+  na.rm = TRUE)
 }
 \arguments{
 \item{formula}{An object of class formula, as in lm(), such as Y ~ D | Z with only the endogenous variable (D) and the instrument (Z) on the right-hand side separated by a vertical bar (|).}

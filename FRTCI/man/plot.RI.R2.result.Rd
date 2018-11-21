@@ -4,8 +4,8 @@
 \alias{plot.RI.R2.result}
 \title{Make a plot of the treatment effect R2 estimates}
 \usage{
-\method{plot}{RI.R2.result}(x, main = paste("R2 for Het Tx (", x$type,
-  ")", sep = ""), ADD = FALSE, ...)
+\method{plot}{RI.R2.result}(x, main = paste("R2 for Het Tx (", x$type, ")",
+  sep = ""), ADD = FALSE, ...)
 }
 \arguments{
 \item{x}{Results from est.beta, etc.}
