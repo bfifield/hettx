@@ -2,41 +2,28 @@
 % Please edit documentation in R/systematic_estimation_library.R
 \name{est.beta}
 \alias{est.beta}
-\title{Estimate Systematic Treatment Effect Variation}
+\title{Calculate systematic effects model using LATE, ITT, or full potential outcomes.}
 \usage{
-est.beta(formula, data, interaction.formula, control.formula = NULL,
-  method = c("RI", "OLS"), empirical.Sxx = FALSE, na.rm = FALSE)
+est.beta(formula, data, interaction.formula, control.formula,
+method, empirical.Sxx, na.rm)
 }
 \arguments{
-\item{formula}{An object of class formula, as in lm(), such as Y ~ Z with only the treatment variable on the right-hand side.}
+\item{formula}{An object of class formula, as in lm(). For ITT estimation, specify as Y ~ Z with only the treatment variable on the right-hand side. For LATE estimation, specify as Y ~ D | Z with only the endogenous variable (D) and the instrument (Z) on the right-hand side separated by a vertical bar (|). For oracle estimation (where full potential outcome schedule is known), specify as Y(1) + Y(0) ~ Z with only the treatment variable on the right-hand side and the variables indicating the outcome under treatment and the outcome under control on the left-hand-side. The first variable on the left-hand-side will be treated as the outcome under treatment, and the second variable on the right-hand-side will be treated as the outcome under control.}
 
 \item{data}{A data.frame, tbl_df, or data.table with the input data.}
 
 \item{interaction.formula}{A right-sided formula with pre-treatment covariates to model treatment effects for on the right hand side, such as ~ x1 + x2 + x3.}
 
-\item{control.formula}{A right-sided formula with pre-treatment covariates to adjust for on the right hand side, such as ~ x1 + x2 + x3. Default is NULL (no variables adjusted for). Default is NULL}
+\item{control.formula}{A right-sided formula with pre-treatment covariates to adjust for on the right hand side, such as ~ x1 + x2 + x3. Default is NULL (no variables adjusted for). Will be ignored for LATE estimation and oracle estimation. Default is NULL}
 
-\item{method}{RI or OLS.  method=OLS is shorthand for setting the empirical.Sxx variable to TRUE, nothing more.}
+\item{method}{RI or OLS (for ITT and oracle), RI or 2SLS (for LATE). method=OLS is shorthand for setting the empirical.Sxx variable to TRUE, nothing more.}
 
 \item{empirical.Sxx}{Estimate seperate Sxx for treatment and control if TRUE, use known Sxx if not.}
 
 \item{na.rm}{A logical flag indicating whether to list-wise delete missing data. The function will report an error if missing data exist. Default is FALSE.}
 }
 \description{
-Estimate our treatment effect model given by the formula "~ X"
-Will do the different estimators listed in our paper given the 'method' flag
-}
-\seealso{
-print.RI.regression.result
-sample size
-dimension of X
-treatment group
-control group
-calculate covariance matrix of X and estimate our gammas
-residuals
-estimate beta
-final estimator for tau, the individual systematic treatments
-covariance
-testing whether any of the non-intercept terms are nonzero
-return results
+Implements the systematic effects model proposed in Ding, Feller, and Miratrix
+(2018). Can estimate an ITT or LATE model, or the actual beta in cases where
+full potential outcomes schedule is available.
 }

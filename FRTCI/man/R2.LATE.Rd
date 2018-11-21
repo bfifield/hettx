@@ -16,15 +16,4 @@ using the LATE estimation output to bound the R2 measures for compliers, etc.
 }
 \seealso{
 R2.ITT
-tau.c: Wald estimator (LATE estimate)
-systematic component by U
-systematic component by X for compliers
-evaluate the ECDFs at the unique values of residuals = Yunique
-approximate the intergral by summation--step quantile functions
-initial values of the integrands
-three R2: bounds and sensitivity analysis
-R2.U
-R2.tau.c
-R2.UX
-results
 }

@@ -5,55 +5,11 @@
 ##
 
 
-scat = function( str, ... ) {
+scat <- function( str, ... ) {
     cat( sprintf( str, ... ) )
 }
 
-est.beta = function( formula, data, interaction.formula, control.formula=NULL,
-                    method=c("RI","OLS","2SLS"),
-                    empirical.Sxx = FALSE, na.rm = FALSE){
-
-    ## Check formula
-    formula.char <- paste( deparse(formula), collapse=" " )
-    if(length(lhs.vars(formula)) == 2){
-        eb.out <- calc.beta.oracle(formula=formula, data=data,
-                                   interaction.formula=interaction.formula,
-                                   method=method, na.rm=na.rm)
-    }else if(grepl("|", formula.char)){
-        eb.out <- est.beta.LATE(formula=formula, data=data,
-                                interaction.formula=interaction.formula,
-                                method=method, na.rm=na.rm)
-    }else if(length(lhs.vars(formula)) == 1 | length(rhs.vars(formula)) == 1){
-        eb.out <- est.beta.ITT(formula=formula, data=data,
-                               interaction.formula=interaction.formula,
-                               control.formula=control.formula,
-                               method=method, empirical.Sxx=empirical.Sxx,
-                               na.rm=na.rm)
-    }else{
-        stop("")
-    }
-    return(eb.out)
-}
-
-
-#' Calculate systematic effects model with full potential outcomes
-#'
-#' Calculate the actual beta for our sample using the full
-#' potential outcome schedule (if available)
-#'
-#' This function is useful for sanity checks and simulation studies
-#' to compare real estimators to optimal baselines.
-#'
-#' Not useful for observed data as it relys on complete knowledge of all potential outcomes.
-#'
-#' @param formula An object of class formula, as in lm(), such as Y(1) + Y(0) ~ Z with only the treatment variable on the right-hand side and the variables indicating the outcome under treatment and the outcome under control on the left-hand-side. The first variable on the left-hand-side will be treated as the outcome under treatment, and the second variable on the right-hand-side will be treated as the outcome under control.
-#' @param data A data.frame, tbl_df, or data.table with the input data.
-#' @param interaction.formula A right-sided formula with pre-treatment covariates to model treatment effects for on the right hand side, such as ~ x1 + x2 + x3. 
-#' @param method   RI or OLS.
-#' @param na.rm A logical flag indicating whether to list-wise delete missing data. The function will report an error if missing data exist. Default is FALSE.
-#' @export
-#' @seealso make.randomized.dat
-calc.beta.oracle = function( formula, data, interaction.formula, method=c("RI","OLS"), na.rm = FALSE ) {
+calc.beta.oracle <- function( formula, data, interaction.formula, method=c("RI","OLS"), na.rm = FALSE ) {
 
     ## ---------------------------
     ## Get variables from formulas
@@ -116,7 +72,7 @@ calc.beta.oracle = function( formula, data, interaction.formula, method=c("RI","
     beta.vec = as.numeric( beta.vec )
     names(beta.vec) = nms
 
-    #' covariance between X and tau
+    ## covariance between X and tau
     tauX = (Y1 - Y0) * X
     S.xtau = apply( tauX, 2, mean )
 
@@ -124,11 +80,11 @@ calc.beta.oracle = function( formula, data, interaction.formula, method=c("RI","
     if ( !is.null( Z ) ) {
         stopifnot( length(Z) == nrow( X ) )
 
-        #' covariance between X and Y(0)
+        ## covariance between X and Y(0)
         Y0X = Y0 * X
         S.x0 = apply(Y0X, 2, mean)
 
-        #' covariance between X and Y(1)
+        ## covariance between X and Y(1)
         Y1X = Y1 * X
         S.x1 = apply(Y1X, 2, mean)
 
@@ -141,7 +97,7 @@ calc.beta.oracle = function( formula, data, interaction.formula, method=c("RI","
         SE = NULL
     }
 
-    #' Calculate individual systematic effects
+    ## Calculate individual systematic effects
     tau = X %*% beta.vec
     e1 = Y1 - X %*% gamma1
     e0 = Y0 - X %*% gamma0
@@ -149,7 +105,7 @@ calc.beta.oracle = function( formula, data, interaction.formula, method=c("RI","
     epsilon = (Y1 - Y0)  - tau
     stopifnot ( all( round( epsilon - (e1 - e0), digits=10 ) == 0 ) )
 
-    #' return results
+    ## return results
     res = list(beta.hat   = beta.vec,
                gamma1.hat = gamma1,
                gamma0.hat = gamma0,
@@ -178,26 +134,7 @@ calc.beta.oracle = function( formula, data, interaction.formula, method=c("RI","
     res
 }
 
-
-
-
-
-#' Estimate Systematic Treatment Effect Variation
-#'
-#' Estimate our treatment effect model given by the formula "~ X"
-#' Will do the different estimators listed in our paper given the 'method' flag
-#'
-#' @param formula An object of class formula, as in lm(), such as Y ~ Z with only the treatment variable on the right-hand side.
-#' @param data A data.frame, tbl_df, or data.table with the input data.
-#' @param interaction.formula A right-sided formula with pre-treatment covariates to model treatment effects for on the right hand side, such as ~ x1 + x2 + x3. 
-#' @param control.formula A right-sided formula with pre-treatment covariates to adjust for on the right hand side, such as ~ x1 + x2 + x3. Default is NULL (no variables adjusted for). Default is NULL
-#' @param method RI or OLS.  method=OLS is shorthand for setting the empirical.Sxx variable to TRUE, nothing more.
-#' @param empirical.Sxx    Estimate seperate Sxx for treatment and control if TRUE, use known Sxx if not.
-#' @param na.rm A logical flag indicating whether to list-wise delete missing data. The function will report an error if missing data exist. Default is FALSE.
-#'
-#' @export
-#' @seealso print.RI.regression.result
-est.beta.ITT = function( formula, data, interaction.formula, control.formula=NULL,
+est.beta.ITT <- function( formula, data, interaction.formula, control.formula=NULL,
                         method = c( "RI", "OLS" ),
                         empirical.Sxx = FALSE,
                         na.rm = FALSE) {
@@ -285,19 +222,19 @@ est.beta.ITT = function( formula, data, interaction.formula, control.formula=NUL
     stopifnot( all( sort( unique( Z ) ) == c( 0, 1 ) ) )
 
 
-    #' sample size
+    ## sample size
     N   = length(Z)
     N1  = sum(Z)
     N0  = N - N1
 
-    #' dimension of X
+    ## dimension of X
     K   = ncol(X)
 
-    #' treatment group
+    ## treatment group
     X1  = X[Z==1, ]
     Y1  = Yobs[Z==1]
 
-    #' control group
+    ## control group
     X0  = X[Z==0, ]
     Y0  = Yobs[Z==0]
 
@@ -344,7 +281,7 @@ est.beta.ITT = function( formula, data, interaction.formula, control.formula=NUL
         S0x.hat = S0x.hat - apply( Y0X.hat, 2, mean )
     }
 
-    #' calculate covariance matrix of X and estimate our gammas
+    ## calculate covariance matrix of X and estimate our gammas
     if ( empirical.Sxx ) {
         Sxx.1 = t( X1 ) %*% X1 / nrow( X1 )
         Sxx.0 = t( X0 ) %*% X0 / nrow( X0 )
@@ -362,23 +299,23 @@ est.beta.ITT = function( formula, data, interaction.formula, control.formula=NUL
 	gamma0.hat = as.numeric( gamma0.hat )
 
 
-	#' residuals
+	## residuals
     e1       = Y1 - as.vector(X1%*%gamma1.hat)
     e0       = Y0 - as.vector(X0%*%gamma0.hat)
 
 
-    #' estimate beta
+    ## estimate beta
     beta.hat = gamma1.hat - gamma0.hat
     beta.hat = as.vector( beta.hat )
     names( gamma1.hat ) = names( gamma0.hat ) = names(beta.hat) = colnames(X)
 
 
-    #' final estimator for tau, the individual systematic treatments
+    ## final estimator for tau, the individual systematic treatments
     tau.hat  = X%*%beta.hat
     tau.hat  = as.vector(tau.hat)
 
 
-    #' covariance
+    ## covariance
     if ( empirical.Sxx ) {
         E1 = e1 * X1
         E0 = e0 * X0
@@ -396,7 +333,7 @@ est.beta.ITT = function( formula, data, interaction.formula, control.formula=NUL
     cov.beta = Sxx.1.inv %*% ( cov(E1)/N1 ) %*% Sxx.1.inv + Sxx.0.inv %*% ( cov(E0)/N0 ) %*% Sxx.0.inv
 
 
-    #' testing whether any of the non-intercept terms are nonzero
+    ## testing whether any of the non-intercept terms are nonzero
     beta1.hat   = beta.hat[2:K]
     cov.beta1   = cov.beta[2:K, 2:K]
 
@@ -409,7 +346,7 @@ est.beta.ITT = function( formula, data, interaction.formula, control.formula=NUL
     SE.ATE = sqrt( var( Y1 ) / N1 + var( Y0 ) / N0 )
 
 
-    #' return results
+    ## return results
     res = list(Yobs       = Yobs,
                Z          = Z,
                X          = X,
@@ -438,102 +375,7 @@ est.beta.ITT = function( formula, data, interaction.formula, control.formula=NUL
     return(res)
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-#' using the OLS output to bound the R2 measure
-#'
-#' @param RI.result  RI regression result (from est.beta, e.g.,) to process.
-#' @param rho.step  Grid size for sensitivity analysis on values of rho.
-#'
-#' @export
-#'
-#' @return RI.R2.result object.
-#' @seealso print.RI.R2.result
-R2.ITT = function( RI.result, rho.step=0.05 ) {
-    stopifnot( is.RI.regression.result(RI.result) )
-
-    with( RI.result, {
-
-        #' systematic component
-        delta     = X%*%beta.hat
-        Sdd       = as.numeric( var(delta) )
-
-        #' idiosyncratic component
-        V1        = var(e1)
-        V0        = var(e0)
-
-        #' approximate the intergral by summation--step quantile functions
-        q.step    = seq(from = 0, to = 1, length.out = min(length(Z), 5000))
-        delta.q   = q.step[2] - q.step[1]
-
-        q.e1      = quantile(e1, prob = q.step)
-        q.e0      = quantile(e0, prob = q.step)
-        See.lower = sum( (q.e1 - q.e0)^2 )*delta.q
-        See.upper = sum( (q.e1 - rev(q.e0))^2 )*delta.q
-
-        #' R2: bounds and sensitivity analysis
-        R2.lower  = Sdd/(Sdd + See.upper)
-        R2.middle = Sdd/(Sdd + V1 + V0)
-        R2.upper  = Sdd/(Sdd + See.lower)
-        rho       = seq(0, 1, rho.step)
-        R2.sensitivity = Sdd/(Sdd + rho*See.lower + (1 - rho)*(V1 + V0))
-
-        #' results
-        res = list(Sdd            = Sdd,
-                   See.lower      = See.lower,
-                   See.upper0     = V0 + V1,
-                   See.upper      = See.upper,
-                   R2.lower       = R2.lower,
-                   R2.lower0      = R2.middle,
-                   R2.upper       = R2.upper,
-                   rho            = rho,
-                   R2.sensitivity = R2.sensitivity)
-
-        class( res ) = "RI.R2.result"
-        res$type = "ITT"
-
-        res
-    } )
-}
-
-
-
-
-
-
-#####################################################################################
-##
-## Our LATE estimators
-##
-#####################################################################################
-
-
-#' Estimate systematic effects in presence of noncompliance
-#'
-#' Estimate a model of effects for compliers under exclusion restriction for
-#' never- and always-takers and under monotonicity.
-#'
-#' @param formula An object of class formula, as in lm(), such as Y ~ D | Z with only the endogenous variable (D) and the instrument (Z) on the right-hand side separated by a vertical bar (|).
-#' @param data A data.frame, tbl_df, or data.table with the input data.
-#' @param interaction.formula A right-sided formula with pre-treatment covariates to model treatment effects for on the right hand side, such as ~ x1 + x2 + x3.
-#' @param method RI or 2SLS.
-#' @param na.rm A logical flag indicating whether to list-wise delete missing data. The function will report an error if missing data exist. Default is FALSE.
-#' @export
-#'
-#' @importFrom stats as.formula
-#'
-#' @seealso est.beta
-est.beta.LATE = function(formula, data, interaction.formula, method=c("RI", "2SLS"), na.rm = TRUE){
+est.beta.LATE <- function(formula, data, interaction.formula, method=c("RI", "2SLS"), na.rm = TRUE){
     method = match.arg( method )
 
     ## -------------------------
@@ -598,7 +440,7 @@ est.beta.LATE = function(formula, data, interaction.formula, method=c("RI", "2SL
     stopifnot( nrow(X) == length( Z ) )
 
 
-    #' sample size, and sub-sample sizes classified by (Z, D)
+    ## sample size, and sub-sample sizes classified by (Z, D)
     N        = length(Z)
     N1       = sum(Z)
     N0       = N - N1
@@ -623,7 +465,7 @@ est.beta.LATE = function(formula, data, interaction.formula, method=c("RI", "2SL
     X01      = X[index01, ]
     X00      = X[index00, ]
 
-    #' estimation of the proportions of the latent strata
+    ## estimation of the proportions of the latent strata
     pi.n     = n10/N1
     pi.a     = n01/N0
     pi.c     = n11/N1 - n01/N0
@@ -635,7 +477,7 @@ est.beta.LATE = function(formula, data, interaction.formula, method=c("RI", "2SL
     Sxxc0.inv = solve(Sxxc0)
 
     if ( method=="2SLS" ) {
-        #' TSLS
+        ## TSLS
         Sxx      = t(X)%*%X/N
         Sxx.D    = t(X[D==1, ])%*%(X[D==1, ])/N
         Sxx.T    = t(X[Z==1, ])%*%(X[Z==1, ])/N
@@ -646,7 +488,7 @@ est.beta.LATE = function(formula, data, interaction.formula, method=c("RI", "2SL
         gamma.hat = TSLS[1:K]
         beta.hat  = TSLS[(K+1):(2*K)]
 
-        #' residual
+        ## residual
         e        = Yobs - as.vector(X%*%gamma.hat) - D*as.vector(X%*%beta.hat)
         e        = as.vector(e)
 
@@ -655,27 +497,27 @@ est.beta.LATE = function(formula, data, interaction.formula, method=c("RI", "2SL
         Sx1.11 = apply(Y11*X11, 2, sum)/N1
         Sx0.01 = apply(Y01*X01, 2, sum)/N0
 
-        #' gamma for compliers: under treatment
+        ## gamma for compliers: under treatment
         gamma1.hat  = Sxxc1.inv %*% ( Sx1.11 - Sx0.01 )
         gamma1.hat  = as.vector(gamma1.hat)
 
         Sx0.00 = apply(Y00*X00, 2, sum)/N0
         Sx1.10 = apply(Y10*X10, 2, sum)/N1
 
-        #' gamma for compliers: under control
+        ## gamma for compliers: under control
         gamma0.hat  = Sxxc0.inv %*% (Sx0.00 - Sx1.10)
         gamma0.hat  = as.vector(gamma0.hat)
 
 
-        #' unbiased estimator for beta
+        ## unbiased estimator for beta
         beta.hat = gamma1.hat - gamma0.hat
 
-        #' residual
+        ## residual
         e        = Yobs - ifelse( D, as.vector(X%*%gamma1.hat), as.vector(X%*%gamma0.hat) )
         e        = as.vector(e)
     }
 
-    #' covariance of beta
+    ## covariance of beta
     X1       = X[Z==1, ]
     e1       = e[Z==1]
     X0       = X[Z==0, ]
@@ -684,7 +526,7 @@ est.beta.LATE = function(formula, data, interaction.formula, method=c("RI", "2SL
     cov.beta = Sxxc1.inv%*%( cov(e1*X1)/N1 )%*%Sxxc1.inv + Sxxc0.inv%*%(  cov(e0*X0)/N0  )%*%Sxxc0.inv
     rownames( cov.beta ) = colnames( cov.beta ) = colnames( X )
 
-        #' testing
+        ## testing
         beta1.hat   = beta.hat[2:K]
         cov.beta1   = cov.beta[2:K, 2:K]
 
@@ -706,7 +548,7 @@ est.beta.LATE = function(formula, data, interaction.formula, method=c("RI", "2SL
         gamma.hat = NA
     }
 
-    #' return
+    ## return
     res = list(Yobs       = Yobs,
                Z          = Z,
                D          = D,
@@ -754,23 +596,129 @@ est.beta.LATE = function(formula, data, interaction.formula, method=c("RI", "2SL
 
 
 
+#' Calculate systematic effects model using LATE, ITT, or full potential outcomes.
+#'
+#' Implements the systematic effects model proposed in Ding, Feller, and Miratrix
+#' (2018). Can estimate an ITT or LATE model, or the actual beta in cases where
+#' full potential outcomes schedule is available.
+#'
+#' @usage est.beta(formula, data, interaction.formula, control.formula,
+#' method, empirical.Sxx, na.rm)
+#'
+#' @param formula An object of class formula, as in lm(). For ITT estimation, specify as Y ~ Z with only the treatment variable on the right-hand side. For LATE estimation, specify as Y ~ D | Z with only the endogenous variable (D) and the instrument (Z) on the right-hand side separated by a vertical bar (|). For oracle estimation (where full potential outcome schedule is known), specify as Y(1) + Y(0) ~ Z with only the treatment variable on the right-hand side and the variables indicating the outcome under treatment and the outcome under control on the left-hand-side. The first variable on the left-hand-side will be treated as the outcome under treatment, and the second variable on the right-hand-side will be treated as the outcome under control.
+#' @param data A data.frame, tbl_df, or data.table with the input data.
+#' @param interaction.formula A right-sided formula with pre-treatment covariates to model treatment effects for on the right hand side, such as ~ x1 + x2 + x3. 
+#' @param control.formula A right-sided formula with pre-treatment covariates to adjust for on the right hand side, such as ~ x1 + x2 + x3. Default is NULL (no variables adjusted for). Will be ignored for LATE estimation and oracle estimation. Default is NULL
+#' @param method RI or OLS (for ITT and oracle), RI or 2SLS (for LATE). method=OLS is shorthand for setting the empirical.Sxx variable to TRUE, nothing more.
+#' @param empirical.Sxx Estimate seperate Sxx for treatment and control if TRUE, use known Sxx if not.
+#' @param na.rm A logical flag indicating whether to list-wise delete missing data. The function will report an error if missing data exist. Default is FALSE.
+#'
+#' @export
+#' @importFrom stats as.formula
+est.beta <- function( formula, data, interaction.formula, control.formula=NULL,
+                    method=c("RI","OLS","2SLS"),
+                    empirical.Sxx = FALSE, na.rm = FALSE){
+
+    ## Check formula
+    formula.char <- paste( deparse(formula), collapse=" " )
+    if(length(lhs.vars(formula)) == 2){
+        if(!is.null(control.formula)){
+            cat("control.formula specified, ignoring for oracle estimation.\n")
+        }
+        eb.out <- calc.beta.oracle(formula=formula, data=data,
+                                   interaction.formula=interaction.formula,
+                                   method=method, na.rm=na.rm)
+    }else if(grepl("|", formula.char)){
+        cat("control.formula specified, ignoring for LATE estimation.\n")
+        eb.out <- est.beta.LATE(formula=formula, data=data,
+                                interaction.formula=interaction.formula,
+                                method=method, na.rm=na.rm)
+    }else if(length(lhs.vars(formula)) == 1 & length(rhs.vars(formula)) == 1){
+        eb.out <- est.beta.ITT(formula=formula, data=data,
+                               interaction.formula=interaction.formula,
+                               control.formula=control.formula,
+                               method=method, empirical.Sxx=empirical.Sxx,
+                               na.rm=na.rm)
+    }else{
+        stop("Please input a proper argument for formula. For ITT estimation, use Y ~ Z, for LATE estimation, use Y ~ T | Z, and for oracle estimation, use Y1 + Y0 ~ Z.")
+    }
+    return(eb.out)
+    
+}
+
+#' using the OLS output to bound the R2 measure
+#'
+#' @param RI.result  RI regression result (from est.beta, e.g.,) to process.
+#' @param rho.step  Grid size for sensitivity analysis on values of rho.
+#'
+#' @export
+#'
+#' @return RI.R2.result object.
+#' @seealso print.RI.R2.result
+R2.ITT <- function( RI.result, rho.step=0.05 ) {
+    stopifnot( is.RI.regression.result(RI.result) )
+
+    with( RI.result, {
+
+        ## systematic component
+        delta     = X%*%beta.hat
+        Sdd       = as.numeric( var(delta) )
+
+        ## idiosyncratic component
+        V1        = var(e1)
+        V0        = var(e0)
+
+        ## approximate the intergral by summation--step quantile functions
+        q.step    = seq(from = 0, to = 1, length.out = min(length(Z), 5000))
+        delta.q   = q.step[2] - q.step[1]
+
+        q.e1      = quantile(e1, prob = q.step)
+        q.e0      = quantile(e0, prob = q.step)
+        See.lower = sum( (q.e1 - q.e0)^2 )*delta.q
+        See.upper = sum( (q.e1 - rev(q.e0))^2 )*delta.q
+
+        ## R2: bounds and sensitivity analysis
+        R2.lower  = Sdd/(Sdd + See.upper)
+        R2.middle = Sdd/(Sdd + V1 + V0)
+        R2.upper  = Sdd/(Sdd + See.lower)
+        rho       = seq(0, 1, rho.step)
+        R2.sensitivity = Sdd/(Sdd + rho*See.lower + (1 - rho)*(V1 + V0))
+
+        ## results
+        res = list(Sdd            = Sdd,
+                   See.lower      = See.lower,
+                   See.upper0     = V0 + V1,
+                   See.upper      = See.upper,
+                   R2.lower       = R2.lower,
+                   R2.lower0      = R2.middle,
+                   R2.upper       = R2.upper,
+                   rho            = rho,
+                   R2.sensitivity = R2.sensitivity)
+
+        class( res ) = "RI.R2.result"
+        res$type = "ITT"
+
+        res
+    } )
+}
+
 #' using the LATE estimation output to bound the R2 measures for compliers, etc.
 #'
 #' @inheritParams R2.ITT
 #'
 #' @export
 #' @seealso R2.ITT
-R2.LATE = function( RI.result, rho.step=0.05 ) {
+R2.LATE <- function( RI.result, rho.step=0.05 ) {
 
     with( RI.result, {
-        #' tau.c: Wald estimator (LATE estimate)
+        ## tau.c: Wald estimator (LATE estimate)
         ITT = mean(Y[Z==1]) - mean(Y[Z==0])
         tau.c = ITT/pi.c
 
-        #' systematic component by U
+        ## systematic component by U
         Stautau.U = pi.c*(1 - pi.c)*tau.c^2
 
-        #' systematic component by X for compliers
+        ## systematic component by X for compliers
         delta     = as.vector(  X%*%beta.hat  )
         mean.c    = (   mean(delta) -  sum(delta[index10])/N1 - sum(delta[index01])/N0    ) /pi.c
         deltatau2 = (   delta - mean.c )^2
@@ -780,18 +728,18 @@ R2.LATE = function( RI.result, rho.step=0.05 ) {
         Sdd.c     = max(0, Sdd.c)
 
 
-        #' evaluate the ECDFs at the unique values of residuals = Yunique
+        ## evaluate the ECDFs at the unique values of residuals = Yunique
         Yunique   = sort( unique(  e ) )
         F1        = (ecdf(e11)(Yunique)*n11/N1 - ecdf(e01)(Yunique)*n01/N0)/pi.c
         F0        = (ecdf(e00)(Yunique)*n00/N0 - ecdf(e10)(Yunique)*n10/N1)/pi.c
 
 
-        #' approximate the intergral by summation--step quantile functions
+        ## approximate the intergral by summation--step quantile functions
         L.approx  = min(length(Z), 5000)
         q.step    = seq( from = 0, to = 1, length.out = L.approx )
         delta.q   = q.step[2] - q.step[1]
 
-        #' initial values of the integrands
+        ## initial values of the integrands
         Quantile1 = q.step
         Quantile2 = q.step
         Quantile3 = q.step
@@ -811,8 +759,8 @@ R2.LATE = function( RI.result, rho.step=0.05 ) {
         See.c.upper = sum( (Quantile1 - Quantile3)^2 )*delta.q - mean1^2 - mean0^2
 
 
-        #' three R2: bounds and sensitivity analysis
-        #' R2.U
+        ## three R2: bounds and sensitivity analysis
+        ## R2.U
         R2.U.lower  = Stautau.U/(  Stautau.U + pi.c*Sdd.c + pi.c*See.c.upper  )
         R2.U.middle = Stautau.U/(  Stautau.U + pi.c*Sdd.c + pi.c*See.c.middle  )
         R2.U.upper  = Stautau.U/(  Stautau.U + pi.c*Sdd.c + pi.c*See.c.lower  )
@@ -820,14 +768,14 @@ R2.LATE = function( RI.result, rho.step=0.05 ) {
         rho              = seq(0, 1, rho.step )
         R2.U.sensitivity = Stautau.U/(  Stautau.U + pi.c*Sdd.c + pi.c*( rho*See.c.lower + (1-rho)*See.c.middle )  )
 
-        #' R2.tau.c
+        ## R2.tau.c
         R2.lower  = Sdd.c/(  Sdd.c + See.c.upper  )
         R2.middle = Sdd.c/(  Sdd.c + See.c.middle  )
         R2.upper  = Sdd.c/(  Sdd.c + See.c.lower  )
 
         R2.sensitivity = Sdd.c/(  Sdd.c + rho*See.c.lower + (1-rho)*See.c.middle  )
 
-        #' R2.UX
+        ## R2.UX
         R2.UX.lower     = (Stautau.U + pi.c*Sdd.c)/(  Stautau.U + pi.c*Sdd.c + pi.c*See.c.upper  )
         R2.UX.middle    = (Stautau.U + pi.c*Sdd.c)/(  Stautau.U + pi.c*Sdd.c + pi.c*See.c.middle  )
         R2.UX.upper     = (Stautau.U + pi.c*Sdd.c)/(  Stautau.U + pi.c*Sdd.c + pi.c*See.c.lower  )
@@ -836,7 +784,7 @@ R2.LATE = function( RI.result, rho.step=0.05 ) {
                                                            + pi.c*( rho*See.c.lower + (1-rho)*See.c.middle )  )
 
 
-        #' results
+        ## results
         res = list(pi.c          = pi.c,
                    tau.c         = tau.c,
                    ITT           = ITT,
@@ -876,18 +824,10 @@ R2.LATE = function( RI.result, rho.step=0.05 ) {
 
 
 
-#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'
-#'
-#' Clean printing of our result objects
-#'
-#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'#'
-
-
-#' Check if object is a RI.regression.result class
-#' @param x Object to test.
-#'
-#' @export
-is.RI.regression.result = function( x ) {
+## ------------------------------------
+## Clean printing of our result objects
+## ------------------------------------
+is.RI.regression.result <- function( x ) {
     inherits(x, "RI.regression.result")
 }
 
@@ -896,7 +836,7 @@ is.RI.regression.result = function( x ) {
 #' @param ... Unused
 #'
 #' @export
-coef.RI.regression.result = function( object, ... ) {
+coef.RI.regression.result <- function( object, ... ) {
     object$beta.hat
 }
 
@@ -909,7 +849,7 @@ coef.RI.regression.result = function( object, ... ) {
 #' @param ...  Unused
 #'
 #' @export
-print.RI.regression.result = function( x, digits = max(3L, getOption("digits") - 3L), ... ) {
+print.RI.regression.result <- function( x, digits = max(3L, getOption("digits") - 3L), ... ) {
 
     scat(  "RI het tx regression (%s):\n\t%s\n\n", x$method, paste( deparse( x$call ), sep="\n\t", collapse="\n\t" ) )
     #browser()
@@ -936,7 +876,7 @@ print.RI.regression.result = function( x, digits = max(3L, getOption("digits") -
 #' @param ... unused
 #'
 #' @export
-vcov.RI.regression.result = function( object, ... ) {
+vcov.RI.regression.result <- function( object, ... ) {
     object$cov.beta
 }
 
@@ -946,7 +886,7 @@ vcov.RI.regression.result = function( object, ... ) {
 #' @param ... unused
 #'
 #' @export
-SE = function( object, ... ) {
+SE <- function( object, ... ) {
     sqrt( diag( vcov( object ) ) )
 }
 
@@ -958,7 +898,7 @@ SE = function( object, ... ) {
 #' @param ...  Ignored
 #'
 #' @export
-print.RI.R2.result = function( x, ... ) {
+print.RI.R2.result <- function( x, ... ) {
     scat(  "Heterogenous Tx Effect R^2 (%s)\n", x$type )
 
     if ( x$type == "LATE" ) {
@@ -998,7 +938,7 @@ print.RI.R2.result = function( x, ... ) {
 #'
 #' @export
 #' @seealso calc.beta
-plot.RI.R2.result = function( x, main=paste( "R2 for Het Tx (", x$type, ")", sep=""),
+plot.RI.R2.result <- function( x, main=paste( "R2 for Het Tx (", x$type, ")", sep=""),
                               ADD=FALSE, ... ) {
     with( x, {
         if ( !ADD ) {
@@ -1027,7 +967,7 @@ plot.RI.R2.result = function( x, main=paste( "R2 for Het Tx (", x$type, ")", sep
 #' @param data  Dataframe with variables listed in formula and control.formula
 #' @export
 #' @importFrom moments kurtosis
-variance.ratio.test = function(Yobs, Z, data= NULL)
+variance.ratio.test <- function(Yobs, Z, data= NULL)
 {
   if (!is.null( data ) ) {
     Yobs = eval( substitute( Yobs ), data )

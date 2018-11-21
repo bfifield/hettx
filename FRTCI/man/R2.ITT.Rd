@@ -19,9 +19,4 @@ using the OLS output to bound the R2 measure
 }
 \seealso{
 print.RI.R2.result
-systematic component
-idiosyncratic component
-approximate the intergral by summation--step quantile functions
-R2: bounds and sensitivity analysis
-results
 }
