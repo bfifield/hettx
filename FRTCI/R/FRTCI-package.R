@@ -12,7 +12,7 @@
 #' @name FRTCI-package
 #' @aliases FRTCI-package 
 #' @docType package
-#' @author Ben Fifield \email{benfifield@@gmail.com}
+#' @author Masha Bertling, Peng Ding, Avi Feller, Ben Fifield, and Luke Miratrix
 #' 
 #' Maintainer: Ben Fifield \email{benfifield@@gmail.com}
 #' @references Ding, Peng, Avi Feller and Luke Miratrix. (2016) "Randomization Inference for Treatment Effect Variation", Journal of the Royal Statistical Society-Series B.

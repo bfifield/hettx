@@ -19,7 +19,7 @@ Date: \tab 2018-09-27\cr License: \tab GPL (>= 3)\cr }
 Ding, Peng, Avi Feller and Luke Miratrix. (2016) "Randomization Inference for Treatment Effect Variation", Journal of the Royal Statistical Society-Series B.
 }
 \author{
-Ben Fifield \email{benfifield@gmail.com}
+Masha Bertling, Peng Ding, Avi Feller, Ben Fifield, and Luke Miratrix
 
 Maintainer: Ben Fifield \email{benfifield@gmail.com}
 }
