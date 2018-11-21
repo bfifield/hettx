@@ -1,5 +1,7 @@
 context("Systematic estimation methods")
 
+
+
 test_that("estimate oracle", {
 
   df = make.randomized.dat( 100, beta.vec=c(-1,-1,1) )
@@ -20,6 +22,8 @@ test_that("estimate oracle", {
 
 } )
 
+
+
 test_that( "OLS estimation corresponds to lm", {
 
   df = make.randomized.dat( 100, beta.vec=c(-1,-1,1) )
@@ -36,6 +40,8 @@ test_that( "OLS estimation corresponds to lm", {
   expect_equivalent( coef( M.ols ), coef(M0)[4:6] )
 
 } )
+
+
 
 test_that( "Main methods work", {
 
@@ -70,6 +76,7 @@ test_that( "Main methods work", {
     tst = est.beta(Yobs ~ D | Z, data = df, interaction.formula = ~ A + B,
                    method = "2SLS")
     r2.tst <- R2(tst)
+    expect_equal( class( tst ), "RI.regression.result" )
     
 } )
 

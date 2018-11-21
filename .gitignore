@@ -366,3 +366,4 @@ rsconnect/
 
 
 # End of https://www.gitignore.io/api/r,osx,c++,latex
+.Rproj.user

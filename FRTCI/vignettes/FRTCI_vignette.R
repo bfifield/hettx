@@ -1,24 +1,21 @@
 ## ---- echo=FALSE, message=FALSE, warning=FALSE---------------------------
-library( plyr )
-library( mvtnorm )
-library( tidyverse )
-library( FRTCI )
 par( mgp=c(1.8,0.8,0), mar=c(2.5, 2.5,2,0.1) )
 knitr::opts_chunk$set(fig.width = 8)
 
 ## ---- message=FALSE, warning=FALSE---------------------------------------
-library( plyr )
 library( mvtnorm )
 library( tidyverse )
 library( FRTCI )
+data( ToyData )
 
 ## ---- echo=TRUE----------------------------------------------------------
+data( ToyData )
 head( ToyData )
 td = gather( ToyData, x1, x2, x3, x4, key="X", value="value" )
 td = gather( td, Y, tau, key="outcome", value="value2" )
 ggplot( td, aes( x=value, y=value2, col=as.factor(Z) ) ) +
         facet_grid( outcome ~ X, scales="free" ) +
-        geom_point( alpha=0.5) + 
+        geom_point( alpha=0.5, size=0.5) + 
         geom_smooth( method="loess", se=FALSE ) +
         labs( x="Covariates", y="" )
 
@@ -44,77 +41,78 @@ B <- 100
 grid.size = 21
 
 ## ---- echo=TRUE, cache=TRUE----------------------------------------------
-tst1 = FRTCI( Y=ToyData$Y, Z=ToyData$Z, B=B, grid.size = grid.size, verbose=FALSE )
+tst1 = fishpidetect( Y ~ Z, data=ToyData, B=B, grid.size = grid.size, verbose=FALSE )
 print( tst1 )
 
 ## ---- echo=TRUE, cache=TRUE----------------------------------------------
-tst1b = FRTCI( Y, Z, data=ToyData, B=B, grid.size = grid.size, verbose=FALSE )
-
-## ---- echo=TRUE----------------------------------------------------------
-Xfull <- model.matrix(Y ~ 0 + x1 + x2 + x3 + x4, data=ToyData )
-
-# get points to check in the confidence interval
-te.vec = get.tau.vector( Y=ToyData$Y, Z=ToyData$Z, X=Xfull, grid.size=grid.size )
-
-# do permutation test for all these points and maximize
-tst2 = FRTCI( Y=ToyData$Y, Z=ToyData$Z, B=B, te.vec = te.vec, test.stat=SKS.stat.cov, 
-              X=Xfull, verbose=FALSE )
+tst2 = fishpidetect( Y ~ Z, data=ToyData, control.formula = ~ x1 + x2 + x3 + x4, B=B, test.stat=SKS.stat.cov, 
+              verbose=FALSE )
 print( tst2 )
 
-## ---- echo=TRUE----------------------------------------------------------
-cat( "Adjusting just using the non-treatment related covariates\n" )
-X34 <- model.matrix( Y ~ 0 + x3 + x4, data=ToyData )
-
-te.vec = get.tau.vector( Y=ToyData$Y, Z=ToyData$Z, X=X34, grid.size = grid.size )
-
-tst2b = FRTCI( Y=ToyData$Y, Z=ToyData$Z, B=B, te.vec = te.vec, test.stat=SKS.stat.cov, 
-               X=X34, verbose=FALSE )
+## ---- echo=TRUE, cache=TRUE----------------------------------------------
+tst2b = fishpidetect( Y ~ Z, data=ToyData, control.formula = ~ x3 + x4, B=B, test.stat=SKS.stat.cov, 
+              verbose=FALSE )
 print( tst2b )
 
-## ---- echo=TRUE----------------------------------------------------------
-N = length(ToyData$Y)
-Xfake = matrix( rnorm( N ), nrow=N )
-
-tst1b = FRTCI( Y=ToyData$Y, Z=ToyData$Z, B=B, test.stat=SKS.stat.cov, X=Xfake,
-               grid.size = grid.size, verbose=FALSE )
+## ---- echo=TRUE, cache=TRUE----------------------------------------------
+N = nrow(ToyData)
+ToyData$Xfake = rnorm( N )
+tst1b = fishpidetect( Y ~ Z, data=ToyData, control.formula = ~ Xfake, B=B, test.stat=SKS.stat.cov, 
+              verbose=FALSE )
 print( tst1b )
 
-## ----ideo_beyond_systematic, echo=TRUE-----------------------------------
+## ----ideo_beyond_systematic, echo=TRUE, cache=TRUE-----------------------
 B = 20 
 
-W1 <- model.matrix(Y ~ 0 + x1, data=ToyData)
-
-tst3a1 <- FRTCI.interact( Y=ToyData$Y, Z=ToyData$Z, W=W1, B=B, verbose=FALSE )
+tst3a1 = fishpidetect( Y ~ Z, data=ToyData, interaction.formula = ~ x1, B=B, test.stat=SKS.stat.int.cov, 
+              verbose=FALSE )
 print( tst3a1 )
 
-## ---- echo=TRUE----------------------------------------------------------
-tst3a2 <- FRTCI.interact( Y=ToyData$Y, Z=ToyData$Z, W=W1, X=X34, B=B, verbose=FALSE )
+## ---- echo=TRUE, cache=TRUE----------------------------------------------
+tst3a2 <- fishpidetect( Y ~ Z, data=ToyData, 
+                        interaction.formula = ~ x1, 
+                        control.formula = ~ x3 + x4,
+                        B=B, test.stat=SKS.stat.int.cov, 
+              verbose=FALSE )
 print( tst3a2 )
 
-## ---- echo=TRUE----------------------------------------------------------
-tst3a2b <- FRTCI.interact( Y=ToyData$Y, Z=ToyData$Z, W=W1, X=Xfull, B=B, verbose=FALSE )
+## ---- echo=TRUE, cache=TRUE----------------------------------------------
+tst3a2b <- fishpidetect( Y ~ Z, data=ToyData, control.formula = ~ x2 + x3 + x4, 
+                         interaction.formula = ~ x1, B=B, test.stat=SKS.stat.int.cov, 
+              verbose=FALSE )
 print( tst3a2b )
 
-## ----beyond_x1_x2, echo=TRUE---------------------------------------------
-W12 <- model.matrix( Y ~ 0 + x1 + x2, data=ToyData )
-
-tst3b <- FRTCI.interact( Y=ToyData$Y, Z=ToyData$Z, W=W12, B=B, verbose=FALSE )
-print( tst3b)
+## ----beyond_x1_x2, echo=TRUE, cache=TRUE---------------------------------
+tst3b <- fishpidetect( Y ~ Z, data=ToyData,
+                         interaction.formula = ~ x1 + x2, B=B, test.stat=SKS.stat.int.cov, 
+              verbose=FALSE )
+print( tst3b )
 
 ## ---- echo=TRUE----------------------------------------------------------
-tst3c <- FRTCI.interact( Y=ToyData$Y, Z=ToyData$Z, W=W12, X=X34, B=B, verbose=FALSE )
+tst3c <- fishpidetect( Y ~ Z, data=ToyData,
+                         interaction.formula = ~ x1 + x2, 
+                       control.formula = ~ x3 + x4,
+                       B=B, test.stat=SKS.stat.int.cov, 
+              verbose=FALSE )
 print( tst3c )
 
-## ----full_correction, echo=TRUE------------------------------------------
-Wfull <- model.matrix( Y ~ 0 + x1 + x2 + x3 + x4, data=ToyData)
-
-tst3d <- FRTCI.interact( Y=ToyData$Y, Z=ToyData$Z, W=Wfull, B=B, verbose=FALSE )
+## ----full_correction, echo=TRUE, cache=TRUE------------------------------
+tst3d <- fishpidetect( Y ~ Z, data=ToyData,
+                         interaction.formula = ~ x1 + x2 + x3 + x4, 
+                       B=B, test.stat=SKS.stat.int.cov, 
+              verbose=FALSE )
 print( tst3d )
 
 ## ----display, echo=TRUE--------------------------------------------------
-tests = list( no_cov=tst1, useless_cov=tst1b, all_covariates=tst2, non_tx_covariates_only=tst2b, het_beyond_x1 = tst3a1, het_beyond_x1_with_x3_x4_cov=tst3a2, het_beyond_x1_with_all_cov=tst3a2, het_beyond_x1_x2=tst3b, het_beyond_x1_x2_with_cov=tst3c, het_beyond_all=tst3d )
+tests = list( no_cov=tst1, useless_cov=tst1b, all_covariates=tst2, 
+              non_tx_covariates_only=tst2b, het_beyond_x1 = tst3a1,
+              het_beyond_x1_with_x3_x4_cov=tst3a2, het_beyond_x1_with_all_cov=tst3a2,
+              het_beyond_x1_x2=tst3b, 
+              het_beyond_x1_x2_with_cov=tst3c, het_beyond_all=tst3d )
 
-agg.res = map_df( tests, get.p.value, .id = "test" )
+agg.res = purrr::map( tests, get.p.value  ) %>%
+  purrr::map( as.list )
+agg.res = bind_rows( agg.res, .id = "test" )
 agg.res
 
 ## ----cautionary_tale, echo=TRUE------------------------------------------

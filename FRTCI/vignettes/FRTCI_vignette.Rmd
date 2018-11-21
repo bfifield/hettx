@@ -10,29 +10,16 @@ vignette: >
 ---
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-library( plyr )
-library( mvtnorm )
-library( tidyverse )
-library( FRTCI )
 par( mgp=c(1.8,0.8,0), mar=c(2.5, 2.5,2,0.1) )
 knitr::opts_chunk$set(fig.width = 8)
 ```
 
 # Introduction
 This document demonstrates how to perform permutation test inference for heterogeneous treatment effects. We use a simulated dataset to illustrate. This data is provided with the package as 'ToyData'.
+Overall, this vignette illustrates the different tests for ideosyncratic variation one might make using our package, and shows how different forms of covariate adjustment can increase power or target inferential questions differently.
 
-These data were generated with the following models:
 
-\[
-Y_i(0) =      1 +   x_{1i} + 2 x_{2i} + 4x_{3i} + \epsilon_i
-\]
-with treatment
-\[
-  \tau_i =     2 + 2x_{1i} +   x_{2i}
-\]
-So $x_1$ and $x_2$ are predictive of treatment impact.  $x_3$ also predicts control side variation, and is useful for increasing precision.  $x_4$ is useless.
 
-  
 ---
 #, with the data generating process being roughly calibrated to the National Head Start Impact Study (HSIS), a large-scale randomized evaluation of a Federal pre-school programm.  
 # Unfortunately, we cannot directly release the HSIS data. 
@@ -40,37 +27,50 @@ So $x_1$ and $x_2$ are predictive of treatment impact.  $x_3$ also predicts cont
 # SAY MORE ABOUT DGP: what Xs, etc.  What is true model?
 ---
 
-This script illustrates the different tests for ideosyncratic variation one might make, and shows how different forms of covariate adjustment can increase power or target inferential questions differently.
 
 We first load our package along with some other useful packages.
 ```{r, message=FALSE, warning=FALSE}
-library( plyr )
 library( mvtnorm )
 library( tidyverse )
 library( FRTCI )
+data( ToyData )
 ```
 
-# Illustrative Dataset
+# The illustrative Dataset
 
-We begin with exploring a toy dataset with `r nrow( ToyData )` observations that we included with the package for illustration. `ToyData` has an outcome, four covariates, and a treatment indicator. For these data we also know the true individual treatment effects.  
+We begin with exploring a toy dataset with `r nrow( ToyData )` observations that we included with the package for illustration. `ToyData` has an outcome, four covariates, and a treatment indicator. 
+They were generated with the following model:
+\[
+Y_i(0) =      1 +   x_{1i} + 2 x_{2i} + 4x_{3i} + \epsilon_i
+\]
+with $\epsilon_i \sim N( 0, 1^2 )$. 
+The treatment model is all systematic:
+\[
+  \tau_i =     2 + 2x_{1i} + x_{2i}
+\]
+So $x_1$ and $x_2$ are both predictive of treatment impact.  $x_3$ also predicts control side variation, and should therefore be useful for increasing precision.  $x_4$ is useless.
+$Y_i(1) = Y_i(0) + \tau_i$, so there is no ideosyncratic variation if we control for both $x_1$ and $x_2$.
+
+As we generated these data, we know the true individual treatment effects.  
 
 ```{r, echo=TRUE}
+data( ToyData )
 head( ToyData )
 td = gather( ToyData, x1, x2, x3, x4, key="X", value="value" )
 td = gather( td, Y, tau, key="outcome", value="value2" )
 ggplot( td, aes( x=value, y=value2, col=as.factor(Z) ) ) +
         facet_grid( outcome ~ X, scales="free" ) +
-        geom_point( alpha=0.5) + 
+        geom_point( alpha=0.5, size=0.5) + 
         geom_smooth( method="loess", se=FALSE ) +
         labs( x="Covariates", y="" )
 ```
 
-As the data is simulated, we have the true ATE:
+As the data is simulated, we have the true finite-sample ATE:
 ```{r, echo=TRUE}
 mean( ToyData$tau )
 ```
 
-We quickly look at the marginal and residual CDFs of treatment and control. We see heterogeniety at left, but after controlling for observed covariates we have no visibile ideosyncratic heterogeniety left over.
+Before testing, we quickly look at the marginal and residual CDFs of treatment and control. We see heterogeniety at left, but after controlling for observed covariates we have no visibile ideosyncratic heterogeniety left over.
 
 ```{r, echo=TRUE}
 par( mfrow=c(1,2) )
@@ -106,132 +106,134 @@ grid.size = 21
 The basic test for ideosyncratic treatment effect variation is as follows (with no adjustment for covariates):
 
 ```{r, echo=TRUE, cache=TRUE}
-tst1 = FRTCI( Y=ToyData$Y, Z=ToyData$Z, B=B, grid.size = grid.size, verbose=FALSE )
+tst1 = fishpidetect( Y ~ Z, data=ToyData, B=B, grid.size = grid.size, verbose=FALSE )
 print( tst1 )
 ```
 
-We can also pass a dataframe for clarity.  This call is the same as above, up to simulation error:
-```{r, echo=TRUE, cache=TRUE}
-tst1b = FRTCI( Y, Z, data=ToyData, B=B, grid.size = grid.size, verbose=FALSE )
-```
 
 
 # Adjusting for covariates
 
 We can increase the power by adjusting for covariates. Please note that we do not include any interaction terms at this point.
 
-We first generate a matrix to hand to the linear regression function. This will convert factors to dummy variables as needed. For continuous variables we could just `cbind()` the variables of interest to make a matrix.  We recommend `model.matrix()` as it is more general.
+We specify a `control.formula` which will be used to generate a matrix to hand to the linear regression function. This will convert factors to dummy variables as needed.
 
 ```{r, echo=TRUE, cache=TRUE}
-Xfull <- model.matrix(Y ~ 0 + x1 + x2 + x3 + x4, data=ToyData )
-
-# get points to check in the confidence interval
-te.vec = get.tau.vector( Y=ToyData$Y, Z=ToyData$Z, X=Xfull, grid.size=grid.size )
-
-# do permutation test for all these points and maximize
-tst2 = FRTCI( Y=ToyData$Y, Z=ToyData$Z, B=B, te.vec = te.vec, test.stat=SKS.stat.cov, 
-              X=Xfull, verbose=FALSE )
+tst2 = fishpidetect( Y ~ Z, data=ToyData, control.formula = ~ x1 + x2 + x3 + x4, B=B, test.stat=SKS.stat.cov, 
+              verbose=FALSE )
 print( tst2 )
 ```
 
 Let's explore how the results might differ when non-treatment covariates are used.
 
 ```{r, echo=TRUE, cache=TRUE}
-cat( "Adjusting just using the non-treatment related covariates\n" )
-X34 <- model.matrix( Y ~ 0 + x3 + x4, data=ToyData )
-
-te.vec = get.tau.vector( Y=ToyData$Y, Z=ToyData$Z, X=X34, grid.size = grid.size )
-
-tst2b = FRTCI( Y=ToyData$Y, Z=ToyData$Z, B=B, te.vec = te.vec, test.stat=SKS.stat.cov, 
-               X=X34, verbose=FALSE )
+tst2b = fishpidetect( Y ~ Z, data=ToyData, control.formula = ~ x3 + x4, B=B, test.stat=SKS.stat.cov, 
+              verbose=FALSE )
 print( tst2b )
 ```
 
 We can compare to when we correct for some useless covariates not related to outcome.
 
 ```{r, echo=TRUE, cache=TRUE}
-N = length(ToyData$Y)
-Xfake = matrix( rnorm( N ), nrow=N )
-
-tst1b = FRTCI( Y=ToyData$Y, Z=ToyData$Z, B=B, test.stat=SKS.stat.cov, X=Xfake,
-               grid.size = grid.size, verbose=FALSE )
+N = nrow(ToyData)
+ToyData$Xfake = rnorm( N )
+tst1b = fishpidetect( Y ~ Z, data=ToyData, control.formula = ~ Xfake, B=B, test.stat=SKS.stat.cov, 
+              verbose=FALSE )
 print( tst1b )
 ```
 
 
 ## Ideosyncratic variation beyond systematic variation
 
-To test for ideosyncratic variation beyond systematic, we use the `FRTCI.interact` method.
+To test for ideosyncratic variation beyond systematic, we pass an `interaction.formula` to the method.
 
-We first test for ideosyncratic variation beyond x1 (and we should get high p-value). We first make a design matrix for the covariates we want to model an effect for, then we pass this along with the original Y and Z to our method.
+We first test for ideosyncratic variation beyond x1 (and we should get high $p$-value).
 
 ```{r ideo_beyond_systematic, echo=TRUE, cache=TRUE}
 B = 20 
 
-W1 <- model.matrix(Y ~ 0 + x1, data=ToyData)
-
-tst3a1 <- FRTCI.interact( Y=ToyData$Y, Z=ToyData$Z, W=W1, B=B, verbose=FALSE )
+tst3a1 = fishpidetect( Y ~ Z, data=ToyData, interaction.formula = ~ x1, B=B, test.stat=SKS.stat.int.cov, 
+              verbose=FALSE )
 print( tst3a1 )
 ```
 
 Include additional terms to increase power.  We are correcting for x3 and x4.
 ```{r, echo=TRUE, cache=TRUE}
-tst3a2 <- FRTCI.interact( Y=ToyData$Y, Z=ToyData$Z, W=W1, X=X34, B=B, verbose=FALSE )
+tst3a2 <- fishpidetect( Y ~ Z, data=ToyData, 
+                        interaction.formula = ~ x1, 
+                        control.formula = ~ x3 + x4,
+                        B=B, test.stat=SKS.stat.int.cov, 
+              verbose=FALSE )
 print( tst3a2 )
 ```
 
 For comparison, we next include all terms.
 ```{r, echo=TRUE, cache=TRUE}
-tst3a2b <- FRTCI.interact( Y=ToyData$Y, Z=ToyData$Z, W=W1, X=Xfull, B=B, verbose=FALSE )
+tst3a2b <- fishpidetect( Y ~ Z, data=ToyData, control.formula = ~ x2 + x3 + x4, 
+                         interaction.formula = ~ x1, B=B, test.stat=SKS.stat.int.cov, 
+              verbose=FALSE )
 print( tst3a2b )
 ```
 
 
 ### Testing for ideosyncratic variation.
 
-Now correct for the other covariates as well, but still have correct heterogeneous treatment model. Note that you should still get high p-value.
+Now correct for the other covariates as well, but still have correct heterogeneous treatment model. Note that you should still get high $p$-value.
 
 Start testing for variation beyond x1 and x2. 
 ```{r beyond_x1_x2, echo=TRUE, cache=TRUE}
-W12 <- model.matrix( Y ~ 0 + x1 + x2, data=ToyData )
-
-tst3b <- FRTCI.interact( Y=ToyData$Y, Z=ToyData$Z, W=W12, B=B, verbose=FALSE )
-print( tst3b)
+tst3b <- fishpidetect( Y ~ Z, data=ToyData,
+                         interaction.formula = ~ x1 + x2, B=B, test.stat=SKS.stat.int.cov, 
+              verbose=FALSE )
+print( tst3b )
 ```
 
 
-Continue to test for ideosyncratic variation beyond x1 and x2, adjusting for x3 and x4. Note that you should still get high p-value.
+Continue to test for ideosyncratic variation beyond x1 and x2, adjusting for x3 and x4. Note that you should still get high $p$-value.
 
 ```{r, echo=TRUE}
-tst3c <- FRTCI.interact( Y=ToyData$Y, Z=ToyData$Z, W=W12, X=X34, B=B, verbose=FALSE )
+tst3c <- fishpidetect( Y ~ Z, data=ToyData,
+                         interaction.formula = ~ x1 + x2, 
+                       control.formula = ~ x3 + x4,
+                       B=B, test.stat=SKS.stat.int.cov, 
+              verbose=FALSE )
 print( tst3c )
 ```
 
 
-Finally, test for ideosyncratic variation beyond all covariates, even irrelevant ones. Again, you should expect to get high p-value.
+Finally, test for ideosyncratic variation beyond all covariates, even irrelevant ones. Again, you should expect to get high $p$-value.
 
 ```{r full_correction, echo=TRUE, cache=TRUE}
-Wfull <- model.matrix( Y ~ 0 + x1 + x2 + x3 + x4, data=ToyData)
-
-tst3d <- FRTCI.interact( Y=ToyData$Y, Z=ToyData$Z, W=Wfull, B=B, verbose=FALSE )
+tst3d <- fishpidetect( Y ~ Z, data=ToyData,
+                         interaction.formula = ~ x1 + x2 + x3 + x4, 
+                       B=B, test.stat=SKS.stat.int.cov, 
+              verbose=FALSE )
 print( tst3d )
 ```
 
 # Display Results
 
-We can easily compare the results by simultaneously displaying the outputs from all tested models.
+We can easily compare the results by simultaneously displaying the outputs from all tested models by using the `get.p.value()` merthod.
 
 ```{r display, echo=TRUE}
-tests = list( no_cov=tst1, useless_cov=tst1b, all_covariates=tst2, non_tx_covariates_only=tst2b, het_beyond_x1 = tst3a1, het_beyond_x1_with_x3_x4_cov=tst3a2, het_beyond_x1_with_all_cov=tst3a2, het_beyond_x1_x2=tst3b, het_beyond_x1_x2_with_cov=tst3c, het_beyond_all=tst3d )
+tests = list( no_cov=tst1, useless_cov=tst1b, all_covariates=tst2, 
+              non_tx_covariates_only=tst2b, het_beyond_x1 = tst3a1,
+              het_beyond_x1_with_x3_x4_cov=tst3a2, het_beyond_x1_with_all_cov=tst3a2,
+              het_beyond_x1_x2=tst3b, 
+              het_beyond_x1_x2_with_cov=tst3c, het_beyond_all=tst3d )
 
-agg.res = map_df( tests, get.p.value, .id = "test" )
+agg.res = purrr::map( tests, get.p.value  ) %>%
+  purrr::map( as.list )
+agg.res = bind_rows( agg.res, .id = "test" )
 agg.res
 ```
 
 
 # Cautionary Tale: A linear model with no treatment interaction.
 
-Let's fit a model with no systematic treatment impact heterogeniety.  This means that all variation would have to be considered ideosyncratic. We control for covariates to increase precision.
+Let's fit a model that allows for no systematic treatment impact heterogeniety.
+This means that all variation would have to be considered ideosyncratic.
+The key, however, is we control for covariates to increase precision.
 ```{r cautionary_tale, echo=TRUE}
 ll1 = lm( Y ~ Z + x1 + x2 + x3 + x4, data=ToyData )
 print( summary( ll1 ) )
