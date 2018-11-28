@@ -1,11 +1,11 @@
 ## Set global variables for foreach
 globalVariables('b')
 
-#' fishpidetect
+#' detect.idiosyncratic
 #'
 #' Test for systematic treatment effect heterogeneity using
 #' Fisherian permutation inference methods.
-#' @usage fishpidetect(formula, data, interaction.formula, control.formula,
+#' @usage detect.idiosyncratic(formula, data, interaction.formula, control.formula,
 #' plugin, tau.hat, test.stat, te.vec, B, gamma, grid.gamma, grid.size,
 #' return.matrix, na.rm, n.cores, verbose, ...)
 #'
@@ -35,7 +35,7 @@ globalVariables('b')
 #' tau <- 4
 #' Y <- ifelse(Z, rnorm(100, tau), rnorm(100, 0))
 #' df <- data.frame(Y=Y, Z=Z)
-#' tst <- fishpidetect(Y ~ Z, df, B = 50, grid.size = 50)
+#' tst <- detect.idiosyncratic(Y ~ Z, df, B = 50, grid.size = 50)
 #' @export
 #' @importFrom graphics abline lines plot rug
 #' @importFrom stats binom.test binomial coef confint ecdf glm lm lowess predict qchisq qnorm var vcov na.omit
@@ -47,15 +47,15 @@ globalVariables('b')
 #' @importFrom parallel makePSOCKcluster stopCluster
 #' @importFrom doParallel registerDoParallel
 #' @importFrom formula.tools get.vars lhs.vars rhs.vars
-fishpidetect <- function(formula, data,
-                         interaction.formula = NULL, control.formula = NULL,
-                         plugin = FALSE, tau.hat = NULL,
-                         test.stat = ifelse( is.null(W) & is.null(X), SKS.stat, ifelse( is.null(W), SKS.stat.cov, SKS.stat.int.cov ) ),
-                         te.vec = NULL,
-                         B = 500, gamma = 0.0001, grid.gamma = 100*gamma,
-                         grid.size = 151, return.matrix = FALSE, na.rm = FALSE,
-                         n.cores = 1, verbose = TRUE, ...){
-
+detect.idiosyncratic <- function(formula, data,
+                                 interaction.formula = NULL, control.formula = NULL,
+                                 plugin = FALSE, tau.hat = NULL,
+                                 test.stat = ifelse( is.null(W) & is.null(X), SKS.stat, ifelse( is.null(W), SKS.stat.cov, SKS.stat.int.cov ) ),
+                                 te.vec = NULL,
+                                 B = 500, gamma = 0.0001, grid.gamma = 100*gamma,
+                                 grid.size = 151, return.matrix = FALSE, na.rm = FALSE,
+                                 n.cores = 1, verbose = TRUE, ...){
+    
     ## ---------------------------
     ## Get variables from formulas
     ## and check formulas

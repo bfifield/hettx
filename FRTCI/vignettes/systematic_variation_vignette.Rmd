@@ -22,9 +22,9 @@ str( df )
 ```
 
 ## Basic estimation
-The function `est.beta` is our core estimator (the naive estimator):
+The function `estimate.systematic` is our core estimator (the naive estimator):
 ```{r}
-rs = est.beta( Yobs ~ Z,  interaction.formula = ~ A + B, data=df )
+rs = estimate.systematic( Yobs ~ Z,  interaction.formula = ~ A + B, data=df )
 rs
 ```
 The arguments are observed outcome, observed treatment assignment, and what variables to find a systematic relationship to, expressed as a formula using the tilde notation (categorical covariates will be automatically converted).
@@ -43,7 +43,7 @@ confint( rs )
 
 OLS is basically using the empirical covariance matrix $\widehat{S}_{xx}$ (`Sxx.hat`) for each treatment arm rather than the known Sxx:
 ```{r}
-M.ols.ours = est.beta( Yobs ~ Z, ~ A + B, data=df, method="OLS" )
+M.ols.ours = estimate.systematic( Yobs ~ Z, ~ A + B, data=df, method="OLS" )
 M.ols.ours
 M.ols.ours$beta.hat
 ```
@@ -65,7 +65,7 @@ two formula, one for the treatment model, one for the control
  adjustment model
 
 ```{r}
-est.beta( Yobs ~ Z, interaction.formula = ~ A + B, 
+estimate.systematic( Yobs ~ Z, interaction.formula = ~ A + B, 
           control.formula = ~ C, data=df )
 ```
 
@@ -73,13 +73,13 @@ est.beta( Yobs ~ Z, interaction.formula = ~ A + B,
 
 using adjustment: we can do with and without empirical Sxx. 
 ```{r}
-est.beta( Yobs ~ Z,  ~ A + B, ~ C, data=df )$beta.hat
-rs = est.beta( Yobs ~ Z,  ~ A + B, ~ C, data=df, empirical.Sxx = TRUE )
+estimate.systematic( Yobs ~ Z,  ~ A + B, ~ C, data=df )$beta.hat
+rs = estimate.systematic( Yobs ~ Z,  ~ A + B, ~ C, data=df, empirical.Sxx = TRUE )
 rs$beta.hat
 ```
 same as model-adjustment + empirical.Sxx, above
 ```{r}
-rs2 = est.beta( Yobs ~ Z,  ~ A + B, ~ C, data=df, method="OLS" )
+rs2 = estimate.systematic( Yobs ~ Z,  ~ A + B, ~ C, data=df, method="OLS" )
 rs2$beta.hat
 ```
 
@@ -88,7 +88,7 @@ If we know all potential outcomes, we can calculate the exact beta for the sampl
 (This is useful for simulation studies.)
 We can also get the true SE, which is why we pass a sample treatment vector (so it can calculate proportion treated, under the assumption of simple random assignment):  
 ```{r}
-Moracle = est.beta( Y.1 + Y.0 ~ Z, ~ A + B, data=df )
+Moracle = estimate.systematic( Y.1 + Y.0 ~ Z, ~ A + B, data=df )
 Moracle
 SE( Moracle )
 ```
@@ -102,9 +102,9 @@ Here we see all the methods on a scenario with no variation
 ```{r}
 df = make.randomized.dat( 1000, beta.vec=c(-1,0,0) )
 
-est.beta( Y.1 + Y.0 ~ Z, ~ A + B, data=df )$beta.hat
-est.beta( Yobs ~ Z, ~ A + B, data=df )$beta.hat
-est.beta( Yobs ~ Z, ~ A + B, data=df, method="OLS" )$beta.hat
+estimate.systematic( Y.1 + Y.0 ~ Z, ~ A + B, data=df )$beta.hat
+estimate.systematic( Yobs ~ Z, ~ A + B, data=df )$beta.hat
+estimate.systematic( Yobs ~ Z, ~ A + B, data=df, method="OLS" )$beta.hat
 ```
 
 
@@ -113,12 +113,12 @@ est.beta( Yobs ~ Z, ~ A + B, data=df, method="OLS" )$beta.hat
 We can look at treatment effect explained.  We will look at two scenarios, one with no ideosyncratic variation, and one with a substantial amount.  We will plot the R2 sensitivity curves for each on top of each other.
 ```{r}
 df = make.randomized.dat( 1000, beta.vec=c(-1,1,1) )
-rs = est.beta( Yobs ~ Z, ~ A + B, data=df, method="OLS" )
+rs = estimate.systematic( Yobs ~ Z, ~ A + B, data=df, method="OLS" )
 r2 = R2( rs )
 r2    
 plot( r2 )
 df = make.randomized.dat( 1000, beta.vec=c(-1,1,1), ideo.sd=3 )
-rs = est.beta( Yobs ~ Z, ~ A + B, data=df, method="OLS" )
+rs = estimate.systematic( Yobs ~ Z, ~ A + B, data=df, method="OLS" )
 r2 = R2( rs )
 r2    
 plot( r2, ADD=TRUE, col="green" )
@@ -127,7 +127,7 @@ plot( r2, ADD=TRUE, col="green" )
 And here is a case where we have 100% systematic variation along a single variable.
 ```{r}
 df = make.randomized.dat( 1000, beta.vec=c(-1,1,0) )
-rs = est.beta( Yobs ~ Z, ~ A + B, data=df, method="OLS" )
+rs = estimate.systematic( Yobs ~ Z, ~ A + B, data=df, method="OLS" )
 r2 = R2( rs )
 r2    
 plot( r2 )
@@ -143,19 +143,19 @@ Here we look at how results differ across different estimators
 ```{r}
 df = make.randomized.dat( 1000, beta.vec=c(-1,1,1), ideo.sd=1 )
 
-rs = est.beta( Yobs ~ Z, ~ A + B, data=df )
+rs = estimate.systematic( Yobs ~ Z, ~ A + B, data=df )
 r2 = R2( rs )
 r2    
 plot( r2, col="green" )
 
 # adjusted
-rs = est.beta( Yobs ~ Z, ~ A + B, ~ C, data=df )
+rs = estimate.systematic( Yobs ~ Z, ~ A + B, ~ C, data=df )
 r2 = R2( rs )
 r2    
 plot( r2, ADD=TRUE )
 
 # adjusted + OLS
-rs = est.beta( Yobs ~ Z, ~ A + B, ~ C, data=df, empirical.Sxx = TRUE )
+rs = estimate.systematic( Yobs ~ Z, ~ A + B, ~ C, data=df, empirical.Sxx = TRUE )
 r2 = R2( rs )
 r2    
 plot( r2, ADD=TRUE, col="blue" )
@@ -196,7 +196,7 @@ legend( "topleft", legend=levels( as.factor( data$S ) ), pch=19, col=1:3 )
 ## Estimating the effects
 
 ```{r}
-rs = est.beta( Yobs ~ D | Z, ~ A + B, data=data )
+rs = estimate.systematic( Yobs ~ D | Z, ~ A + B, data=data )
 rs
 rs$beta.hat
 SE( rs )
@@ -211,7 +211,7 @@ plot( r2 )
 
 ## The 2SLS Approach
 ```{r}
-rs = est.beta( Yobs ~ Z | D,  ~ A + B, data=data, method="2SLS" )
+rs = estimate.systematic( Yobs ~ Z | D,  ~ A + B, data=data, method="2SLS" )
 rs
 SE( rs )
 rs$beta.hat

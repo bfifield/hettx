@@ -598,7 +598,7 @@ est.beta.LATE <- function(formula, data, interaction.formula, method=c("RI", "2S
 #' (2018). Can estimate an ITT or LATE model, or the actual beta in cases where
 #' full potential outcomes schedule is available.
 #'
-#' @usage est.beta(formula, data, interaction.formula, control.formula,
+#' @usage estimate.systematic(formula, data, interaction.formula, control.formula,
 #' method, empirical.Sxx, na.rm)
 #'
 #' @param formula An object of class formula, as in lm(). For ITT estimation, specify as Y ~ Z with only the treatment variable on the right-hand side. For LATE estimation, specify as Y ~ D | Z with only the endogenous variable (D) and the instrument (Z) on the right-hand side separated by a vertical bar (|). For oracle estimation (where full potential outcome schedule is known), specify as Y(1) + Y(0) ~ Z with only the treatment variable on the right-hand side and the variables indicating the outcome under treatment and the outcome under control on the left-hand-side. The first variable on the left-hand-side will be treated as the outcome under treatment, and the second variable on the right-hand-side will be treated as the outcome under control.
@@ -611,7 +611,7 @@ est.beta.LATE <- function(formula, data, interaction.formula, method=c("RI", "2S
 #'
 #' @export
 #' @importFrom stats as.formula
-est.beta <- function( formula, data, interaction.formula, control.formula=NULL,
+estimate.systematic <- function( formula, data, interaction.formula, control.formula=NULL,
                     method=c("RI","OLS","2SLS"),
                     empirical.Sxx = FALSE, na.rm = FALSE){
 
