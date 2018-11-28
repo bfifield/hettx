@@ -1,8 +1,8 @@
-Package: FRTCI
+Package: hettx
 Type: Package
-Title: Conduct the FRT CI Method of Ding, Feller, and Miratrix (2016, JRSS-B)
+Title: Conduct the FRT CI Method of Ding, Feller, and Miratrix (2016, JRSS-B) and the systematic estimation method of Ding, Feller, and Miratrix (2019, JASA)
 Version: 0.0.1
-Date: 2018-09-27
+Date: 2018-11-27
 Authors@R: c(
   person("Masha", "Bertling", email = "mbertling@g.harvard.edu", role = "aut"),
   person("Peng", "Ding", email = "pengdingpku@berkeley.edu", role = "aut"),

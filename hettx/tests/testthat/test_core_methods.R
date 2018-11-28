@@ -1,5 +1,5 @@
 library( testthat )
-library( FRTCI )
+library( hettx )
 
 context("Core methods")
 

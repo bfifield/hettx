@@ -10,9 +10,9 @@ vignette: >
 ---
 
 # Introduction
-This document demonstrates how to use the systematic variation estimation methods of the `FRTCI` package. First load the package:
+This document demonstrates how to use the systematic variation estimation methods of the `hettx` package. First load the package:
 ```{r}
-library( FRTCI )
+library( hettx )
 ```
 
 This package has code to make synthetic data.  Here we make a dataset with 3 covariates that we will use to illustrate the function calls.  For this dataset, the first two variables have a systematic relationship with treatment impact, and the third is good for adjustment for increasing power:

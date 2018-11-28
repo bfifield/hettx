@@ -32,7 +32,7 @@ We first load our package along with some other useful packages.
 ```{r, message=FALSE, warning=FALSE}
 library( mvtnorm )
 library( tidyverse )
-library( FRTCI )
+library( hettx )
 data( ToyData )
 ```
 
