@@ -134,11 +134,12 @@ calc.beta.oracle <- function( formula, data, interaction.formula, method=c("RI",
     res
 }
 
+
 est.beta.ITT <- function( formula, data, interaction.formula, control.formula=NULL,
                         method = c( "RI", "OLS" ),
-                        empirical.Sxx = FALSE,
                         na.rm = FALSE) {
 
+    empirical.Sxx = FALSE
     method = match.arg(method)
     if ( method == "OLS" ) {
         empirical.Sxx = TRUE
@@ -189,11 +190,6 @@ est.beta.ITT <- function( formula, data, interaction.formula, control.formula=NU
         }
         if(any(main.vars %in% interaction.vars)){
             stop("Either your outcome variable or your treatment variable is present in your control formula.")
-        }
-        if(!is.null(interaction.formula)){
-            if(any(control.vars %in% interaction.vars)){
-                stop("You have variables in your interaction formula that are also present in your control formula.")
-            }
         }
     }else{
         control.vars <- NULL
@@ -362,7 +358,8 @@ est.beta.ITT <- function( formula, data, interaction.formula, control.formula=NU
                SD.Y0      = sd( Y0 ),
                SD.Y1      = sd( Y1 ) )
 
-    res$method = paste( ifelse( empirical.Sxx, "OLS", "RI" ), ifelse( adjust.Stx, "Adjusted","Unadjusted"), sep="-" )
+    res$method = paste( ifelse( empirical.Sxx, "OLS", "RI" ),
+                        ifelse( adjust.Stx, "Adjusted","Unadjusted"), sep="-" )
 
     res$call = match.call()
     res$X = X
@@ -374,7 +371,8 @@ est.beta.ITT <- function( formula, data, interaction.formula, control.formula=NU
     return(res)
 }
 
-est.beta.LATE <- function(formula, data, interaction.formula, method=c("RI", "2SLS"), na.rm = TRUE){
+est.beta.LATE <- function(formula, data, interaction.formula, 
+                          method=c("RI", "2SLS"), na.rm = TRUE){
     method = match.arg( method )
 
     ## -------------------------
