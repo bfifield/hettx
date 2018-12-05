@@ -1,15 +1,15 @@
 #' test.stat.info
 #'
-#' A list of test statistics for fishpidetect(), and information on use cases when each is appropriate.
+#' A list of test statistics for detect.idiosyncratic(), and information on use cases when each is appropriate.
 #'
 #' @usage test.stat.info()
 #'
 #' @export
 test.stat.info <- function(){
     cat("
-## ---------------------------------------------
-## Available test statistics for fishpidetect():
-## ---------------------------------------------
+## -----------------------------------------------------
+## Available test statistics for detect.idiosyncratic():
+## -----------------------------------------------------
 Test statistics when not adjusting for covariates or specifying interactions:
 \t1) KS.stat - Calculate classic (not shifted) KS statistic. If tau passed, Y1 will be shifted by tau.
 \t2) SKS.stat - Shifted KS statistic. Calculate KS distance between Y0 and Y1 shfited by tau.
