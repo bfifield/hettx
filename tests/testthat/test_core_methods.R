@@ -1,7 +1,7 @@
 library( testthat )
 library( hettx )
 
-context("Core methods")
+context("Test idiosyncratic detection methods")
 
 test_that("FRTCI Runs", {
     data(ToyData)

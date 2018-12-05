@@ -8,7 +8,7 @@
 \usage{
 make.linear.data(n, gamma.vec = c(1, 2, 2, 1), gamma2.vec = NULL,
   beta.vec = c(-1, -1, 1), ideo.sd = 0, quad.tx = FALSE,
-  stand.norm.X = FALSE, corr.X = !stand.norm.X)
+  mu.X = FALSE, corr.X = TRUE)
 
 make.quadradic.data(n, beta.vec = c(-1, -1, 1))
 
@@ -27,7 +27,7 @@ make.skew.data(n, beta.vec = c(-1, -1, 1))
 
 \item{quad.tx}{Quadratic treatment effects?}
 
-\item{stand.norm.X}{Xs shifted around 0 or no}
+\item{mu.X}{Center of the X covariates (can be single number or vector of length equal to the max of the length of gamma.vec, gamma2.vec, and beta.vec)}
 
 \item{corr.X}{TRUE or FALSE.  Have Xs correlated or no.}
 }
@@ -37,6 +37,12 @@ List of elements of data (not data frame)
 \description{
 Given the parameters, generate a dataset and return a potential outcomes schedule (science table)
 of synthetic potential outcomes.
+}
+\details{
+The control outcome surface is either linear or quadratic, of the form:
+$$ Y_i = \gamma_0 + \sum_{k=1}^J \gamma_k X_{ki} + \sum_{k=1}^{J_2} \gamma^{(2)}_k X_{ki}^2 + \epsilon_i $$
+
+The individual treatment effects are similarly a linear or quadratic model.
 }
 \section{Functions}{
 \itemize{

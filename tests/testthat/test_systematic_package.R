@@ -1,3 +1,5 @@
+library( testthat )
+
 context("Systematic estimation methods")
 
 

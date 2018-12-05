@@ -5,7 +5,7 @@ knitr::opts_chunk$set(fig.width = 8)
 ## ---- message=FALSE, warning=FALSE---------------------------------------
 library( mvtnorm )
 library( tidyverse )
-library( FRTCI )
+library( hettx )
 data( ToyData )
 
 ## ---- echo=TRUE----------------------------------------------------------
@@ -41,35 +41,35 @@ B <- 100
 grid.size = 21
 
 ## ---- echo=TRUE, cache=TRUE----------------------------------------------
-tst1 = fishpidetect( Y ~ Z, data=ToyData, B=B, grid.size = grid.size, verbose=FALSE )
+tst1 = detect.idiosyncratic( Y ~ Z, data=ToyData, B=B, grid.size = grid.size, verbose=FALSE )
 print( tst1 )
 
 ## ---- echo=TRUE, cache=TRUE----------------------------------------------
-tst2 = fishpidetect( Y ~ Z, data=ToyData, control.formula = ~ x1 + x2 + x3 + x4, B=B, test.stat=SKS.stat.cov, 
+tst2 = detect.idiosyncratic( Y ~ Z, data=ToyData, control.formula = ~ x1 + x2 + x3 + x4, B=B, test.stat=SKS.stat.cov, 
               verbose=FALSE )
 print( tst2 )
 
 ## ---- echo=TRUE, cache=TRUE----------------------------------------------
-tst2b = fishpidetect( Y ~ Z, data=ToyData, control.formula = ~ x3 + x4, B=B, test.stat=SKS.stat.cov, 
+tst2b = detect.idiosyncratic( Y ~ Z, data=ToyData, control.formula = ~ x3 + x4, B=B, test.stat=SKS.stat.cov, 
               verbose=FALSE )
 print( tst2b )
 
 ## ---- echo=TRUE, cache=TRUE----------------------------------------------
 N = nrow(ToyData)
 ToyData$Xfake = rnorm( N )
-tst1b = fishpidetect( Y ~ Z, data=ToyData, control.formula = ~ Xfake, B=B, test.stat=SKS.stat.cov, 
+tst1b = detect.idiosyncratic( Y ~ Z, data=ToyData, control.formula = ~ Xfake, B=B, test.stat=SKS.stat.cov, 
               verbose=FALSE )
 print( tst1b )
 
 ## ----ideo_beyond_systematic, echo=TRUE, cache=TRUE-----------------------
 B = 20 
 
-tst3a1 = fishpidetect( Y ~ Z, data=ToyData, interaction.formula = ~ x1, B=B, test.stat=SKS.stat.int.cov, 
+tst3a1 = detect.idiosyncratic( Y ~ Z, data=ToyData, interaction.formula = ~ x1, B=B, test.stat=SKS.stat.int.cov, 
               verbose=FALSE )
 print( tst3a1 )
 
 ## ---- echo=TRUE, cache=TRUE----------------------------------------------
-tst3a2 <- fishpidetect( Y ~ Z, data=ToyData, 
+tst3a2 <- detect.idiosyncratic( Y ~ Z, data=ToyData, 
                         interaction.formula = ~ x1, 
                         control.formula = ~ x3 + x4,
                         B=B, test.stat=SKS.stat.int.cov, 
@@ -77,19 +77,19 @@ tst3a2 <- fishpidetect( Y ~ Z, data=ToyData,
 print( tst3a2 )
 
 ## ---- echo=TRUE, cache=TRUE----------------------------------------------
-tst3a2b <- fishpidetect( Y ~ Z, data=ToyData, control.formula = ~ x2 + x3 + x4, 
+tst3a2b <- detect.idiosyncratic( Y ~ Z, data=ToyData, control.formula = ~ x2 + x3 + x4, 
                          interaction.formula = ~ x1, B=B, test.stat=SKS.stat.int.cov, 
               verbose=FALSE )
 print( tst3a2b )
 
 ## ----beyond_x1_x2, echo=TRUE, cache=TRUE---------------------------------
-tst3b <- fishpidetect( Y ~ Z, data=ToyData,
+tst3b <- detect.idiosyncratic( Y ~ Z, data=ToyData,
                          interaction.formula = ~ x1 + x2, B=B, test.stat=SKS.stat.int.cov, 
               verbose=FALSE )
 print( tst3b )
 
 ## ---- echo=TRUE----------------------------------------------------------
-tst3c <- fishpidetect( Y ~ Z, data=ToyData,
+tst3c <- detect.idiosyncratic( Y ~ Z, data=ToyData,
                          interaction.formula = ~ x1 + x2, 
                        control.formula = ~ x3 + x4,
                        B=B, test.stat=SKS.stat.int.cov, 
@@ -97,7 +97,7 @@ tst3c <- fishpidetect( Y ~ Z, data=ToyData,
 print( tst3c )
 
 ## ----full_correction, echo=TRUE, cache=TRUE------------------------------
-tst3d <- fishpidetect( Y ~ Z, data=ToyData,
+tst3d <- detect.idiosyncratic( Y ~ Z, data=ToyData,
                          interaction.formula = ~ x1 + x2 + x3 + x4, 
                        B=B, test.stat=SKS.stat.int.cov, 
               verbose=FALSE )

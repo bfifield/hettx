@@ -12,7 +12,7 @@
 
 <meta name="author" content="Bertling, M., Ding, P., Feller, A., and Miratrix, L." />
 
-<meta name="date" content="2018-11-21" />
+<meta name="date" content="2018-12-04" />
 
 <title>FRT CI Package Tutorial</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">FRT CI Package Tutorial</h1>
 <h4 class="author"><em>Bertling, M., Ding, P., Feller, A., and Miratrix, L.</em></h4>
-<h4 class="date"><em>2018-11-21</em></h4>
+<h4 class="date"><em>2018-12-04</em></h4>
 
 
 
@@ -80,7 +80,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>We first load our package along with some other useful packages.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>( mvtnorm )
 <span class="kw">library</span>( tidyverse )
-<span class="kw">library</span>( FRTCI )
+<span class="kw">library</span>( hettx )
 <span class="kw">data</span>( ToyData )</code></pre></div>
 </div>
 <div id="the-illustrative-dataset" class="section level1">
@@ -137,12 +137,12 @@ ll1 =<span class="st"> </span><span class="kw">lm</span>( Y <span class="op">~</
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">B &lt;-<span class="st"> </span><span class="dv">100</span>
 grid.size =<span class="st"> </span><span class="dv">21</span></code></pre></div>
 <p>The basic test for ideosyncratic treatment effect variation is as follows (with no adjustment for covariates):</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tst1 =<span class="st"> </span><span class="kw">fishpidetect</span>( Y <span class="op">~</span><span class="st"> </span>Z, <span class="dt">data=</span>ToyData, <span class="dt">B=</span>B, <span class="dt">grid.size =</span> grid.size, <span class="dt">verbose=</span><span class="ot">FALSE</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tst1 =<span class="st"> </span><span class="kw">detect.idiosyncratic</span>( Y <span class="op">~</span><span class="st"> </span>Z, <span class="dt">data=</span>ToyData, <span class="dt">B=</span>B, <span class="dt">grid.size =</span> grid.size, <span class="dt">verbose=</span><span class="ot">FALSE</span> )
 <span class="kw">print</span>( tst1 )</code></pre></div>
 <pre><code>##   FRT CI Test for Tx Effect Heterogeneity with test.stat 
 ## data:  500 observations 
-## t = 0.08 , p-value = 0.1301  (plug =  0.0401 )
-##  p-value range = 0.0401 - 0.1301 
+## t = 0.08 , p-value = 0.1001  (plug =  0.0701 )
+##  p-value range = 0.0701 - 0.1001 
 ## CI range =  0.3473426 - 3.936448     MOE = 1.794553 
 ##  Neyman Difference point estimate of average = 2.141895  SE = 0.4612544 
 ##  # tested points = 21 
@@ -153,7 +153,7 @@ grid.size =<span class="st"> </span><span class="dv">21</span></code></pre></div
 <h1>Adjusting for covariates</h1>
 <p>We can increase the power by adjusting for covariates. Please note that we do not include any interaction terms at this point.</p>
 <p>We specify a <code>control.formula</code> which will be used to generate a matrix to hand to the linear regression function. This will convert factors to dummy variables as needed.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tst2 =<span class="st"> </span><span class="kw">fishpidetect</span>( Y <span class="op">~</span><span class="st"> </span>Z, <span class="dt">data=</span>ToyData, <span class="dt">control.formula =</span> <span class="op">~</span><span class="st"> </span>x1 <span class="op">+</span><span class="st"> </span>x2 <span class="op">+</span><span class="st"> </span>x3 <span class="op">+</span><span class="st"> </span>x4, <span class="dt">B=</span>B, <span class="dt">test.stat=</span>SKS.stat.cov, 
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tst2 =<span class="st"> </span><span class="kw">detect.idiosyncratic</span>( Y <span class="op">~</span><span class="st"> </span>Z, <span class="dt">data=</span>ToyData, <span class="dt">control.formula =</span> <span class="op">~</span><span class="st"> </span>x1 <span class="op">+</span><span class="st"> </span>x2 <span class="op">+</span><span class="st"> </span>x3 <span class="op">+</span><span class="st"> </span>x4, <span class="dt">B=</span>B, <span class="dt">test.stat=</span>SKS.stat.cov, 
               <span class="dt">verbose=</span><span class="ot">FALSE</span> )
 <span class="kw">print</span>( tst2 )</code></pre></div>
 <pre><code>##   FRT CI Test for Tx Effect Heterogeneity with test.stat 
@@ -165,7 +165,7 @@ grid.size =<span class="st"> </span><span class="dv">21</span></code></pre></div
 ##  # tested points = 151 
 ##  B =  100    gamma =  1e-04</code></pre>
 <p>Let’s explore how the results might differ when non-treatment covariates are used.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tst2b =<span class="st"> </span><span class="kw">fishpidetect</span>( Y <span class="op">~</span><span class="st"> </span>Z, <span class="dt">data=</span>ToyData, <span class="dt">control.formula =</span> <span class="op">~</span><span class="st"> </span>x3 <span class="op">+</span><span class="st"> </span>x4, <span class="dt">B=</span>B, <span class="dt">test.stat=</span>SKS.stat.cov, 
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tst2b =<span class="st"> </span><span class="kw">detect.idiosyncratic</span>( Y <span class="op">~</span><span class="st"> </span>Z, <span class="dt">data=</span>ToyData, <span class="dt">control.formula =</span> <span class="op">~</span><span class="st"> </span>x3 <span class="op">+</span><span class="st"> </span>x4, <span class="dt">B=</span>B, <span class="dt">test.stat=</span>SKS.stat.cov, 
               <span class="dt">verbose=</span><span class="ot">FALSE</span> )
 <span class="kw">print</span>( tst2b )</code></pre></div>
 <pre><code>##   FRT CI Test for Tx Effect Heterogeneity with test.stat 
@@ -179,15 +179,15 @@ grid.size =<span class="st"> </span><span class="dv">21</span></code></pre></div
 <p>We can compare to when we correct for some useless covariates not related to outcome.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">N =<span class="st"> </span><span class="kw">nrow</span>(ToyData)
 ToyData<span class="op">$</span>Xfake =<span class="st"> </span><span class="kw">rnorm</span>( N )
-tst1b =<span class="st"> </span><span class="kw">fishpidetect</span>( Y <span class="op">~</span><span class="st"> </span>Z, <span class="dt">data=</span>ToyData, <span class="dt">control.formula =</span> <span class="op">~</span><span class="st"> </span>Xfake, <span class="dt">B=</span>B, <span class="dt">test.stat=</span>SKS.stat.cov, 
+tst1b =<span class="st"> </span><span class="kw">detect.idiosyncratic</span>( Y <span class="op">~</span><span class="st"> </span>Z, <span class="dt">data=</span>ToyData, <span class="dt">control.formula =</span> <span class="op">~</span><span class="st"> </span>Xfake, <span class="dt">B=</span>B, <span class="dt">test.stat=</span>SKS.stat.cov, 
               <span class="dt">verbose=</span><span class="ot">FALSE</span> )
 <span class="kw">print</span>( tst1b )</code></pre></div>
 <pre><code>##   FRT CI Test for Tx Effect Heterogeneity with test.stat 
 ## data:  500 observations 
-## t = 0.072 , p-value = 0.3401  (plug =  0.2301 )
-##  p-value range = 0.2001 - 0.3401 
-## CI range =  0.3359494 - 3.922934     MOE = 1.793492 
-##  Neyman Difference point estimate of average = 2.129442  SE = 0.4609819 
+## t = 0.088 , p-value = 0.1101  (plug =  0.0801 )
+##  p-value range = 0.0401 - 0.1101 
+## CI range =  0.3540498 - 3.946385     MOE = 1.796168 
+##  Neyman Difference point estimate of average = 2.150217  SE = 0.4616695 
 ##  # tested points = 151 
 ##  B =  100    gamma =  1e-04</code></pre>
 <div id="ideosyncratic-variation-beyond-systematic-variation" class="section level2">
@@ -196,18 +196,18 @@ tst1b =<span class="st"> </span><span class="kw">fishpidetect</span>( Y <span cl
 <p>We first test for ideosyncratic variation beyond x1 (and we should get high <span class="math inline">\(p\)</span>-value).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">B =<span class="st"> </span><span class="dv">20</span> 
 
-tst3a1 =<span class="st"> </span><span class="kw">fishpidetect</span>( Y <span class="op">~</span><span class="st"> </span>Z, <span class="dt">data=</span>ToyData, <span class="dt">interaction.formula =</span> <span class="op">~</span><span class="st"> </span>x1, <span class="dt">B=</span>B, <span class="dt">test.stat=</span>SKS.stat.int.cov, 
+tst3a1 =<span class="st"> </span><span class="kw">detect.idiosyncratic</span>( Y <span class="op">~</span><span class="st"> </span>Z, <span class="dt">data=</span>ToyData, <span class="dt">interaction.formula =</span> <span class="op">~</span><span class="st"> </span>x1, <span class="dt">B=</span>B, <span class="dt">test.stat=</span>SKS.stat.int.cov, 
               <span class="dt">verbose=</span><span class="ot">FALSE</span> )
 <span class="kw">print</span>( tst3a1 )</code></pre></div>
 <pre><code>##   FRT CI Test for Tx Effect Heterogeneity Beyond a Systematic Model with test.stat 
 ## data:  500 observations 
-## t = 0.072 , p-value = 0.3501  (plug =  0.2001 )
-##  p-value range = 0.0501 - 0.3501 
+## t = 0.072 , p-value = 0.2501  (plug =  0.1001 )
+##  p-value range = 0.1001 - 0.2501 
 ##  # tested points = 151 
 ##  B =  20     gamma =  1e-04 
 ##  Corrected for</code></pre>
 <p>Include additional terms to increase power. We are correcting for x3 and x4.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tst3a2 &lt;-<span class="st"> </span><span class="kw">fishpidetect</span>( Y <span class="op">~</span><span class="st"> </span>Z, <span class="dt">data=</span>ToyData, 
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tst3a2 &lt;-<span class="st"> </span><span class="kw">detect.idiosyncratic</span>( Y <span class="op">~</span><span class="st"> </span>Z, <span class="dt">data=</span>ToyData, 
                         <span class="dt">interaction.formula =</span> <span class="op">~</span><span class="st"> </span>x1, 
                         <span class="dt">control.formula =</span> <span class="op">~</span><span class="st"> </span>x3 <span class="op">+</span><span class="st"> </span>x4,
                         <span class="dt">B=</span>B, <span class="dt">test.stat=</span>SKS.stat.int.cov, 
@@ -222,14 +222,14 @@ tst3a1 =<span class="st"> </span><span class="kw">fishpidetect</span>( Y <span c
 ##  Corrected for  
 ##  Adjusted for x3 x4</code></pre>
 <p>For comparison, we next include all terms.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tst3a2b &lt;-<span class="st"> </span><span class="kw">fishpidetect</span>( Y <span class="op">~</span><span class="st"> </span>Z, <span class="dt">data=</span>ToyData, <span class="dt">control.formula =</span> <span class="op">~</span><span class="st"> </span>x2 <span class="op">+</span><span class="st"> </span>x3 <span class="op">+</span><span class="st"> </span>x4, 
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tst3a2b &lt;-<span class="st"> </span><span class="kw">detect.idiosyncratic</span>( Y <span class="op">~</span><span class="st"> </span>Z, <span class="dt">data=</span>ToyData, <span class="dt">control.formula =</span> <span class="op">~</span><span class="st"> </span>x2 <span class="op">+</span><span class="st"> </span>x3 <span class="op">+</span><span class="st"> </span>x4, 
                          <span class="dt">interaction.formula =</span> <span class="op">~</span><span class="st"> </span>x1, <span class="dt">B=</span>B, <span class="dt">test.stat=</span>SKS.stat.int.cov, 
               <span class="dt">verbose=</span><span class="ot">FALSE</span> )
 <span class="kw">print</span>( tst3a2b )</code></pre></div>
 <pre><code>##   FRT CI Test for Tx Effect Heterogeneity Beyond a Systematic Model with test.stat 
 ## data:  500 observations 
-## t = 0.12 , p-value = 1e-04  (plug =  1e-04 )
-##  p-value range = 1e-04 - 1e-04 
+## t = 0.12 , p-value = 0.0501  (plug =  1e-04 )
+##  p-value range = 1e-04 - 0.0501 
 ##  # tested points = 151 
 ##  B =  20     gamma =  1e-04 
 ##  Corrected for  
@@ -238,19 +238,19 @@ tst3a1 =<span class="st"> </span><span class="kw">fishpidetect</span>( Y <span c
 <h3>Testing for ideosyncratic variation.</h3>
 <p>Now correct for the other covariates as well, but still have correct heterogeneous treatment model. Note that you should still get high <span class="math inline">\(p\)</span>-value.</p>
 <p>Start testing for variation beyond x1 and x2.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tst3b &lt;-<span class="st"> </span><span class="kw">fishpidetect</span>( Y <span class="op">~</span><span class="st"> </span>Z, <span class="dt">data=</span>ToyData,
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tst3b &lt;-<span class="st"> </span><span class="kw">detect.idiosyncratic</span>( Y <span class="op">~</span><span class="st"> </span>Z, <span class="dt">data=</span>ToyData,
                          <span class="dt">interaction.formula =</span> <span class="op">~</span><span class="st"> </span>x1 <span class="op">+</span><span class="st"> </span>x2, <span class="dt">B=</span>B, <span class="dt">test.stat=</span>SKS.stat.int.cov, 
               <span class="dt">verbose=</span><span class="ot">FALSE</span> )
 <span class="kw">print</span>( tst3b )</code></pre></div>
 <pre><code>##   FRT CI Test for Tx Effect Heterogeneity Beyond a Systematic Model with test.stat 
 ## data:  500 observations 
-## t = 0.044 , p-value = 1.0001  (plug =  0.9501 )
-##  p-value range = 0.8001 - 1.0001 
+## t = 0.044 , p-value = 1.0001  (plug =  0.8501 )
+##  p-value range = 0.7501 - 1.0001 
 ##  # tested points = 151 
 ##  B =  20     gamma =  1e-04 
 ##  Corrected for x1 x2</code></pre>
 <p>Continue to test for ideosyncratic variation beyond x1 and x2, adjusting for x3 and x4. Note that you should still get high <span class="math inline">\(p\)</span>-value.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tst3c &lt;-<span class="st"> </span><span class="kw">fishpidetect</span>( Y <span class="op">~</span><span class="st"> </span>Z, <span class="dt">data=</span>ToyData,
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tst3c &lt;-<span class="st"> </span><span class="kw">detect.idiosyncratic</span>( Y <span class="op">~</span><span class="st"> </span>Z, <span class="dt">data=</span>ToyData,
                          <span class="dt">interaction.formula =</span> <span class="op">~</span><span class="st"> </span>x1 <span class="op">+</span><span class="st"> </span>x2, 
                        <span class="dt">control.formula =</span> <span class="op">~</span><span class="st"> </span>x3 <span class="op">+</span><span class="st"> </span>x4,
                        <span class="dt">B=</span>B, <span class="dt">test.stat=</span>SKS.stat.int.cov, 
@@ -258,22 +258,22 @@ tst3a1 =<span class="st"> </span><span class="kw">fishpidetect</span>( Y <span c
 <span class="kw">print</span>( tst3c )</code></pre></div>
 <pre><code>##   FRT CI Test for Tx Effect Heterogeneity Beyond a Systematic Model with test.stat 
 ## data:  500 observations 
-## t = 0.064 , p-value = 0.6001  (plug =  0.3501 )
-##  p-value range = 0.2001 - 0.6001 
+## t = 0.064 , p-value = 0.4001  (plug =  0.3001 )
+##  p-value range = 0.1001 - 0.4001 
 ##  # tested points = 151 
 ##  B =  20     gamma =  1e-04 
 ##  Corrected for x1 x2 
 ##  Adjusted for x3 x4</code></pre>
 <p>Finally, test for ideosyncratic variation beyond all covariates, even irrelevant ones. Again, you should expect to get high <span class="math inline">\(p\)</span>-value.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tst3d &lt;-<span class="st"> </span><span class="kw">fishpidetect</span>( Y <span class="op">~</span><span class="st"> </span>Z, <span class="dt">data=</span>ToyData,
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tst3d &lt;-<span class="st"> </span><span class="kw">detect.idiosyncratic</span>( Y <span class="op">~</span><span class="st"> </span>Z, <span class="dt">data=</span>ToyData,
                          <span class="dt">interaction.formula =</span> <span class="op">~</span><span class="st"> </span>x1 <span class="op">+</span><span class="st"> </span>x2 <span class="op">+</span><span class="st"> </span>x3 <span class="op">+</span><span class="st"> </span>x4, 
                        <span class="dt">B=</span>B, <span class="dt">test.stat=</span>SKS.stat.int.cov, 
               <span class="dt">verbose=</span><span class="ot">FALSE</span> )
 <span class="kw">print</span>( tst3d )</code></pre></div>
 <pre><code>##   FRT CI Test for Tx Effect Heterogeneity Beyond a Systematic Model with test.stat 
 ## data:  500 observations 
-## t = 0.068 , p-value = 0.3501  (plug =  0.2501 )
-##  p-value range = 0.1001 - 0.3501 
+## t = 0.068 , p-value = 0.4001  (plug =  0.1501 )
+##  p-value range = 0.1001 - 0.4001 
 ##  # tested points = 151 
 ##  B =  20     gamma =  1e-04 
 ##  Corrected for x1 x2 x3 x4</code></pre>
@@ -294,18 +294,18 @@ agg.res =<span class="st"> </span>purrr<span class="op">::</span><span class="kw
 agg.res =<span class="st"> </span><span class="kw">bind_rows</span>( agg.res, <span class="dt">.id =</span> <span class="st">&quot;test&quot;</span> )
 agg.res</code></pre></div>
 <pre><code>## # A tibble: 10 x 5
-##    test                         p.value   min.p  max.p   plug
-##    &lt;chr&gt;                          &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
-##  1 no_cov                        0.130  0.0110  0.212  0.0401
-##  2 useless_cov                   0.340  0.127   0.442  0.230 
-##  3 all_covariates                0.0001 0       0.0362 0.0001
-##  4 non_tx_covariates_only        0.0001 0       0.0362 0.0001
-##  5 het_beyond_x1                 0.350  0.00127 0.592  0.200 
-##  6 het_beyond_x1_with_x3_x4_cov  0.0001 0       0.168  0.0001
-##  7 het_beyond_x1_with_all_cov    0.0001 0       0.168  0.0001
-##  8 het_beyond_x1_x2              1.00   0.563   1      0.950 
-##  9 het_beyond_x1_x2_with_cov     0.600  0.0573  0.809  0.350 
-## 10 het_beyond_all                0.350  0.0123  0.592  0.250</code></pre>
+##    test                         p.value  min.p  max.p   plug
+##    &lt;chr&gt;                          &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+##  1 no_cov                        0.100  0.0286 0.176  0.0701
+##  2 useless_cov                   0.110  0.0110 0.188  0.0801
+##  3 all_covariates                0.0001 0      0.0362 0.0001
+##  4 non_tx_covariates_only        0.0001 0      0.0362 0.0001
+##  5 het_beyond_x1                 0.250  0.0123 0.491  0.100 
+##  6 het_beyond_x1_with_x3_x4_cov  0.0001 0      0.168  0.0001
+##  7 het_beyond_x1_with_all_cov    0.0001 0      0.168  0.0001
+##  8 het_beyond_x1_x2              1.00   0.509  1      0.850 
+##  9 het_beyond_x1_x2_with_cov     0.400  0.0123 0.639  0.300 
+## 10 het_beyond_all                0.400  0.0123 0.639  0.150</code></pre>
 </div>
 <div id="cautionary-tale-a-linear-model-with-no-treatment-interaction." class="section level1">
 <h1>Cautionary Tale: A linear model with no treatment interaction.</h1>

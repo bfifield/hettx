@@ -1,12 +1,12 @@
 ## ------------------------------------------------------------------------
-library( FRTCI )
+library( hettx )
 
 ## ------------------------------------------------------------------------
-df = make.randomized.dat( 100, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1) )
+df = make.randomized.dat( 10000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
 str( df )
 
 ## ------------------------------------------------------------------------
-rs = est.beta( Yobs ~ Z,  interaction.formula = ~ A + B, data=df )
+rs = estimate.systematic( Yobs ~ Z,  interaction.formula = ~ A + B, data=df )
 rs
 
 ## ------------------------------------------------------------------------
@@ -17,7 +17,7 @@ SE( rs )
 confint( rs )
 
 ## ------------------------------------------------------------------------
-M.ols.ours = est.beta( Yobs ~ Z, ~ A + B, data=df, method="OLS" )
+M.ols.ours = estimate.systematic( Yobs ~ Z, ~ A + B, data=df, method="OLS" )
 M.ols.ours
 M.ols.ours$beta.hat
 
@@ -25,49 +25,65 @@ M.ols.ours$beta.hat
 M0 = lm( Yobs ~ (A+B) * Z, data=df )
 M0
 
+## ------------------------------------------------------------------------
 M.ols.ours$beta - coef(M0)[4:6]
 
 ## ------------------------------------------------------------------------
-est.beta( Yobs ~ Z, interaction.formula = ~ A + B, 
+estimate.systematic( Yobs ~ Z, interaction.formula = ~ A + B, 
           control.formula = ~ C, data=df )
 
 ## ------------------------------------------------------------------------
-est.beta( Yobs ~ Z,  ~ A + B, ~ C, data=df )$beta.hat
-rs = est.beta( Yobs ~ Z,  ~ A + B, ~ C, data=df, empirical.Sxx = TRUE )
-rs$beta.hat
+rsA2 = estimate.systematic( Yobs ~ Z,  ~ A + B, ~ A + B + C, data=df )
+coef( rsA2 )
 
 ## ------------------------------------------------------------------------
-rs2 = est.beta( Yobs ~ Z,  ~ A + B, ~ C, data=df, method="OLS" )
-rs2$beta.hat
+rsB = estimate.systematic( Yobs ~ Z,  ~ A + B, ~ C, data=df, method = "OLS" )
+coef( rsB )
+rsB2 = estimate.systematic( Yobs ~ Z,  ~ A + B, ~ A + B + C, data=df, method = "OLS" )
+coef( rsB2 )
 
 ## ------------------------------------------------------------------------
-Moracle = calc.beta.oracle( Y.1 + Y.0 ~ Z, ~ A + B, data=df )
+rsB.lm = lm( Yobs ~ Z * (A+B) + C, data=df )
+coef( rsB.lm )
+
+# Doesn't work?
+#library( texreg )
+#screenreg( rsB, rsB2)
+
+cbind( C.only=coef( rsB ), ABC=coef( rsB2 ), lmC=coef( rsB.lm )[c(2,6,7)])
+
+## ------------------------------------------------------------------------
+Moracle = estimate.systematic( Y.1 + Y.0 ~ Z, ~ A + B, data=df )
 Moracle
 SE( Moracle )
 
 ## ------------------------------------------------------------------------
 df = make.randomized.dat( 1000, beta.vec=c(-1,0,0) )
 
-calc.beta.oracle( Y.1 + Y.0 ~ Z, ~ A + B, data=df )$beta.hat
-est.beta( Yobs ~ Z, ~ A + B, data=df )$beta.hat
-est.beta( Yobs ~ Z, ~ A + B, data=df, method="OLS" )$beta.hat
+estimate.systematic( Y.1 + Y.0 ~ Z, ~ A + B, data=df )$beta.hat
+estimate.systematic( Yobs ~ Z, ~ A + B, data=df )$beta.hat
+estimate.systematic( Yobs ~ Z, ~ A + B, data=df, method="OLS" )$beta.hat
 
 ## ------------------------------------------------------------------------
 df = make.randomized.dat( 1000, beta.vec=c(-1,1,1) )
-rs = est.beta( Yobs ~ Z, ~ A + B, data=df, method="OLS" )
-r2 = R2.ITT( rs )
+rs = estimate.systematic( Yobs ~ Z, ~ A + B, data=df, method="OLS" )
+r2 = R2( rs )
 r2    
-plot( r2 )
+
+## ------------------------------------------------------------------------
 df = make.randomized.dat( 1000, beta.vec=c(-1,1,1), ideo.sd=3 )
-rs = est.beta( Yobs ~ Z, ~ A + B, data=df, method="OLS" )
-r2 = R2.ITT( rs )
+rs = estimate.systematic( Yobs ~ Z, ~ A + B, data=df, method="OLS" )
+r2 = R2( rs )
 r2    
+
+## ------------------------------------------------------------------------
+plot( r2 )
 plot( r2, ADD=TRUE, col="green" )
 
 ## ------------------------------------------------------------------------
 df = make.randomized.dat( 1000, beta.vec=c(-1,1,0) )
-rs = est.beta( Yobs ~ Z, ~ A + B, data=df, method="OLS" )
-r2 = R2.ITT( rs )
+rs = estimate.systematic( Yobs ~ Z, ~ A + B, data=df, method="OLS" )
+r2 = R2( rs )
 r2    
 plot( r2 )
 
@@ -77,20 +93,20 @@ plot( df$tau ~ df$A )
 ## ------------------------------------------------------------------------
 df = make.randomized.dat( 1000, beta.vec=c(-1,1,1), ideo.sd=1 )
 
-rs = est.beta( Yobs ~ Z, ~ A + B, data=df )
-r2 = R2.ITT( rs )
+rs = estimate.systematic( Yobs ~ Z, ~ A + B, data=df )
+r2 = R2( rs )
 r2    
 plot( r2, col="green" )
 
 # adjusted
-rs = est.beta( Yobs ~ Z, ~ A + B, ~ C, data=df )
-r2 = R2.ITT( rs )
+rs = estimate.systematic( Yobs ~ Z, ~ A + B, ~ C, data=df )
+r2 = R2( rs )
 r2    
 plot( r2, ADD=TRUE )
 
 # adjusted + OLS
-rs = est.beta( Yobs ~ Z, ~ A + B, ~ C, data=df, empirical.Sxx = TRUE )
-r2 = R2.ITT( rs )
+rs = estimate.systematic( Yobs ~ Z, ~ A + B, ~ C, data=df, method = "OLS" )
+r2 = R2( rs )
 r2    
 plot( r2, ADD=TRUE, col="blue" )
 
@@ -113,7 +129,7 @@ plot( Y.1 - Y.0 ~ B, data=data, col=as.factor(data$S), pch=19, cex=0.5 )
 legend( "topleft", legend=levels( as.factor( data$S ) ), pch=19, col=1:3 )
 
 ## ------------------------------------------------------------------------
-rs = est.beta.LATE( Yobs ~ D | Z, ~ A + B, data=data )
+rs = estimate.systematic( Yobs ~ D | Z, ~ A + B, data=data )
 rs
 rs$beta.hat
 SE( rs )
@@ -121,12 +137,12 @@ SE( rs )
 # error
 rs$beta.hat - beta
 
-r2 = R2.LATE( rs )
+r2 = R2( rs )
 r2
 plot( r2 )
 
 ## ------------------------------------------------------------------------
-rs = est.beta.LATE( Yobs ~ Z | D,  ~ A + B, data=data, method="2SLS" )
+rs = estimate.systematic( Yobs ~ Z | D,  ~ A + B, data=data, method="2SLS" )
 rs
 SE( rs )
 rs$beta.hat
