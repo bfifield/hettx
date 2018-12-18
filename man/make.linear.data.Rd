@@ -40,7 +40,7 @@ of synthetic potential outcomes.
 }
 \details{
 The control outcome surface is either linear or quadratic, of the form:
-$$ Y_i = \gamma_0 + \sum_{k=1}^J \gamma_k X_{ki} + \sum_{k=1}^{J_2} \gamma^{(2)}_k X_{ki}^2 + \epsilon_i $$
+\deqn{Y_i = \\gamma_0 + \\sum_{k=1}^J \\gamma_k X_{ki} + \\sum_{k=1}^{J_2} \\gamma^{(2)}_k X_{ki}^2 + \\epsilon_i}
 
 The individual treatment effects are similarly a linear or quadratic model.
 }
