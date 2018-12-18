@@ -16,9 +16,9 @@ method, na.rm)
 
 \item{control.formula}{A right-sided formula with pre-treatment covariates to adjust for on the right hand side, such as ~ x1 + x2 + x3. Default is NULL (no variables adjusted for). Will be ignored for LATE estimation and oracle estimation. Default is NULL}
 
-\item{method}{RI or OLS (for ITT and oracle), RI or 2SLS (for LATE). method=OLS is shorthand for setting the empirical.Sxx variable to TRUE, nothing more.
+\item{method}{RI or OLS (for ITT and oracle), RI or 2SLS (for LATE). method=OLS is shorthand for setting the empirical.Sxx variable to TRUE, nothing more.}
 
- @param na.rm A logical flag indicating whether to list-wise delete missing data. The function will report an error if missing data exist. Default is FALSE.}
+\item{na.rm}{A logical flag indicating whether to list-wise delete missing data. The function will report an error if missing data exist. Default is FALSE.}
 }
 \description{
 Implements the systematic effects model proposed in Ding, Feller, and Miratrix

@@ -2,12 +2,7 @@
 title: "FRT CI Package Tutorial"
 author: "Bertling, M., Ding, P., Feller, A., and Miratrix, L."
 date: "`r Sys.Date()`"
-output:
-  pdf_document: default
----
-
-<!--
-output:  pdf_document: default
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
