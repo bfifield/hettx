@@ -1,3 +1,18 @@
+#' summary.FRTCI.test
+#'
+#' 
+summary.FRTCI.test <- function(x, ...){
+
+    ## Create data frame
+    rng <- range(x$ci.p)
+    df <- data.frame(x$statistic, x$p.value, x$p.value.plug, rng[1], rng[2])
+    names(df) <- c("Estimate", "P-Value (Sweep)", "P-Value (Plug-In)",
+                   "P-Value Lower CI", "P-Value Upper CI")
+
+    
+    
+}
+
 #' print.FRTCI.test
 #' 
 #' Print out FRTCI.test object.
