@@ -858,7 +858,7 @@ coef.RI.regression.result <- function( object, ... ) {
 #' @export
 print.RI.regression.result <- function( x, digits = max(3L, getOption("digits") - 3L), ... ) {
 
-    scat(  "RI het tx regression (%s):\n\t%s\n\n", x$method, paste( deparse( x$call ), sep="\n\t", collapse="\n\t" ) )
+     scat(  "Heterogeneous Treatment Effects Regression (%s):\n\t%s\n\n", x$method, paste( deparse( x$call ), sep="\n", collapse="\n" ) )
     #browser()
     #scat(  "RI het tx regression (%s):\n\n", x$method )
 
@@ -868,15 +868,15 @@ print.RI.regression.result <- function( x, digits = max(3L, getOption("digits") 
                       quote = FALSE)
     }
     else cat("No coefficients\n")
-    cat("\nVar-Cor Matrix:\n")
+    cat("\nVariance-Covariance Matrix:\n")
     print( x$cov.beta )
     scat(  "\nChi-squared test for systematic variation: X^2=%.2f ; p=%.3f\n", x$chisq.stat, x$p.value )
 
     scat( "\nDetails:  ATE = %.3f +/- %.3f     SD( Y(0) ) = %.3f   SD( Y(1) ) = %.3f", x$ATE, 1.96 * x$SE.ATE, x$SD.Y0, x$SD.Y1 )
+    cat("\n")
 
     invisible( x )
 }
-
 
 ## #' @title extract for texreg package
 ## #' 

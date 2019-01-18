@@ -50,7 +50,7 @@ globalVariables('b')
 detect.idiosyncratic <- function(formula, data,
                                  interaction.formula = NULL, control.formula = NULL,
                                  plugin = FALSE, tau.hat = NULL,
-                                 test.stat = ifelse( is.null(W) & is.null(X), SKS.stat, ifelse( is.null(W), SKS.stat.cov, SKS.stat.int.cov ) ),
+                                 test.stat = ifelse( is.null(W) & is.null(X), "SKS.stat", ifelse( is.null(W), "SKS.stat.cov", "SKS.stat.int.cov" ) ),
                                  te.vec = NULL,
                                  B = 500, gamma = 0.0001, grid.gamma = 100*gamma,
                                  grid.size = 151, return.matrix = FALSE, na.rm = FALSE,
@@ -186,41 +186,25 @@ detect.idiosyncratic <- function(formula, data,
     }
 
     ## Checks on functions
-    no.adj.funs <- c(KS.stat, SKS.stat, rq.stat)
-    adj.funs <- c(SKS.stat.cov.pool, SKS.stat.cov, SKS.stat.cov.rq, rq.stat.cond.cov, rq.stat.uncond.cov)
-    adj.int.funs <- c(SKS.stat.int.cov.pool, SKS.stat.int.cov)
-    int.funs <- c(WSKS.t, SKS.pool.t)
+    no.adj.funs <- c("KS.stat", "SKS.stat", "rq.stat")
+    adj.funs <- c("SKS.stat.cov.pool", "SKS.stat.cov", "SKS.stat.cov.rq", "rq.stat.cond.cov", "rq.stat.uncond.cov")
+    adj.int.funs <- c("SKS.stat.int.cov.pool", "SKS.stat.int.cov")
+    int.funs <- c("WSKS.t", "SKS.pool.t")
     if(is.null(W) & is.null(X)){
-        store.test <- rep(NA, length(no.adj.funs))
-        for(i in 1:length(no.adj.funs)){
-            store.test[i] <- identical(no.adj.funs[[i]], test.stat)
-        }
-        if(!any(store.test)){
+        if(!(test.stat %in% no.adj.funs)){
             stop("You have provided an invalid test statistic when not adjusting for covariates or specifying interactions. Must provide one of KS.stat, SKS.stat, or rq.stat. Please see test.stat.info() for more information.")
         }
     }else if(is.null(W)){
-        store.test <- rep(NA, length(adj.funs))
-        for(i in 1:length(adj.funs)){
-            store.test[i] <- identical(adj.funs[[i]], test.stat)
-        }
-        if(!any(store.test)){
+        if(!(test.stat %in% adj.funs)){
             stop("You have provided an invalid test statistic when adjusting for covariates in control.formula but not specifying interactions. Must provide one of SKS.stat.cov.pool, SKS.stat.cov, SKS.stat.cov.rq, rq.stat.cond.cov, or rq.stat.uncond.cov. Please see test.stat.info() for more information.")
         }
     }else if(is.null(X)){
         just.int.funs <- c(adj.int.funs, int.funs)
-        store.test <- rep(NA, length(just.int.funs))
-        for(i in 1:length(just.int.funs)){
-            store.test[i] <- identical(just.int.funs[[i]], test.stat)
-        }
-        if(!any(store.test)){
+        if(!(test.stat %in% just.int.funs)){
             stop("You have provided an invalid test statistic when specifying interactions in interaction.formula but not adjusting for covariates. Must provide one of SKS.stat.int.cov.pool, SKS.stat.int.cov, WSKS.t, or SKS.pool.t. Please see test.stat.info() for more information.")
         }
     }else{
-        store.test <- rep(NA, length(adj.int.funs))
-        for(i in 1:length(adj.int.funs)){
-            store.test[i] <- identical(adj.int.funs[[i]], test.stat)
-        }
-        if(!any(store.test)){
+        if(!(test.stat %in% adj.int.funs)){
             stop("You have provided an invalid test statistic when specifying interactions in interaction.formula and adjusting for covariates in control.formula. Must provide one of SKS.stat.int.cov.pool or SKS.stat.int.cov. Please see test.stat.info() for more information.")
         }
     }
@@ -232,19 +216,23 @@ detect.idiosyncratic <- function(formula, data,
         if(is.null(tau.hat)){
             tau.hat <- mean(Y[Z == 1]) - mean(Y[Z == 0])
         }
-        fpi_out <- FRTplug(Y = Y, Z = Z, test.stat = test.stat, tau.hat = tau.hat, verbose= verbose, ...)
+        fpi_out <- FRTplug(Y = Y, Z = Z, test.stat = match.fun(test.stat), tau.hat = tau.hat, verbose= verbose, ...)
     }else if(is.null(W)){ ## FRTCI - with or without adjusting
-        fpi_out <- FRTCI(Y = Y, Z = Z, X = X, test.stat = test.stat, B = B, gamma = gamma,
+        fpi_out <- FRTCI(Y = Y, Z = Z, X = X, test.stat = match.fun(test.stat), B = B, gamma = gamma,
                          grid.gamma = grid.gamma, grid.size = grid.size,
                          te.vec = te.vec, return.matrix = return.matrix,
                          n.cores = n.cores, verbose = verbose, ...)
     }else{ ## FRTCI.interact
         fpi_out <- FRTCI.interact(Y = Y, Z = Z, W = W, X = X,
-                                  test.stat = test.stat, B = B, gamma = gamma,
+                                  test.stat = match.fun(test.stat), B = B, gamma = gamma,
                                   grid.gamma = grid.gamma, grid.size = grid.size,
                                   return.matrix = return.matrix, n.cores = n.cores,
                                   verbose = verbose, ...)
     }
+
+    ## Add to output
+    fpi_out$call <- match.call()
+    fpi_out$test.stat <- test.stat
 
     return(fpi_out)
 
@@ -291,7 +279,7 @@ FRTCI <- function(Y, Z, X = NULL, test.stat = SKS.stat, B=500,
     t = res$ks.obs
     p.value = max( ci.p )
     n=length(Y)
-    method = paste( "FRT CI Test for Tx Effect Heterogeneity with ", substitute(test.stat), sep="" )
+    method = paste( "FRT CI Test for Treatment Effect Heterogeneity with ", substitute(test.stat), sep="" )
     DAT = paste( n, " observations", sep="")
     
     if ( !return.matrix ) {
@@ -316,7 +304,7 @@ FRTCI <- function(Y, Z, X = NULL, test.stat = SKS.stat, B=500,
 ## Test using plug-in sample average treatment effect
 FRTplug <- function( Y, Z, test.stat=SKS.stat, tau.hat=mean(Y[Z == 1]) - mean(Y[Z == 0]), ... ){
     mth = FRTCI( Y, Z, test.stat=test.stat, te.vec=c(tau.hat), n.cores = 1, ...)
-    mth$method = paste( "FRT Plug-in Test for Tx Effect Heterogeneity with ", substitute(test.stat), sep="" )
+    mth$method = paste( "FRT Plug-in Test for Treatment Effect Heterogeneity with ", substitute(test.stat), sep="" )
     mth
 }
 

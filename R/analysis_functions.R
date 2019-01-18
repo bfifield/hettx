@@ -1,6 +1,14 @@
 #' summary.FRTCI.test
 #'
-#' 
+#' Summarize FRTCI.test object
+#'
+#' @usage \method{summary}{FRTCI.test}(x, ...)
+#'
+#' @param x An object of class \code{FRTCI.test}
+#' @param ... Further arguments to be passed to \code{summary.FRTCI.test()}
+#'
+#' @export
+#' @method summary FRTCI.test
 summary.FRTCI.test <- function(x, ...){
 
     ## Create data frame
@@ -8,8 +16,16 @@ summary.FRTCI.test <- function(x, ...){
     df <- data.frame(x$statistic, x$p.value, x$p.value.plug, rng[1], rng[2])
     names(df) <- c("Estimate", "P-Value (Sweep)", "P-Value (Plug-In)",
                    "P-Value Lower CI", "P-Value Upper CI")
+    rownames(df) <- NULL
 
-    
+    cat("\n")
+    cat("Call:\n")
+    print(x$call)
+    cat("\n")
+    cat("Test Statistic:", x$test.stat, "\n")
+    cat("\n")
+    cat("Estimates:\n")
+    print(df)
     
 }
 
