@@ -847,87 +847,65 @@ coef.RI.regression.result <- function( object, ... ) {
     object$beta.hat
 }
 
-
-#' Print out result of systematic treatment effect estimation.
-#'
-#' @param x  Result from est.beta
-#'
-#' @param digits  Number of digits for rounding
-#' @param ...  Unused
-#'
 #' @export
-print.RI.regression.result <- function( x, digits = max(3L, getOption("digits") - 3L), ... ) {
-
-    scat(  "RI het tx regression (%s):\n\t%s\n\n", x$method, paste( deparse( x$call ), sep="\n\t", collapse="\n\t" ) )
-    #browser()
-    #scat(  "RI het tx regression (%s):\n\n", x$method )
-
-    if (length(coef(x))) {
-        cat("Coefficients:\n")
-        print.default(format( coef(x), digits = digits), print.gap = 2L,
+print.RI.regression.result <- function(x, digits = max(3L, getOption("digits") - 3L), ...){
+    out <- summary(x)
+    if("coefficients" %in% names(out)) {
+        cat("\nCoefficients:\n")
+        print.default(format( out$coefficients, digits = digits), print.gap = 2L,
                       quote = FALSE)
     }
     else cat("No coefficients\n")
-    cat("\nVar-Cor Matrix:\n")
-    print( x$cov.beta )
-    scat(  "\nChi-squared test for systematic variation: X^2=%.2f ; p=%.3f\n", x$chisq.stat, x$p.value )
-
-    scat( "\nDetails:  ATE = %.3f +/- %.3f     SD( Y(0) ) = %.3f   SD( Y(1) ) = %.3f", x$ATE, 1.96 * x$SE.ATE, x$SD.Y0, x$SD.Y1 )
-
-    invisible( x )
+    cat("\nVariance-Covariance Matrix:\n")
+    print( out$vcov )
+    scat(  "\nChi-squared test for systematic variation: X^2=%.2f; p=%.3f\n",
+         out$chisq.stat, out$p.value )
+    invisible(x)
 }
 
+#' @export
+summary.RI.regression.result <- function(object, ...){
+    out <- vector(mode = "list")
+    out$method <- object$method
+    out$call <- object$call
+    if(length(coef(object))){
+        out$coefficients <- coef(object)
+    }
+    out$vcov <- vcov(object)
+    out$chisq.stat <- object$chisq.stat
+    out$p.value <- object$p.value
+    out$ATE <- object$ATE
+    out$SE.ATE <- object$SE.ATE
+    out$SD.Y0 <- object$SD.Y0
+    out$SD.Y1 <- object$SD.Y1
+    class(out) <- "summary.RI.regression.result"
 
-## #' @title extract for texreg package
-## #' 
-## #' @export
-## #'
-## #' @importFrom texreg createTexreg
-## extract.RI.regression.result = function(model, include.rsquared = FALSE, include.adjrs = FALSE, 
-##           include.nobs = TRUE, include.fstatistic = FALSE, include.rmse = FALSE, 
-##           ...) 
-## {
-##   names <- names(model$beta.hat)
-##   co <- model$beta.hat
-##   se <- SE( model )
-##   pval <- pnorm( abs( co / se ) )
-##   rs <- 0
-##   adj <- 0
-##   n <- nrow(model$X)
-##   gof <- numeric()
-##   gof.names <- character()
-##   gof.decimal <- logical()
-##   if (include.rsquared == TRUE) {
-##     gof <- c(gof, rs)
-##     gof.names <- c(gof.names, "R$^2$")
-##     gof.decimal <- c(gof.decimal, TRUE)
-##   }
-##   if (include.adjrs == TRUE) {
-##     gof <- c(gof, adj)
-##     gof.names <- c(gof.names, "Adj. R$^2$")
-##     gof.decimal <- c(gof.decimal, TRUE)
-##   }
-##   if (include.nobs == TRUE) {
-##     gof <- c(gof, n)
-##     gof.names <- c(gof.names, "Num. obs.")
-##     gof.decimal <- c(gof.decimal, FALSE)
-##   }
-##   if (include.fstatistic == TRUE) {
-##     fstat <- s$fstatistic[[1]]
-##     gof <- c(gof, fstat)
-##     gof.names <- c(gof.names, "F statistic")
-##     gof.decimal <- c(gof.decimal, TRUE)
-##   }
-##   if (include.rmse == TRUE && !is.null(s$sigma[[1]])) {
-##     rmse <- s$sigma[[1]]
-##     gof <- c(gof, rmse)
-##     gof.names <- c(gof.names, "RMSE")
-##     gof.decimal <- c(gof.decimal, TRUE)
-##   }
-##   tr <- createTexreg(coef.names = names, coef = co, se = se, 
-##                      pvalues = pval, gof.names = gof.names, gof = gof, gof.decimal = gof.decimal)
-##   return(tr)
-## }
+    return(out)
+}
+
+#' @export
+print.summary.RI.regression.result <- function(x, digits = max(3L, getOption("digits") - 3L), ...){
+
+    cat("\nSystematic Estimation Regression of Heterogeneous Treatment Effects:", x$method, "\n\n")
+    cat("Call:\n")
+    print(x$call)
+
+    if("coefficients" %in% names(x)) {
+        cat("\nCoefficients:\n")
+        print.default(format( x$coefficients, digits = digits), print.gap = 2L,
+                      quote = FALSE)
+    }
+    else cat("No coefficients\n")
+    cat("\nVariance-Covariance Matrix:\n")
+    print( x$vcov )
+    scat(  "\nChi-squared test for systematic variation: X^2=%.2f; p=%.3f\n", x$chisq.stat, x$p.value )
+
+    scat( "\nDetails: ATE = %.3f +/- %.3f     SD(Y(0)) = %.3f   SD(Y(1)) = %.3f", x$ATE, 1.96 * x$SE.ATE, x$SD.Y0, x$SD.Y1 )
+    scat("\n")
+
+    invisible( x )
+
+}
 
 #' Get vcov() from object.
 #'
@@ -972,14 +950,14 @@ print.RI.R2.result <- function( x, ... ) {
         scat( "\tSystematic Tx Var (Strata):\t %.3f\n", x$Stautau.U )
         totsys = x$pi.c * x$Sdd + x$Stautau.U
         scat( "\tTotal Systematic Var:\t\t %.3f\n", totsys )
-        scat( "\tIdeosyncratic Tx Var (Comp):\t %.3f -- %.3f | %0.3f\n",  x$See.lower, x$See.upper0, x$See.upper )
+        scat( "\tIdiosyncratic Tx Var (Comp):\t %.3f -- %.3f | %0.3f\n",  x$See.lower, x$See.upper0, x$See.upper )
         scat( "\tTotal variation:\t\t %.3f -- %.3f | %.3f\n", totsys + x$pi.c*x$See.lower, totsys+x$pi.c*x$See.upper0, totsys+x$pi.c*x$See.upper )
         scat( "\n  Details: \tLATE = %.3f   ITT = %.3f    Proportion compliers = %.3f\n", x$tau.c, x$ITT, x$pi.c )
     } else {
         scat( "\tR^2:\t\t\t %.3f | %.3f -- %.3f\n", x$R2.lower, x$R2.lower0, x$R2.upper  )
         scat( "\n  Treatment Effect Variances:\n" )
         scat( "\tSystematic:\t %.3f\n", x$Sdd  )
-        scat( "\tIdeosyncratic:\t %.3f -- %.3f | %0.3f\n", x$See.lower, x$See.upper0, x$See.upper )
+        scat( "\tIdiosyncratic:\t %.3f -- %.3f | %0.3f\n", x$See.lower, x$See.upper0, x$See.upper )
         scat( "\tTotal:\t %.3f -- %.3f | %0.3f\n", x$Sdd + x$See.lower, x$Sdd  +x$See.upper0, x$Sdd + x$See.upper )
 
 

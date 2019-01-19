@@ -25,7 +25,7 @@ str( df )
 The function `estimate.systematic` is our core estimator that implements our various methods:
 ```{r}
 rs = estimate.systematic( Yobs ~ Z,  interaction.formula = ~ A + B, data=df )
-rs
+summary(rs)
 ```
 The arguments are observed outcome, observed treatment assignment, and what variables to find a systematic relationship to, expressed as a formula using the tilde notation (categorical covariates will be automatically converted).
 The output give coefficients for the model for individual systematic treatment effects. In the above, our model of effects is $\tau_i = \beta_0 + \beta_1 A_i + \beta_2 B_i$.
@@ -45,7 +45,7 @@ confint( rs )
 OLS uses the empirical covariance matrix $\widehat{S}_{xx}$ (`Sxx.hat`) for each treatment arm rather than the known Sxx:
 ```{r}
 M.ols.ours = estimate.systematic( Yobs ~ Z, ~ A + B, data=df, method="OLS" )
-M.ols.ours
+summary(M.ols.ours)
 M.ols.ours$beta.hat
 ```
 
@@ -110,7 +110,7 @@ If we know all potential outcomes, we can calculate the exact beta for the sampl
 We can also get the true SE, which is why we pass a sample treatment vector (so it can calculate proportion treated, under the assumption of simple random assignment):  
 ```{r}
 Moracle = estimate.systematic( Y.1 + Y.0 ~ Z, ~ A + B, data=df )
-Moracle
+summary(Moracle)
 SE( Moracle )
 ```
 It will give the same results regardless of $Z$ assuming the total number of units remains the same.
@@ -136,7 +136,7 @@ We can look at treatment effect explained.  We will look at two scenarios, one w
 df = make.randomized.dat( 1000, beta.vec=c(-1,1,1) )
 rs = estimate.systematic( Yobs ~ Z, ~ A + B, data=df, method="OLS" )
 r2 = R2( rs )
-r2    
+r2
 ```
 
 And now our DGP with lots of idiosyncratic variation:
@@ -229,7 +229,7 @@ We use our same method, but by using the ``bar'' notation, we can specify our tr
 Now our treatment variation formula is for the compliers (the always- and never-takers have no impact or variation).
 ```{r}
 rs = estimate.systematic( Yobs ~ D | Z, ~ A + B, data=data )
-rs
+summary(rs)
 rs$beta.hat
 SE( rs )
 ```
@@ -244,7 +244,7 @@ plot( r2 )
 Analogous to the OLS approach, above, we can use a 2SLS approach here.
 ```{r}
 rs2SLS = estimate.systematic( Yobs ~ Z | D,  ~ A + B, data=data, method="2SLS" )
-rs2SLS
+summary(rs2SLS)
 SE( rs2SLS )
 ```
 Comparing our errors in estimation from the two approaches we have:

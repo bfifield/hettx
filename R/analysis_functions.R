@@ -1,38 +1,41 @@
-#' print.FRTCI.test
-#' 
-#' Print out FRTCI.test object.
-#'
-#' @usage \method{print}{FRTCI.test}(x, ...)
-#'
-#' @param x An object of class \code{FRTCI.test}
-#' @param ... Further arguments to be passed to \code{print.FRTCI.test()}
-#'
 #' @export
-#' @method print FRTCI.test
-print.FRTCI.test = function( x, ... ) {
-    cat( "\t", x$method, "\n" )
-    cat( "data: ", x$data.name, "\n" )
-    cat( "t =", x$statistic, ", p-value =", x$p.value, " (plug = ", x$p.value.plug, ")\n" )
-    rng = range(x$ci.p)
-    cat( "\tp-value range =", rng[1], "-", rng[2] , "\n" )
-    
-    if ( !is.null( x$te.vec ) ) {    
-        rng = range( x$te.vec )
-        cat( "CI range = ", rng[1], "-",rng[2], "\tMOE =", x$te.MOE, "\n" )
-        cat( "\tNeyman Difference point estimate of average =", x$te.hat, " SE =", x$te.SE,  "\n" )
-    }
-    cat( "\t# tested points =", length( x$ci.p ), "\n" )
-    cat( "\tB = ", x$B, "\tgamma = ", x$gamma, "\n" )
-    
-    if ( !is.null( x$W ) ) {
-        cat( "\tCorrected for", paste( colnames(x$W), sep=", " ), "\n" )        
-    }
+summary.FRTCI.test <- function(object, ...){
 
-    if ( !is.null( x$X ) ) {
-        cat( "\tAdjusted for", paste( colnames(x$X), sep=", " ), "\n" )        
-    }
+    ## Create data frame
+    rng <- range(object$ci.p)
+    df <- data.frame(object$statistic, object$p.value, object$p.value.plug, rng[1], rng[2])
+    names(df) <- c("Estimate", "P-Value (Sweep)", "P-Value (Plug-In)",
+                   "P-Value Lower CI", "P-Value Upper CI")
+    rownames(df) <- NULL
     
+    ## Create output
+    out <- vector(mode = "list")
+    out$call <- object$call
+    out$estimates <- df
+    out$test.stat <- object$test.stat
+    out$B <- object$B
+    out$gamma <- object$gamma
+    class(out) <- "summary.FRTCI.test"
+    return(out)   
+}
+
+#' @export
+print.summary.FRTCI.test <- function(x, ...){
     
+    cat("\n")
+    cat("Call:\n")
+    print(x$call)
+    cat("\n")
+    cat("Test Statistic:", x$test.stat, "\n")
+    cat("\n")
+    cat("Estimates:\n")
+    print(x$estimates)
+    
+}
+
+#' @export
+print.FRTCI.test = function( x, ... ) {
+    print(summary(x)$estimates)
 }
  
 #' get p-value along with uncertainty on p-value

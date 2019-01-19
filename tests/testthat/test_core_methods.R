@@ -72,30 +72,30 @@ test_that( "Every non-rq test statistic works", {
     ## ------------------------------------------------
     ## Test statistics for no adjustment or interaction
     ## ------------------------------------------------
-    tst = detect.idiosyncratic(Y ~ Z, data = ToyData, test.stat=KS.stat, B=B, grid.size=grid.size, verbose=FALSE)
-    tst = detect.idiosyncratic(Y ~ Z, data = ToyData, test.stat=SKS.stat, B=B, grid.size=grid.size, verbose=FALSE)
+    tst = detect.idiosyncratic(Y ~ Z, data = ToyData, test.stat="KS.stat", B=B, grid.size=grid.size, verbose=FALSE)
+    tst = detect.idiosyncratic(Y ~ Z, data = ToyData, test.stat="SKS.stat", B=B, grid.size=grid.size, verbose=FALSE)
 
     ## ----------------------------------------------
     ## Test statistics for adjustment, no interaction
     ## ----------------------------------------------
-    tst = detect.idiosyncratic(Y ~ Z, data = ToyData, control.formula = ~ x1 + x2, test.stat=SKS.stat.cov.pool, B=B, grid.size=grid.size, verbose=FALSE)
-    tst = detect.idiosyncratic(Y ~ Z, data = ToyData, control.formula = ~ x1 + x2, test.stat=SKS.stat.cov, B=B, grid.size=grid.size, verbose=FALSE)
+    tst = detect.idiosyncratic(Y ~ Z, data = ToyData, control.formula = ~ x1 + x2, test.stat="SKS.stat.cov.pool", B=B, grid.size=grid.size, verbose=FALSE)
+    tst = detect.idiosyncratic(Y ~ Z, data = ToyData, control.formula = ~ x1 + x2, test.stat="SKS.stat.cov", B=B, grid.size=grid.size, verbose=FALSE)
 
     ## ----------------------------------------------
     ## Test statistics for interaction, no adjustment
     ## ----------------------------------------------
 
-    tst = detect.idiosyncratic(Y ~ Z, data = ToyData, interaction.formula = ~ x3 + x4, test.stat=SKS.stat.int.cov.pool, B=B, grid.size=grid.size, verbose=FALSE)
-    tst = detect.idiosyncratic(Y ~ Z, data = ToyData, interaction.formula = ~ x3 + x4, test.stat=SKS.stat.int.cov, B=B, grid.size=grid.size, verbose=FALSE)
-    tst = detect.idiosyncratic(Y ~ Z, data = ToyData, interaction.formula = ~ W.fact, test.stat=WSKS.t, B=B, grid.size=grid.size, verbose=FALSE)
-    tst = detect.idiosyncratic(Y ~ Z, data = ToyData, interaction.formula = ~ W.fact, test.stat=SKS.pool.t, B=B, grid.size=grid.size, verbose=FALSE)
+    tst = detect.idiosyncratic(Y ~ Z, data = ToyData, interaction.formula = ~ x3 + x4, test.stat="SKS.stat.int.cov.pool", B=B, grid.size=grid.size, verbose=FALSE)
+    tst = detect.idiosyncratic(Y ~ Z, data = ToyData, interaction.formula = ~ x3 + x4, test.stat="SKS.stat.int.cov", B=B, grid.size=grid.size, verbose=FALSE)
+    tst = detect.idiosyncratic(Y ~ Z, data = ToyData, interaction.formula = ~ W.fact, test.stat="WSKS.t", B=B, grid.size=grid.size, verbose=FALSE)
+    tst = detect.idiosyncratic(Y ~ Z, data = ToyData, interaction.formula = ~ W.fact, test.stat="SKS.pool.t", B=B, grid.size=grid.size, verbose=FALSE)
 
     ## ----------------------------------------------
     ## Test statistics for interaction and adjustment
     ## ----------------------------------------------
 
-    tst = detect.idiosyncratic(Y ~ Z, data = ToyData, interaction.formula = ~ x3 + x4, control.formula = ~ x1 + x2, test.stat=SKS.stat.int.cov.pool, B=B, grid.size=grid.size, verbose=FALSE)
-    tst = detect.idiosyncratic(Y ~ Z, data = ToyData, interaction.formula = ~ x3 + x4, control.formula = ~ x1 + x2, test.stat=SKS.stat.int.cov, B=B, grid.size=grid.size, verbose=FALSE)
+    tst = detect.idiosyncratic(Y ~ Z, data = ToyData, interaction.formula = ~ x3 + x4, control.formula = ~ x1 + x2, test.stat="SKS.stat.int.cov.pool", B=B, grid.size=grid.size, verbose=FALSE)
+    tst = detect.idiosyncratic(Y ~ Z, data = ToyData, interaction.formula = ~ x3 + x4, control.formula = ~ x1 + x2, test.stat="SKS.stat.int.cov", B=B, grid.size=grid.size, verbose=FALSE)
     
 })
 
