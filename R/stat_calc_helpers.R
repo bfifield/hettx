@@ -292,7 +292,7 @@ SKS.stat.cov.rq <- function(Y, Z, X)
 {
 
     this.lm <- lm(Y ~ Z + X)
-    this.rq <- rq(Y ~ Z + X, tau = seq(0.05, 0.95, by = 0.05))
+    this.rq <- suppressWarnings(rq(Y ~ Z + X, tau = seq(0.05, 0.95, by = 0.05)))
     
     z.rq <- coef(this.rq)["Z",]
     return( max(z.rq - coef(this.lm)["Z"]) )
@@ -319,7 +319,7 @@ rq.stat <- function(Y, Z, rq.pts = seq(0.1, 0.9, by = 0.1))
     }
     
     this.lm <- lm(Y ~ Z)
-    this.rq <- rq(Y ~ Z, tau = rq.pts)
+    this.rq <- suppressWarnings(rq(Y ~ Z, tau = rq.pts))
     
     z.rq <- coef(this.rq)["Z",]
     return( max(z.rq - coef(this.lm)["Z"]) )
@@ -348,7 +348,7 @@ rq.stat.cond.cov <- function(Y, Z, X, rq.pts = seq(0.1, 0.9, by = 0.1))
     }
     
     this.lm <- lm(Y ~ Z + X)
-    this.rq <- rq(Y ~ Z + X, tau = rq.pts)
+    this.rq <- suppressWarnings(rq(Y ~ Z + X, tau = rq.pts))
     
     z.rq <- coef(this.rq)["Z",]
     return( max(z.rq - coef(this.lm)["Z"]) )
@@ -382,7 +382,7 @@ rq.stat.uncond.cov <- function(Y, Z, X, rq.pts = seq(0.1, 0.9, by = 0.1))
     
     
     this.lm <- lm(Y ~ Z, weights = ipw.weights)
-    this.rq <- rq(Y ~ Z, tau = rq.pts, weights = ipw.weights)
+    this.rq <- suppressWarnings(rq(Y ~ Z, tau = rq.pts, weights = ipw.weights))
     
     z.rq <- coef(this.rq)["Z",]
     return( max(z.rq - coef(this.lm)["Z"]) )

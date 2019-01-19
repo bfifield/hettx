@@ -102,36 +102,40 @@ test_that( "Every non-rq test statistic works", {
 
 
 
-# test_that( "rq test statistic works", {
-#   
-#   data(ToyData)
-#   
-#   B <- 20
-#   grid.size = 11
-#   
-#   ## -------------
-#   ## Test defaults
-#   ## -------------
-#   X <- model.matrix(~ x1 + x2, data = ToyData)[,-1]
-#   W <- model.matrix(~ x3 + x4, data = ToyData)[,-1]
-#   W.fact <- as.factor(sample(c("A", "B"), nrow(W), replace = TRUE))
-#   
-#    
-#   ## ------------------------------------------------
-#   ## Test statistics for no adjustment or interaction
-#   ## ------------------------------------------------
-#   tst = detect.idiosyncratic(Y ~ Z, data = ToyData, test.stat=rq.stat, B=B, grid.size=grid.size, verbose=FALSE)
-#   
-#   ## ----------------------------------------------
-#   ## Test statistics for adjustment, no interaction
-#   ## ----------------------------------------------
-#   tst = detect.idiosyncratic(Y ~ Z, data = ToyData, control.formula = ~ x1 + x2, test.stat=rq.stat.cond.cov, B=B, grid.size=grid.size, verbose=FALSE)
-#   tst = detect.idiosyncratic(Y ~ Z, data = ToyData, control.formula = ~ x1 + x2, test.stat=rq.stat.uncond.cov, B=B, grid.size=grid.size, verbose=FALSE)
-#   
-#   tst = detect.idiosyncratic(Y ~ Z, data = ToyData, control.formula = ~ x1 + x2, test.stat=SKS.stat.cov.rq, B=B, grid.size=grid.size, verbose=FALSE)
-#   tst = detect.idiosyncratic(ToyData$Y, ToyData$Z, X=X, test.stat=rq.stat.cond.cov, B=B, grid.size=grid.size, verbose=FALSE, verbose=FALSE)
-#   tst = detect.idiosyncratic(ToyData$Y, ToyData$Z, X=X, test.stat=rq.stat.uncond.cov, B=B, grid.size=grid.size, verbose=FALSE, verbose=FALSE)
-#   
-#   
-# })
+test_that( "rq test statistic works", {
+    
+    data(ToyData)
+    
+    B <- 20
+    grid.size = 11
+    
+    ## -------------
+    ## Test defaults
+    ## -------------
+    X <- model.matrix(~ x1 + x2, data = ToyData)[,-1]
+    W <- model.matrix(~ x3 + x4, data = ToyData)[,-1]
+    W.fact <- as.factor(sample(c("A", "B"), nrow(W), replace = TRUE))
+    
+    
+    ## ------------------------------------------------
+    ## Test statistics for no adjustment or interaction
+    ## ------------------------------------------------
+    tst = detect.idiosyncratic(Y ~ Z, data = ToyData,
+                               test.stat="rq.stat", B=B,
+                               grid.size=grid.size, verbose=FALSE)
+    
+    ## ----------------------------------------------
+    ## Test statistics for adjustment, no interaction
+    ## ----------------------------------------------
+    tst = detect.idiosyncratic(Y ~ Z, data = ToyData, control.formula = ~ x1 + x2,
+                               test.stat="rq.stat.cond.cov", B=B,
+                               grid.size=grid.size, verbose=FALSE)
+    tst = detect.idiosyncratic(Y ~ Z, data = ToyData, control.formula = ~ x1 + x2,
+                               test.stat="rq.stat.uncond.cov", B=B,
+                               grid.size=grid.size, verbose=FALSE)
+    tst = detect.idiosyncratic(Y ~ Z, data = ToyData, control.formula = ~ x1 + x2,
+                               test.stat="SKS.stat.cov.rq", B=B,
+                               grid.size=grid.size, verbose=FALSE)   
+    
+})
 
