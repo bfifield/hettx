@@ -8,7 +8,6 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
--->
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 par( mgp=c(1.8,0.8,0), mar=c(2.5, 2.5,2,0.1) )
