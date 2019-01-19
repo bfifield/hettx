@@ -11,7 +11,7 @@
 #' visualizing the results of the tests.
 #' 
 #' \tabular{ll}{ Package: \tab hettx\cr Type: \tab Package\cr Version: \tab 0.0.1-\cr
-#' Date: \tab 2018-11-28\cr License: \tab GPL (>= 3)\cr }
+#' Date: \tab 2019-01-20\cr License: \tab GPL (>= 3)\cr }
 #'
 #' @name hettx-package
 #' @aliases hettx-package 

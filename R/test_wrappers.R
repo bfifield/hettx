@@ -160,7 +160,7 @@ detect.idiosyncratic <- function(formula, data,
         warning("Adjusting for existing heterogeneity but treatment effect vector provided, ignoring provided treatment effect vector.")
     }
     if(!is.null(W)){
-        if(identical(WSKS.t, test.stat) | identical(SKS.pool.t, test.stat)){
+        if(test.stat %in% c("WSKS.t", "SKS.pool.t")){
             if(ncol(W) > 1){
                 stop("Can only adjust for a single (categorical) covariate when using WSKS.t or SKS.pool.t as test statistics.")
             }

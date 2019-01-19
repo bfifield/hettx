@@ -17,7 +17,7 @@ visualizing the results of the tests.
 }
 \details{
 \tabular{ll}{ Package: \tab hettx\cr Type: \tab Package\cr Version: \tab 0.0.1-\cr
-Date: \tab 2018-11-28\cr License: \tab GPL (>= 3)\cr }
+Date: \tab 2019-01-20\cr License: \tab GPL (>= 3)\cr }
 }
 \references{
 Ding, Peng, Avi Feller and Luke Miratrix. (2016) "Randomization Inference for Treatment Effect Variation", Journal of the Royal Statistical Society-Series B.
