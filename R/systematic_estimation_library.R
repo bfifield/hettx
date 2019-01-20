@@ -121,7 +121,6 @@ calc.beta.oracle <- function( formula, data, interaction.formula, method=c("RI",
                p.value    = NA )
 
     res$method = "Oracle RI"
-    res$call = match.call()
     res$X = X
     res$Y = ifelse( Z, Y1, Y0 )
     res$Y1 = Y1
@@ -361,7 +360,6 @@ est.beta.ITT <- function( formula, data, interaction.formula, control.formula=NU
     res$method = paste( ifelse( empirical.Sxx, "OLS", "RI" ),
                         ifelse( adjust.Stx, "Adjusted","Unadjusted"), sep="-" )
 
-    res$call = match.call()
     res$X = X
     res$Y = Yobs
     res$Z = Z
@@ -584,7 +582,6 @@ est.beta.LATE <- function(formula, data, interaction.formula,
     res$X = X
 
     res$method = paste( "LATE RI-", method, sep="" )
-    res$call = match.call()
 
     class( res ) = c("RI.regression.result", "RI.regression.result.LATE")
 
@@ -643,6 +640,7 @@ estimate.systematic <- function( formula, data, interaction.formula, control.for
     }else{
         stop("Please input a proper argument for formula. For ITT estimation, use Y ~ Z, for LATE estimation, use Y ~ T | Z, and for oracle estimation, use Y1 + Y0 ~ Z.")
     }
+    eb.out$call <- match.call()
     return(eb.out)
     
 }
@@ -700,10 +698,10 @@ R2.ITT <- function( RI.result, rho.step=0.05 ) {
         ## results
         res = list(Sdd            = Sdd,
                    See.lower      = See.lower,
-                   See.upper0     = V0 + V1,
+                   See.upper.sharp     = V0 + V1,
                    See.upper      = See.upper,
                    R2.lower       = R2.lower,
-                   R2.lower0      = R2.middle,
+                   R2.lower.sharp      = R2.middle,
                    R2.upper       = R2.upper,
                    rho            = rho,
                    R2.sensitivity = R2.sensitivity)
@@ -798,7 +796,7 @@ R2.LATE <- function( RI.result, rho.step=0.05 ) {
                    Stautau.U     = Stautau.U,
                    Sdd           = Sdd.c,
                    See.lower   = See.c.lower,
-                   See.upper0  = See.c.middle,
+                   See.upper.sharp  = See.c.middle,
                    See.upper   = See.c.upper,
 
                    Yunique       = Yunique,
@@ -808,17 +806,17 @@ R2.LATE <- function( RI.result, rho.step=0.05 ) {
                    rho           = rho,
 
                    R2.U.lower    = R2.U.lower,
-                   R2.U.lower0   = R2.U.middle,
+                   R2.U.lower.sharp   = R2.U.middle,
                    R2.U.upper    = R2.U.upper,
                    R2.U.sensitivity = R2.U.sensitivity,
 
                    R2.lower  = R2.lower,
-                   R2.lower0 = R2.middle,
+                   R2.lower.sharp = R2.middle,
                    R2.upper  = R2.upper,
                    R2.sensitivity = R2.sensitivity,
 
                    R2.UX.lower     = R2.UX.lower,
-                   R2.UX.lower0    = R2.UX.middle,
+                   R2.UX.lower.sharp    = R2.UX.middle,
                    R2.UX.upper     = R2.UX.upper,
                    R2.UX.sensitivity = R2.UX.sensitivity )
 
@@ -927,43 +925,159 @@ SE <- function( object, ... ) {
     sqrt( diag( vcov( object ) ) )
 }
 
-#' Print out results on estimating treatment effect R2
-#'
-#' Print various R2 measures including the bounds due to the sensitivity analysis.
-#'
-#' @param x  Object to print
-#' @param ...  Ignored
-#'
 #' @export
 print.RI.R2.result <- function( x, ... ) {
-    scat(  "Heterogenous Tx Effect R^2 (%s)\n", x$type )
-
-    if ( x$type == "LATE" ) {
-        scat( "\tR^2 (within Compliers):\t\t %.3f | %.3f -- %.3f\n", x$R2.lower, x$R2.lower0, x$R2.upper )
-
-        scat( "\tR^2 for noncompliance alone:\t %.3f | %.3f -- %.3f\n", x$R2.U.lower, x$R2.U.lower0, x$R2.U.upper )
-
-        scat( "\tR^2 for covariates & compliance: %.3f | %.3f -- %.3f\n", x$R2.UX.lower, x$R2.UX.lower0, x$R2.UX.upper )
-
-        scat( "\n  Variances:\n" )
-        scat( "\tSystematic Tx Var (Compliers):\t %.3f\n", x$Sdd  )
-        scat( "\tSystematic Tx Var (Strata):\t %.3f\n", x$Stautau.U )
-        totsys = x$pi.c * x$Sdd + x$Stautau.U
-        scat( "\tTotal Systematic Var:\t\t %.3f\n", totsys )
-        scat( "\tIdiosyncratic Tx Var (Comp):\t %.3f -- %.3f | %0.3f\n",  x$See.lower, x$See.upper0, x$See.upper )
-        scat( "\tTotal variation:\t\t %.3f -- %.3f | %.3f\n", totsys + x$pi.c*x$See.lower, totsys+x$pi.c*x$See.upper0, totsys+x$pi.c*x$See.upper )
-        scat( "\n  Details: \tLATE = %.3f   ITT = %.3f    Proportion compliers = %.3f\n", x$tau.c, x$ITT, x$pi.c )
-    } else {
-        scat( "\tR^2:\t\t\t %.3f | %.3f -- %.3f\n", x$R2.lower, x$R2.lower0, x$R2.upper  )
-        scat( "\n  Treatment Effect Variances:\n" )
-        scat( "\tSystematic:\t %.3f\n", x$Sdd  )
-        scat( "\tIdiosyncratic:\t %.3f -- %.3f | %0.3f\n", x$See.lower, x$See.upper0, x$See.upper )
-        scat( "\tTotal:\t %.3f -- %.3f | %0.3f\n", x$Sdd + x$See.lower, x$Sdd  +x$See.upper0, x$Sdd + x$See.upper )
-
-
-    }
+    print(summary(x))
+    invisible(x)
 }
 
+#' @export
+summary.RI.R2.result <- function(object, ...){
+
+    ## Type
+    out <- vector(mode = "list")
+    out$method <- object$type
+
+    if(object$type == "ITT"){
+
+        ## -------
+        ## For ITT
+        ## -------
+        
+        ## Data frame for R2
+        df_hte_r2 <- data.frame(
+            object$R2.lower, object$R2.lower.sharp, object$R2.upper
+        )
+        names(df_hte_r2) <- c(
+            "R2 Lower Bound", "R2 Lower Bound (Sharp)", "R2 Upper Bound"
+        )
+        rownames(df_hte_r2) <- NULL
+        out$hte_r2 <- df_hte_r2
+        
+        ## Store systematic treatment effect variance
+        out$hte_variance_systematic <- object$Sdd
+        
+        ## Data frame for idiosyncratic variance
+        df_hte_idio <- data.frame(
+            object$See.lower, object$See.upper.sharp, object$See.upper
+        )
+        names(df_hte_idio) <- c(
+            "Lower Bound", "Upper Bound (Sharp)", "Upper Bound"
+        )
+        rownames(df_hte_idio) <- NULL
+        out$hte_variance_idiosyncratic <- df_hte_idio
+
+        ## Data frame for total variance
+        df_hte_total <- data.frame(
+            object$Sdd + object$See.lower, object$Sdd + object$See.upper.sharp,
+            object$Sdd + object$See.upper
+        )
+        names(df_hte_total) <- c(
+            "Lower Bound", "Upper Bound (Sharp)", "Upper Bound"
+        )
+        out$hte_variance_total <- df_hte_total
+    }else{
+
+        ## --------
+        ## For LATE
+        ## --------
+
+        ## Data frame for R2
+        df_hte_r2 <- data.frame(
+            c(object$R2.lower, object$R2.U.lower, object$R2.UX.lower),
+            c(object$R2.lower.sharp, object$R2.U.lower.sharp,
+              object$R2.UX.lower.sharp),
+            c(object$R2.upper, object$R2.U.upper, object$R2.UX.upper)
+        )
+        names(df_hte_r2) <- c(
+            "R2 Lower Bound", "R2 Lower Bound (Sharp)", "R2 Upper Bound"
+        )
+        rownames(df_hte_r2) <- c(
+            "Compliers", "Noncompliers", "Covariates and compliers"
+        )
+        out$hte_r2 <- df_hte_r2
+
+        ## Variances
+        out$hte_variance_systematic_compliers <- object$Sdd
+        out$hte_variance_systematic_strata <- object$Stautau.U
+        totsys = object$pi.c * object$Sdd + object$Stautau.U
+        out$hte_variance_systematic_total <- totsys
+
+        ## Variance Data frames
+        df_hte_idio <- data.frame(
+            object$See.lower, object$See.upper.sharp, object$See.upper
+        )
+        names(df_hte_idio) <- c(
+            "Lower Bound", "Upper Bound (Sharp)", "Upper Bound"
+        )
+        rownames(df_hte_idio) <- NULL
+        out$hte_variance_idiosyncratic <- df_hte_idio
+
+        df_hte_total <- data.frame(
+            totsys + object$pi.c * object$See.lower,
+            totsys + object$pi.c * object$See.upper.sharp,
+            totsys + object$pi.c * object$See.upper
+        )
+        names(df_hte_total) <- c(
+            "Lower Bound", "Upper Bound (Sharp)", "Upper Bound"
+        )
+        out$hte_variance_total <- df_hte_total
+
+        out$LATE <- object$tau.c
+        out$ITT <- object$ITT
+        out$prop_compliers <- object$pi.c
+        
+    }
+    
+    class(out) <- "summary.RI.R2.result"
+    return(out)
+    
+}
+
+#' @export
+print.summary.RI.R2.result <- function(x, digits = max(3L, getOption("digits") - 3L), ...){
+
+    cat("\n", paste0("R2 for Systematic Estimation Regression of Heterogeneous Treatment Effects (", x$method, ")"), "\n")
+    if(x$method == "LATE"){
+        cat("\nR2 Estimates:\n")
+        print(round(x$hte_r2, digits = digits))
+        cat("\nVariance Estimates:\n")
+        cat("\tSystematic Treatment Effect Variation for Compliers:",
+            round(x$hte_variance_systematic_compliers, digits), "\n")
+        cat("\tSystematic Treatment Effect Variation for Strata:",
+            round(x$hte_variance_systematic_strata, digits), "\n")
+        cat("\tTotal Systematic Treatment Effect Variation:",
+            round(x$hte_variance_systematic_total, digits), "\n")
+        cat("\tIdiosyncratic Treatment Effect Variation for Compliers:",
+            paste0(round(x$hte_variance_idiosyncratic[1], digits), " -- ",
+                   round(x$hte_variance_idiosyncratic[3], digits),
+                   " (", round(x$hte_variance_idiosyncratic[2], digits),
+                   " Sharp)"), "\n")
+        cat("\tTotal Treatment Effect Variation:",
+            paste0(round(x$hte_variance_total[1], digits), " -- ",
+            round(x$hte_variance_total[3], digits),
+            " (", round(x$hte_variance_total[2], digits), " Sharp)"), "\n")
+
+        scat( "\nDetails: LATE = %.3f; ITT = %.3f; Proportion compliers = %.3f\n", x$LATE, x$ITT, x$prop_compliers)
+
+    }else{
+        cat("\nR2 Estimates:\n")
+        print(round(x$hte_r2, digits = digits))
+        cat("\nVariance Estimates:\n")
+        cat("\tSystematic Treatment Effect Variation:",
+            round(x$hte_variance_systematic, digits), "\n")
+        cat("\tIdiosyncratic Treatment Effect Variation:",
+            paste0(round(x$hte_variance_idiosyncratic[1], digits), " -- ",
+                   round(x$hte_variance_idiosyncratic[3], digits),
+                   " (", round(x$hte_variance_idiosyncratic[2], digits),
+                   " Sharp)"), "\n")
+        cat("\tTotal Treatment Effect Variation:",
+            paste0(round(x$hte_variance_total[1], digits), " -- ",
+            round(x$hte_variance_total[3], digits),
+            " (", round(x$hte_variance_total[2], digits), " Sharp)"), "\n")
+    }
+    invisible(x)
+}
 
 #' Make a plot of the treatment effect R2 estimates
 #'
