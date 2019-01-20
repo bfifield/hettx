@@ -214,7 +214,9 @@ est.beta.ITT <- function( formula, data, interaction.formula, control.formula=NU
     stopifnot( is.numeric( Z ) )
     stopifnot( nrow(X) == length( Z ) )
     stopifnot( length( Yobs ) == length( Z ) )
-    stopifnot( all( sort( unique( Z ) ) == c( 0, 1 ) ) )
+    if(!(all(sort(unique(Z))) == c(0,1))){
+        stop("Your instrument variable must only take values of 0 and 1.")
+    }
 
 
     ## sample size
@@ -409,7 +411,7 @@ est.beta.LATE <- function(formula, data, interaction.formula,
         stop("Some variables in interaction.formula are not present in your data.")
     }
     if(any(main.vars %in% interaction.vars)){
-        stop("Either your outcome variable or your treatment variable is present in your interaction formula.")
+        stop("Either your outcome variable, your treatment variable, or your instrument variable is present in your interaction formula.")
     }
 
     ## NA handling
@@ -427,10 +429,15 @@ est.beta.LATE <- function(formula, data, interaction.formula,
     Z = data[,main.vars[3]]
     X = model.matrix(interaction.formula, data)
 
+    if(!(all(sort(unique(Z))) == c(0,1))){
+        stop("Your instrument variable must only take values of 0 and 1.")
+    }
+    if(!(all(sort(unique(D))) == c(0,1))){
+        stop("Your instrument variable must only take values of 0 and 1.")
+    }
+
     stopifnot( is.numeric( Yobs ) )
     stopifnot( is.numeric( Z ) )
-    stopifnot( all( sort( unique( Z ) ) == c( 0, 1 ) ) )
-    stopifnot( all( sort( unique( D ) ) == c( 0, 1 ) ) )
     stopifnot( nrow(X) == length( Yobs ) )
     stopifnot( nrow(X) == length( D ) )
     stopifnot( nrow(X) == length( Z ) )
