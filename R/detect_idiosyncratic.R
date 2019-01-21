@@ -1,11 +1,11 @@
 ## Set global variables for foreach
 globalVariables('b')
 
-#' detect.idiosyncratic
+#' detect_idiosyncratic
 #'
 #' Test for systematic treatment effect heterogeneity using
 #' Fisherian permutation inference methods.
-#' @usage detect.idiosyncratic(formula, data, interaction.formula, control.formula,
+#' @usage detect_idiosyncratic(formula, data, interaction.formula, control.formula,
 #' plugin, tau.hat, test.stat, te.vec, B, gamma, grid.gamma, grid.size,
 #' return.matrix, na.rm, n.cores, verbose, ...)
 #'
@@ -35,7 +35,7 @@ globalVariables('b')
 #' tau <- 4
 #' Y <- ifelse(Z, rnorm(100, tau), rnorm(100, 0))
 #' df <- data.frame(Y=Y, Z=Z)
-#' tst <- detect.idiosyncratic(Y ~ Z, df, B = 50, grid.size = 50)
+#' tst <- detect_idiosyncratic(Y ~ Z, df, B = 50, grid.size = 50)
 #' @export
 #' @importFrom graphics abline lines plot rug
 #' @importFrom stats binom.test binomial coef confint ecdf glm lm lowess predict qchisq qnorm var vcov na.omit
@@ -47,7 +47,7 @@ globalVariables('b')
 #' @importFrom parallel makePSOCKcluster stopCluster
 #' @importFrom doParallel registerDoParallel
 #' @importFrom formula.tools get.vars lhs.vars rhs.vars
-detect.idiosyncratic <- function(formula, data,
+detect_idiosyncratic <- function(formula, data,
                                  interaction.formula = NULL, control.formula = NULL,
                                  plugin = FALSE, tau.hat = NULL,
                                  test.stat = ifelse( is.null(W) & is.null(X), "SKS.stat", ifelse( is.null(W), "SKS.stat.cov", "SKS.stat.int.cov" ) ),
