@@ -68,15 +68,20 @@ test_that( "Main methods work", {
     tst = estimate_systematic(Yobs ~ Z, data = df, interaction.formula = ~ A,
                    control.formula = ~ B + C, method = "OLS")
     r2.tst <- R2(tst)
+} )
 
+test_that( "Main complier methods work", {
+  
     ## calc.beta.LATE
     df = make.randomized.compliance.dat( 100 )
 
     tst = estimate_systematic(Yobs ~ D | Z, data = df, interaction.formula = ~ A + B,
                    method = "RI")
+    
     r2.tst <- R2(tst)
     tst = estimate_systematic(Yobs ~ D | Z, data = df, interaction.formula = ~ A + B,
                    method = "2SLS")
+    
     r2.tst <- R2(tst)
     expect_is( tst, "RI.regression.result" )
     

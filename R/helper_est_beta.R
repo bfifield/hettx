@@ -203,8 +203,8 @@ est.beta.ITT <- function( formula, data, interaction.formula, control.formula=NU
     stopifnot( is.numeric( Z ) )
     stopifnot( nrow(X) == length( Z ) )
     stopifnot( length( Yobs ) == length( Z ) )
-    if(!(all(sort(unique(Z))) == c(0,1))){
-        stop("Your instrument variable must only take values of 0 and 1.")
+    if( !(all( sort(unique(Z)) == c(0,1)) ) ) {
+        stop("Your treatment variable must only take values of 0 and 1.")
     }
 
 
@@ -418,10 +418,10 @@ est.beta.LATE <- function(formula, data, interaction.formula,
     Z = data[,main.vars[3]]
     X = model.matrix(interaction.formula, data)
 
-    if(!(all(sort(unique(Z))) == c(0,1))){
+    if( !(all( sort(unique(Z)) == c(0,1) ) ) ){
         stop("Your instrument variable must only take values of 0 and 1.")
     }
-    if(!(all(sort(unique(D))) == c(0,1))){
+    if(!(all( sort(unique(D)) == c(0,1)) ) ){
         stop("Your instrument variable must only take values of 0 and 1.")
     }
 

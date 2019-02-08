@@ -5,8 +5,10 @@ date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{detect_idiosyncratic() Tutorial}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
@@ -15,7 +17,7 @@ knitr::opts_chunk$set(fig.width = 8)
 ```
 
 # Introduction
-This document demonstrates how to perform permutation test inference for heterogeneous treatment effects. We use a simulated dataset to illustrate. This data is provided with the package as 'ToyData'.
+This document demonstrates how to perform permutation test inference for heterogeneous treatment effects. We use a simulated dataset to illustrate. This data is provided with the package as \verb|ToyData|.
 Overall, this vignette illustrates the different tests for ideosyncratic variation one might make using our package, and shows how different forms of covariate adjustment can increase power or target inferential questions differently.
 
 
@@ -136,8 +138,8 @@ We can compare to when we correct for some useless covariates not related to out
 
 ```{r, echo=TRUE, cache=TRUE}
 N = nrow(ToyData)
-ToyData$Xfake = rnorm( N )
-tst1b = detect_idiosyncratic( Y ~ Z, data=ToyData, control.formula = ~ Xfake, B=B, 
+ToyData$x4 = rnorm( N )
+tst1b = detect_idiosyncratic( Y ~ Z, data=ToyData, control.formula = ~ x4, B=B, 
                               test.stat="SKS.stat.cov", verbose=FALSE )
 summary( tst1b )
 ```
@@ -211,10 +213,15 @@ tst3d <- detect_idiosyncratic( Y ~ Z, data=ToyData,
 summary( tst3d )
 ```
 
-# Display Results
+# Comparing the tests
 
-We can easily compare the results by simultaneously displaying the outputs from all tested models by using the `get.p.value()` merthod.
+We can easily compare the results by simultaneously displaying the outputs from all tested models by using the `get.p.value()` method.
+This method extracts some core summary statistics:
+```{r}
+get.p.value( tst1b )
+```
 
+We can thus collect all our models from above, and make a dataframe of the overall results:
 ```{r display, echo=TRUE}
 tests = list( no_cov=tst1, useless_cov=tst1b, all_covariates=tst2, 
               non_tx_covariates_only=tst2b, het_beyond_x1 = tst3a1,
@@ -247,6 +254,9 @@ plot( ecdf( resid(ll1)[ToyData$Z==0] ), pch=".", col="red", add=TRUE )
 ```
 
 
-Note the residual ECDFs from above are quite aligned.  The Tx effect variation has been picked up by main effects which means we would not detect ideosyncratic variation even though there is such variation.  This is why the choice of test statistic is delicate.
+Note the residual ECDFs from above are quite aligned.  The Tx effect variation has been picked up by main effects which means we would not detect ideosyncratic variation even though there is such variation.
+In other words, the treatment variation has been distributed across the residuals of the control group as well as treatment, and thus when we compare the distributions they are the same.
+This is why the choice of test statistic is delicate, and why for the covariate adjusted SKS statistic, we need to fit the model on the control units only, and then extract the residuals.
+
 
 

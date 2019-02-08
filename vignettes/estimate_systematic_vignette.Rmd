@@ -1,12 +1,15 @@
 ---
-title: "estimate_systematic() Tutorial"
+title: "Tutorial on Systematic Treatment Detection"
 author: "Ding, P., Feller, A., and Miratrix, L."
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output:
+  rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{estimate_systematic() Tutorial}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+editor_options: 
+  chunk_output_type: console
 ---
 
 # Introduction
@@ -72,7 +75,7 @@ estimate_systematic( Yobs ~ Z, interaction.formula = ~ A + B,
           control.formula = ~ C, data=df )
 ```
 
-These formula can use the same covariates. Here we adjust for the covariates we are using for variation also:
+These formula can use the same covariates. Here we also adjust for the covariates used in our treatment model:
 ```{r}
 rsA2 = estimate_systematic( Yobs ~ Z,  ~ A + B, ~ A + B + C, data=df )
 coef( rsA2 )
@@ -93,11 +96,6 @@ As a comparison, using `lm()` we have
 ```{r}
 rsB.lm = lm( Yobs ~ Z * (A+B) + C, data=df )
 coef( rsB.lm )
-
-# Doesn't work?
-#library( texreg )
-#screenreg( rsB, rsB2)
-
 cbind( C.only=coef( rsB ), ABC=coef( rsB2 ), lmC=coef( rsB.lm )[c(2,6,7)])
 ```
 Note that the model adjustment approach is not the same as including a term as a control variable in a linear regression (and you can do both).
@@ -117,21 +115,10 @@ It will give the same results regardless of $Z$ assuming the total number of uni
 
 
 
-# When there is no het tx variation 
-
-Here we see all the methods on a scenario with no variation
-```{r}
-df = make.randomized.dat( 1000, beta.vec=c(-1,0,0) )
-
-estimate_systematic( Y.1 + Y.0 ~ Z, ~ A + B, data=df )$beta.hat
-estimate_systematic( Yobs ~ Z, ~ A + B, data=df )$beta.hat
-estimate_systematic( Yobs ~ Z, ~ A + B, data=df, method="OLS" )$beta.hat
-```
-
 
 # Looking at $R^2$
 
-We can look at treatment effect explained.  We will look at two scenarios, one with no ideosyncratic variation, and one with a substantial amount.  We will plot the R2 sensitivity curves for each on top of each other.
+We can look at treatment effect explained.  We will look at two scenarios, one with no ideosyncratic variation on top of the systematic variation, and one with a substantial amount.  We will plot the R2 sensitivity curves for each on top of each other.
 ```{r}
 df = make.randomized.dat( 1000, beta.vec=c(-1,1,1) )
 rs = estimate_systematic( Yobs ~ Z, ~ A + B, data=df, method="OLS" )
@@ -170,31 +157,29 @@ plot( df$tau ~ df$A )
 Here we look at how our ability to capture $R^2_\tau$ differs across different estimators.
 We have systematic effects for both $A$ and $B$, and $C$ is related to baseline outcomes but not impacts.
 ```{r}
+set.seed( 1020 )
 df = make.randomized.dat( 1000, beta.vec=c(-1,1,1), 
                           gamma.vec = c( 1, 2, 2, 1 ),
                           ideo.sd=1 )
 
 rs = estimate_systematic( Yobs ~ Z, ~ A + B, data=df )
 r2 = R2( rs )
-r2    
 plot( r2, col="green" )
 
 # adjusted
 rs = estimate_systematic( Yobs ~ Z, ~ A + B, ~ C, data=df )
 r2 = R2( rs )
-r2    
 plot( r2, ADD=TRUE )
 
 # adjusted + OLS
 rs = estimate_systematic( Yobs ~ Z, ~ A + B, ~ C, data=df, method = "OLS" )
 r2 = R2( rs )
-r2    
 plot( r2, ADD=TRUE, col="blue" )
 ```
 
 
 
-# Testing LATE estimators
+# Treatment variation and non-compliance
 
 Our estimators also work in non-compliance contexts (see paper for details).  The story is analogous to the code above.
 
@@ -209,13 +194,15 @@ names(data)
 ```
 
 Our four observable groups defined by treatment assignment and take-up are as follows:
+
 ```{r observed_subgroups}
 zd = with( data, interaction( Z, D, sep="-" ) )
 boxplot( Yobs ~ zd, data=data, ylab="Yobs")
 ```
 
 The true relationships for the three latent groups are as follows:
-```{r}
+
+```{r, fig.width = 7}
 par( mfrow=c(1,2), mgp=c(1.8,0.8,0), mar=c(3,3,0.5,0.5) )
 plot( Y.1 - Y.0 ~ A, data=data, col=as.factor(data$S), pch=19, cex=0.5 )
 plot( Y.1 - Y.0 ~ B, data=data, col=as.factor(data$S), pch=19, cex=0.5 )
@@ -223,6 +210,11 @@ legend( "topleft", legend=levels( as.factor( data$S ) ), pch=19, col=1:3 )
 ```
 
 (We see no impacts for the AT and the NT as required under the assumptions of noncompliance here.)
+
+In this scenario we have a moderate compiance rate, meaning not a particulary weak instrument:
+```{r}
+prop.table( table( data$S ) )
+```
 
 ## Estimating the effects
 We use our same method, but by using the ``bar'' notation, we can specify our treatment assigment $Z$ and our compliance status $D$ in our primary formula.
@@ -251,6 +243,6 @@ Comparing our errors in estimation from the two approaches we have:
 ```{r}
 err = rs$beta.hat - beta
 err2SLS = rs2SLS$beta.hat - beta
-rbind( err, err2SLS )
+data.frame( SE.RI = SE( rs ), err.RI=err, SE.2SLS = SE( rs2SLS ), err.2SLS = err2SLS )
 ```
 
