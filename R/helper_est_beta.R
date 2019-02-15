@@ -422,7 +422,7 @@ est.beta.LATE <- function(formula, data, interaction.formula,
         stop("Your instrument variable must only take values of 0 and 1.")
     }
     if(!(all( sort(unique(D)) == c(0,1)) ) ){
-        stop("Your instrument variable must only take values of 0 and 1.")
+        stop("Your treatment variable must only take values of 0 and 1.")
     }
 
     stopifnot( is.numeric( Yobs ) )
