@@ -41,7 +41,8 @@ Test statistics when specifying interactions, without covariate adjustment:
 
 #' KS.stat
 #'
-#' Calculate classic (not shifted) KS statistic, code modified version of R's ks.test.
+#' Calculate classic (not shifted) KS statistic; code is a modified version of R's ks.test().
+#' 
 #' If tau passed, Y1 will be shifted by tau.
 #'
 #' @usage KS.stat(Y, Z, tau, alternative)
@@ -53,6 +54,8 @@ Test statistics when specifying interactions, without covariate adjustment:
 #'
 #' @return The value of the test.
 #' @export
+#' 
+#' @seealso detect_idiosyncratic
 KS.stat <- function( Y, Z, tau = NULL, alternative = c("two.sided", "less", "greater") ) {
     x = Y[Z==1]
     y = Y[Z==0]
@@ -87,6 +90,9 @@ KS.stat <- function( Y, Z, tau = NULL, alternative = c("two.sided", "less", "gre
 #'
 #' @return The value of the test.
 #'
+#' @seealso KS.stat, SKS.stat.cov
+#' @seealso detect_idiosyncratic
+#' 
 #' @export
 SKS.stat <- function(Y, Z)
 {
@@ -108,19 +114,14 @@ SKS.stat <- function(Y, Z)
 }
 
 #' SKS.stat.cov.pool
-#' 
-#' Shifted kolmogorov-smirnov statistic with covariates
-#' to increase precision.
 #'
-#' This is the test statistic used Ding, Feller, and Miratrix (2016), JRSS-B.
+#' SKS.stat.cov.pool is the shifted kolmogorov-smirnov statistic with covariates
+#' to increase precision.  This is the test statistic used Ding, Feller, and
+#' Miratrix (2016), JRSS-B.
 #'
 #' @usage SKS.stat.cov.pool(Y, Z, X)
 #'
-#' @param Y  Observed outcome vector
-#' @param Z  Treatment assigment vector 
-#' @param X Additional pre-treatment covariates to adjust for in estimation, but not to interact with treatment. Default is NULL.
-#'
-#' @return The value of the test.
+#' @rdname SKS.stat.cov
 #'
 #' @export
 SKS.stat.cov.pool <- function(Y, Z, X)
@@ -141,7 +142,7 @@ SKS.stat.cov.pool <- function(Y, Z, X)
 
 #' SKS.stat.cov
 #' 
-#' Shifted kolmogorov-smirnov statistic with covariates
+#' SKS.stat.cov is the shifted kolmogorov-smirnov statistic with covariates
 #' with model for outcomes calculated on control group only.
 #' This avoids "splitting" the treatment variation between tx 
 #' and co groups.  
@@ -149,7 +150,9 @@ SKS.stat.cov.pool <- function(Y, Z, X)
 #'
 #' @usage SKS.stat.cov(Y, Z, X)
 #'
-#' @inheritParams SKS.stat.cov.pool
+#' @param Y  Observed outcome vector
+#' @param Z  Treatment assigment vector
+#' @param X Additional pre-treatment covariates to adjust for in estimation, but not to interact with treatment. 
 #'
 #' @return The value of the test.
 #'
@@ -176,27 +179,16 @@ SKS.stat.cov <- function(Y, Z, X)
 
 #' SKS.stat.int.cov.pool
 #'
-#' Shifted kolmogorov-smirnov statistic with a linear treatment
-#' effect model defined by W
+#' SKS.stat.int.cov.pool is a shifted kolmogorov-smirnov statistic with a linear
+#' treatment effect model defined by W. It will attempt to remove any systematic
+#' variation corresponding to W and then return a SKS statistic on the residuals
+#' to measure any variation "left over".
 #'
-#' This will attempt to remove any systematic variation corresponding
-#' to W and then return a SKS statistic on the residuals to measure
-#' any variation "left over".
-#'
-#' X are _additional_ covariates to adjust for beyond those involved
-#' in treatment effect model.  It will automatically adjust for W as
-#' well.  Do not put a covariate in for both X and W.
-#'
-#' This is the test statistic used in Ding, Feller, and Miratrix (2016), JRSS-B.
 #'
 #' @usage SKS.stat.int.cov.pool(Y, Z, W, X)
 #'
-#' @param Y  Observed outcome vector
-#' @param Z  Treatment assigment vector
-#' @param W Additional pre-treatment covariates to interact with T to define linear model of treatment effects. 
-#' @param X Additional pre-treatment covariates to adjust for in estimation, but not to interact with treatment. Default is NULL.
 #'
-#' @return The value of the test.
+#' @rdname SKS.stat.int.cov
 #'
 #' @export
 SKS.stat.int.cov.pool <- function( Y, Z, W, X=NULL )
@@ -220,30 +212,29 @@ SKS.stat.int.cov.pool <- function( Y, Z, W, X=NULL )
 }
 
 #' SKS.stat.int.cov
-#' 
-#' Shifted kolmogorov-smirnov statistic with a linear treatment
-#' effect model defined by W
 #'
-#' This will attempt to remove any systematic variation corresponding
-#' to W and then return a SKS statistic on the residuals to measure
-#' any variation "left over".
+#' SKS.stat.int.cov() is a Shifted kolmogorov-smirnov statistic with a linear
+#' treatment effect model defined by W. It will attempt to remove any systematic
+#' variation corresponding to W and then return a SKS statistic on the residuals
+#' to measure any variation "left over".
 #'
-#' X are _additional_ covariates to adjust for beyond those involved
-#' in treatment effect model.  It will automatically ajust for W as
-#' well.  Do not put a covariate in for both X and W.
+#' X are _additional_ covariates to adjust for beyond those involved in
+#' treatment effect model.  It will automatically ajust for W as well.  Do not
+#' put a covariate in for both X and W.
 #'
 #' This is the test statistic used in Ding, Feller, and Miratrix (2016), JRSS-B.
 #'
-#' This method first adjusts for baseline and then models treatment effect
-#' on the residuals to not split treatment effects.
+#' SKS.stat.int.cov first adjusts for baseline and then models treatment effect
+#' on the residuals to not split treatment effects (see the vignette for more
+#' information on this).
 #'
-#' We recommend this method over the "pool" method.
+#' We recommend SKS.stat.int.cov over the "pool" method.
+#'
+#' @inheritParams SKS.stat.cov
+#' @param W Additional pre-treatment covariates to interact with T to define
+#'   linear model of treatment effects.
 #'
 #' @usage SKS.stat.int.cov(Y, Z, W, X)
-#'
-#' @inheritParams SKS.stat.int.cov.pool
-#'
-#' @return The value of the test.
 #'
 #' @export
 SKS.stat.int.cov <- function( Y, Z, W, X=NULL )
@@ -280,13 +271,13 @@ SKS.stat.int.cov <- function( Y, Z, W, X=NULL )
 
 #' SKS.stat.cov.rq
 #' 
-#' Shifted kolmogorov-smirnov statistic with covariates and rq.
+#' Shifted kolmogorov-smirnov statistic with covariates and quantile regression.
 #'
 #' @usage SKS.stat.cov.rq(Y, Z, X)
 #'
-#' @inheritParams SKS.stat.cov.pool
+#' @inheritParams SKS.stat.cov
+#' @return The test statistic value.
 #'
-#' @return The value of the test.
 #' @export
 SKS.stat.cov.rq <- function(Y, Z, X)
 {
@@ -301,7 +292,7 @@ SKS.stat.cov.rq <- function(Y, Z, X)
 
 #' rq.stat
 #' 
-#' Kolmogorov-smirnov statistic via quantile regression with covariates
+#' rq.stat is the Kolmogorov-smirnov statistic via quantile regression with covariates without further adjustment.
 #'
 #' @usage rq.stat(Y, Z, rq.pts)
 #'
@@ -327,18 +318,16 @@ rq.stat <- function(Y, Z, rq.pts = seq(0.1, 0.9, by = 0.1))
 }
 
 #' rq.stat.cond.cov
-#' 
-#' Kolmogorov-smirnov statistic via quantile regression with covariates
-#' Conditional approach; see Koenker and Xiao (2002)
+#'
+#' rq.stat.cond.cov does Kolmogorov-smirnov statistic via quantile regression
+#' with covariates, with a conditional approach; see Koenker and Xiao (2002).
 #'
 #' @usage rq.stat.cond.cov(Y, Z, X, rq.pts)
 #'
-#' @param Y  Observed outcome vector
-#' @param Z  Treatment assigment vector
-#' @param X Additional pre-treatment covariates to adjust for in estimation, but not to interact with treatment. 
-#' @param rq.pts Sequence of quantile points at which to evaluate the test. Default is seq(.1, .9, by = .1). Should not go beyond 0 and 1.
+#' @param X Additional pre-treatment covariates to adjust for in estimation, but
+#'   not to interact with treatment.
 #'
-#' @return The value of the test.
+#' @rdname rq.stat
 #' @export
 rq.stat.cond.cov <- function(Y, Z, X, rq.pts = seq(0.1, 0.9, by = 0.1))
 {
@@ -358,14 +347,14 @@ rq.stat.cond.cov <- function(Y, Z, X, rq.pts = seq(0.1, 0.9, by = 0.1))
 
 #' rq.stat.uncond.cov
 #' 
-#' Kolmogorov-smirnov statistic via quantile regression with covariates
-#' Unconditional approach; see Firpo (2007)
+#' rq.stat.uncond.cov implements a Kolmogorov-smirnov statistic via quantile regression with covariates,
+#' unconditional approach; see Firpo (2007).
 #'
 #' @usage rq.stat.uncond.cov(Y, Z, X, rq.pts)
 #'
 #' @inheritParams rq.stat.cond.cov
 #'
-#' @return The value of the test.
+#' @rdname rq.stat
 #' @export
 rq.stat.uncond.cov <- function(Y, Z, X, rq.pts = seq(0.1, 0.9, by = 0.1))
 {
@@ -397,7 +386,8 @@ rq.stat.uncond.cov <- function(Y, Z, X, rq.pts = seq(0.1, 0.9, by = 0.1))
 
 #' WSKS.t
 #'
-#' Weighted average of the group-level SKS statistics
+#' Weighted average of the group-level SKS statistics.  This is useful for a
+#' blocked experiment.
 #'
 #' @usage WSKS.t(Y, Z, W)
 #'
@@ -428,7 +418,6 @@ WSKS.t <- function( Y, Z, W ) {
 #'
 #' @inheritParams WSKS.t
 #'
-#' @return The value of the test.
 #' @export
 SKS.pool.t <- function( Y, Z, W ) {
     

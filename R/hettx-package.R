@@ -1,14 +1,22 @@
-#' Implementation of the FRT CI Method of Ding, Feller, and Miratrix (2016, JRSS-B) and the
-#' systematic estimation methods of Ding, Feller, and Miratrix (2018, JASA)
+#' Implementation of the FRT CI Method of Ding, Feller, and Miratrix (2016,
+#' JRSS-B) and the systematic estimation methods of Ding, Feller, and Miratrix
+#' (2018, JASA)
 #'
-#' This package implements methods developed by Ding, Feller, and Miratrix (2016)
-#' ''Randomization Inference for Treatment Effect Variation'', for validly testing
-#' whether there is unexplained variation in treatment effects across observations.
-#' The package also implements methods introduced in Ding, Feller, and Miratrix (2018)
-#' ''Decomposing Treatment Effect Variation'', for measuring the degree of treatment
-#' effect heterogeneity explained by covariates. The package includes wrapper functions
-#' implementing the proposed methods, as well as helper functions for analyzing and
-#' visualizing the results of the tests.
+#' This package implements methods developed by Ding, Feller, and Miratrix
+#' (2016) ''Randomization Inference for Treatment Effect Variation'', for
+#' validly testing whether there is unexplained variation in treatment effects
+#' across observations. The package also implements methods introduced in Ding,
+#' Feller, and Miratrix (2018) ''Decomposing Treatment Effect Variation'', for
+#' measuring the degree of treatment effect heterogeneity explained by
+#' covariates. The package includes wrapper functions implementing the proposed
+#' methods, as well as helper functions for analyzing and visualizing the
+#' results of the tests.
+#'
+#' This package partially supported by the Institute of Education Sciences, U.S.
+#' Department of Education, through Grant R305D150040. The opinions expressed
+#' are those of the authors and do not represent views of the Institute or the
+#' U.S. Department of Education.
+
 #' 
 #' \tabular{ll}{ Package: \tab hettx\cr Type: \tab Package\cr Version: \tab 0.0.1-\cr
 #' Date: \tab 2019-01-20\cr License: \tab GPL (>= 3)\cr }

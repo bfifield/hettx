@@ -2,20 +2,24 @@
 % Please edit documentation in R/estimate_systematic.R
 \name{R2}
 \alias{R2}
-\title{Bounds the R2 measure using OLS output for ITT from est.beta, and bounds R2 measure for compliers using LATE estimation from est.beta.}
+\title{Estimate treatment variation R2}
 \usage{
 R2(est.beta, rho.step)
 }
 \arguments{
-\item{est.beta}{The output from `est.beta()`. Either an estimate of overall systematic effect variation, or systematic effect variation for compliers.}
+\item{est.beta}{The output from `est.beta()`. Either an estimate of overall
+systematic effect variation, or systematic effect variation for compliers.}
 
-\item{rho.step}{Grid size for sensitivity analysis on values of rho. Default is 0.05}
+\item{rho.step}{Grid size for sensitivity analysis on values of rho. Default
+is 0.05}
 }
 \value{
 RI.R2.result object.
 }
 \description{
-Bounds the R2 measure using OLS output for ITT from est.beta, and bounds R2 measure for compliers using LATE estimation from est.beta.
+Bounds the R2 measure (how much of treatment variation is explained by given
+covariates) using either the OLS output for the ITT from est.beta, or the
+LATE estimation from est.beta.
 }
 \seealso{
 print.RI.R2.result

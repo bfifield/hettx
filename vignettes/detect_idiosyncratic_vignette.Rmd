@@ -96,6 +96,7 @@ round( coef( M0 ), digits=1 )
 
 # Testing for ideosyncratic treatment effect variation 
 
+
 ## Basic case: no covariate adjustment
 
 To do our tests, we first must specify some parameters determining the resolution of the grid search and number of permutations at each grid point. Note that these values should be increased for a real analysis. We chose these particular values to reduce computation time for illustration.
@@ -259,4 +260,20 @@ In other words, the treatment variation has been distributed across the residual
 This is why the choice of test statistic is delicate, and why for the covariate adjusted SKS statistic, we need to fit the model on the control units only, and then extract the residuals.
 
 
+# A simple variance ratio test
 
+We also offer an adjusted variance ratio test:
+```{r}
+variance.ratio.test( ToyData$Y, ToyData$Z )
+```
+
+This does not use permutation inference.
+
+# The variety of test statistics
+
+We offer several test statistics one might use.  We also have a method to print out some info on what is available:
+```{r}
+test.stat.info()
+```
+
+```

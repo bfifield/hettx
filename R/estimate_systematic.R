@@ -65,12 +65,18 @@ estimate_systematic <- function( formula, data, interaction.formula, control.for
     
 }
 
-#' Bounds the R2 measure using OLS output for ITT from est.beta, and bounds R2 measure for compliers using LATE estimation from est.beta. 
+#' Estimate treatment variation R2
+#'
+#' Bounds the R2 measure (how much of treatment variation is explained by given
+#' covariates) using either the OLS output for the ITT from est.beta, or the
+#' LATE estimation from est.beta.
 #'
 #' @usage R2(est.beta, rho.step)
 #'
-#' @param est.beta The output from `est.beta()`. Either an estimate of overall systematic effect variation, or systematic effect variation for compliers.
-#' @param rho.step Grid size for sensitivity analysis on values of rho. Default is 0.05
+#' @param est.beta The output from `est.beta()`. Either an estimate of overall
+#'   systematic effect variation, or systematic effect variation for compliers.
+#' @param rho.step Grid size for sensitivity analysis on values of rho. Default
+#'   is 0.05
 #'
 #' @export
 #'
