@@ -13,9 +13,6 @@ SKS.pool.t(Y, Z, W)
 
 \item{W}{A a factor or categorical covariate.}
 }
-\value{
-The value of the test.
-}
 \description{
 Subtract off group level treatment effect estimates and then look
 at KS statistic on residuals.

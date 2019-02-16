@@ -11,11 +11,11 @@ SKS.stat.cov.rq(Y, Z, X)
 
 \item{Z}{Treatment assigment vector}
 
-\item{X}{Additional pre-treatment covariates to adjust for in estimation, but not to interact with treatment. Default is NULL.}
+\item{X}{Additional pre-treatment covariates to adjust for in estimation, but not to interact with treatment.}
 }
 \value{
-The value of the test.
+The test statistic value.
 }
 \description{
-Shifted kolmogorov-smirnov statistic with covariates and rq.
+Shifted kolmogorov-smirnov statistic with covariates and quantile regression.
 }

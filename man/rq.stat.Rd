@@ -2,9 +2,15 @@
 % Please edit documentation in R/helper_stat_calc.R
 \name{rq.stat}
 \alias{rq.stat}
+\alias{rq.stat.cond.cov}
+\alias{rq.stat.uncond.cov}
 \title{rq.stat}
 \usage{
 rq.stat(Y, Z, rq.pts)
+
+rq.stat.cond.cov(Y, Z, X, rq.pts)
+
+rq.stat.uncond.cov(Y, Z, X, rq.pts)
 }
 \arguments{
 \item{Y}{Observed outcome vector}
@@ -12,10 +18,19 @@ rq.stat(Y, Z, rq.pts)
 \item{Z}{Treatment assigment vector}
 
 \item{rq.pts}{Sequence of quantile points at which to evaluate the test. Default is seq(.1, .9, by = .1). Should not go beyond 0 and 1.}
+
+\item{X}{Additional pre-treatment covariates to adjust for in estimation, but
+not to interact with treatment.}
 }
 \value{
 The value of the test.
 }
 \description{
-Kolmogorov-smirnov statistic via quantile regression with covariates
+rq.stat is the Kolmogorov-smirnov statistic via quantile regression with covariates without further adjustment.
+
+rq.stat.cond.cov does Kolmogorov-smirnov statistic via quantile regression
+with covariates, with a conditional approach; see Koenker and Xiao (2002).
+
+rq.stat.uncond.cov implements a Kolmogorov-smirnov statistic via quantile regression with covariates,
+unconditional approach; see Firpo (2007).
 }

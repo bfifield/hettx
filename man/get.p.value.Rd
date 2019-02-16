@@ -7,7 +7,7 @@
 get.p.value(tst)
 }
 \arguments{
-\item{tst}{A FRTCI.test object from fishpidetect}
+\item{tst}{A FRTCI.test object from detect_idiosyncratic()}
 }
 \value{
 p-value and range of p-values due to monte carlo error.

@@ -19,6 +19,11 @@ KS.stat(Y, Z, tau, alternative)
 The value of the test.
 }
 \description{
-Calculate classic (not shifted) KS statistic, code modified version of R's ks.test.
+Calculate classic (not shifted) KS statistic; code is a modified version of R's ks.test().
+}
+\details{
 If tau passed, Y1 will be shifted by tau.
+}
+\seealso{
+detect_idiosyncratic
 }

@@ -18,3 +18,8 @@ The value of the test.
 Shifted kolmogorov-smirnov statistic. Calculate KS distance between Y0 and Y1
 shifted by sample tau.
 }
+\seealso{
+KS.stat, SKS.stat.cov
+
+detect_idiosyncratic
+}

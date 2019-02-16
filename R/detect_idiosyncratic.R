@@ -242,7 +242,8 @@ detect_idiosyncratic <- function(formula, data,
 #' 
 #' Give confidence bounds (from monte carlo simulation error) for the p-values returned by a test
 #' 
-#' @param tst A FRTCI.test object from fishpidetect
+#' @param tst A FRTCI.test object from detect_idiosyncratic()
+#' 
 #' @return p-value and range of p-values due to monte carlo error.
 #' @export
 get.p.value <- function( tst ) {

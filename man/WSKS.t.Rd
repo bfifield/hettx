@@ -17,5 +17,6 @@ WSKS.t(Y, Z, W)
 The value of the test.
 }
 \description{
-Weighted average of the group-level SKS statistics
+Weighted average of the group-level SKS statistics.  This is useful for a
+blocked experiment.
 }
