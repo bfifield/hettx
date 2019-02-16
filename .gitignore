@@ -286,8 +286,5 @@ rsconnect/
 *.Rproj.user
 *.Rproj
 .Rproj.user
-<<<<<<< HEAD
 /vignettes/*_cache/
 /vignettes/*_files/
-=======
->>>>>>> 3362dc4c67c30b88ae2dac6c4cbfe6c45581a880
