@@ -18,8 +18,8 @@
 #' U.S. Department of Education.
 
 #' 
-#' \tabular{ll}{ Package: \tab hettx\cr Type: \tab Package\cr Version: \tab 0.0.1-\cr
-#' Date: \tab 2019-01-20\cr License: \tab GPL (>= 3)\cr }
+#' \tabular{ll}{ Package: \tab hettx\cr Type: \tab Package\cr Version: \tab 0.1.0-\cr
+#' Date: \tab 2019-02-16\cr License: \tab GPL (>= 3)\cr }
 #'
 #' @name hettx-package
 #' @aliases hettx-package 
