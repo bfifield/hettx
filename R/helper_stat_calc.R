@@ -1,3 +1,9 @@
+##
+## This file has all the various test statistic functions provided in the package.
+##
+
+
+
 #' test.stat.info
 #'
 #' A list of test statistics for detect.idiosyncratic(), and information on use cases when each is appropriate.
@@ -293,6 +299,8 @@ SKS.stat.cov.rq <- function(Y, Z, X)
 #' rq.stat
 #' 
 #' rq.stat is the Kolmogorov-smirnov statistic via quantile regression with covariates without further adjustment.
+#' 
+#' Warning: This function supresses all warnings of the `rq()` method call.
 #'
 #' @usage rq.stat(Y, Z, rq.pts)
 #'
@@ -321,6 +329,8 @@ rq.stat <- function(Y, Z, rq.pts = seq(0.1, 0.9, by = 0.1))
 #'
 #' rq.stat.cond.cov does Kolmogorov-smirnov statistic via quantile regression
 #' with covariates, with a conditional approach; see Koenker and Xiao (2002).
+#'
+#' Warning: This function supresses all warnings of the `rq()` method call.
 #'
 #' @usage rq.stat.cond.cov(Y, Z, X, rq.pts)
 #'

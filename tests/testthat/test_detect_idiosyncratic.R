@@ -96,7 +96,8 @@ test_that( "Every non-rq test statistic works", {
 
     tst = detect_idiosyncratic(Y ~ Z, data = ToyData, interaction.formula = ~ x3 + x4, control.formula = ~ x1 + x2, test.stat="SKS.stat.int.cov.pool", B=B, grid.size=grid.size, verbose=FALSE)
     tst = detect_idiosyncratic(Y ~ Z, data = ToyData, interaction.formula = ~ x3 + x4, control.formula = ~ x1 + x2, test.stat="SKS.stat.int.cov", B=B, grid.size=grid.size, verbose=FALSE)
-    
+
+    expect_equal( class( tst ), "FRTCI.test" ) 
 })
 
 
@@ -137,5 +138,6 @@ test_that( "rq test statistic works", {
                                test.stat="SKS.stat.cov.rq", B=B,
                                grid.size=grid.size, verbose=FALSE)   
     
+    expect_is( tst, "FRTCI.test" )
 })
 

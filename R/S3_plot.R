@@ -19,6 +19,10 @@ plot.FRTCI.test <- function( x, true.tau=NULL,
                              xlab=expression(tau), ylab="p-value", true.tau.col="red",
                              plot.envelope=TRUE, ci.line.col="blue", ... ) {
     
+  if ( !is.null( x$W ) ) {
+    stop( "No default plot for test results beyond a systematic model" )
+  }
+  
     cnts = (x$ci.p - x$gamma) * x$B
     bts = sapply( cnts, function( cnt ) {
         bt = binom.test( cnt, x$B )

@@ -13,7 +13,7 @@ calc.beta.oracle <- function( formula, data, interaction.formula, method=c("RI",
     if(length(lhs.vars(formula)) != 2 | length(rhs.vars(formula)) != 1){
         stop("The formula argument must be of the form treated_outcome + control_outcome ~ treatment.")
     }
-    main.vars <- get.vars(formula)
+    main.vars <- get.vars(formula,data=data)
     if(any(!(main.vars %in% colnames(data)))){
         stop("Some variables in formula are not present in your data.")
     }
@@ -22,7 +22,7 @@ calc.beta.oracle <- function( formula, data, interaction.formula, method=c("RI",
     if(length(lhs.vars(interaction.formula)) != 0){
         stop("Do not provide an outcome variable in interaction.formula.")
     }
-    interaction.vars <- get.vars(interaction.formula)
+    interaction.vars <- get.vars(interaction.formula,data=data)
     if(any(!(interaction.vars %in% colnames(data)))){
         stop("Some variables in interaction.formula are not present in your data.")
     }
@@ -150,7 +150,7 @@ est.beta.ITT <- function( formula, data, interaction.formula, control.formula=NU
     if(length(lhs.vars(formula)) != 1 | length(rhs.vars(formula)) != 1){
         stop("The formula argument must be of the form outcome ~ treatment.")
     }
-    main.vars <- get.vars(formula)
+    main.vars <- get.vars(formula,data=data)
     if(any(!(main.vars %in% colnames(data)))){
         stop("Some variables in formula are not present in your data.")
     }
@@ -159,7 +159,7 @@ est.beta.ITT <- function( formula, data, interaction.formula, control.formula=NU
     if(length(lhs.vars(interaction.formula)) != 0){
         stop("Do not provide an outcome variable in interaction.formula.")
     }
-    interaction.vars <- get.vars(interaction.formula)
+    interaction.vars <- get.vars(interaction.formula,data=data)
     if(any(!(interaction.vars %in% colnames(data)))){
         stop("Some variables in interaction.formula are not present in your data.")
     }
@@ -172,7 +172,7 @@ est.beta.ITT <- function( formula, data, interaction.formula, control.formula=NU
         if(length(lhs.vars(control.formula)) != 0){
             stop("Do not provide an outcome variable in control.formula.")
         }
-        control.vars <- get.vars(control.formula)
+        control.vars <- get.vars(control.formula,data=data)
         if(any(!(control.vars %in% colnames(data)))){
             stop("Some variables in control.formula are not present in your data.")
         }
@@ -354,6 +354,9 @@ est.beta.ITT <- function( formula, data, interaction.formula, control.formula=NU
     res$X = X
     res$Y = Yobs
     res$Z = Z
+    res$control.vars = control.vars
+    res$main.vars = main.vars
+    res$interaction.vars = interaction.vars
 
     class( res ) = c("RI.regression.result", "RI.regression.result.ITT")
 
@@ -386,7 +389,7 @@ est.beta.LATE <- function(formula, data, interaction.formula,
     if(length(lhs.vars(formula)) != 1 | length(rhs.vars(formula)) != 2){
         stop("The formula argument must be of the form outcome ~ treatment | instrument.")
     }
-    main.vars <- get.vars(formula)
+    main.vars <- get.vars(formula,data=data)
     if(any(!(main.vars %in% colnames(data)))){
         stop("Some variables in formula are not present in your data.")
     }
@@ -395,7 +398,7 @@ est.beta.LATE <- function(formula, data, interaction.formula,
     if(length(lhs.vars(interaction.formula)) != 0){
         stop("Do not provide an outcome variable in interaction.formula.")
     }
-    interaction.vars <- get.vars(interaction.formula)
+    interaction.vars <- get.vars(interaction.formula,data=data)
     if(any(!(interaction.vars %in% colnames(data)))){
         stop("Some variables in interaction.formula are not present in your data.")
     }
@@ -574,6 +577,10 @@ est.beta.LATE <- function(formula, data, interaction.formula,
 
     res$Y = Yobs
     res$Z = Z
+    res$control.vars = NA
+    res$main.vars = main.vars
+    res$interaction.vars = interaction.vars
+    
     res$D = D
     res$X = X
 

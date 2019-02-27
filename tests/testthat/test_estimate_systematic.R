@@ -45,7 +45,7 @@ test_that( "OLS estimation corresponds to lm", {
 
 
 
-test_that( "Main methods work", {
+test_that( "Main methods run without crashing", {
 
     df = make.randomized.dat( 100, beta.vec=c(-1,-1,1) )
 
@@ -68,7 +68,28 @@ test_that( "Main methods work", {
     tst = estimate_systematic(Yobs ~ Z, data = df, interaction.formula = ~ A,
                    control.formula = ~ B + C, method = "OLS")
     r2.tst <- R2(tst)
+    expect_is( tst, "RI.regression.result" )
 } )
+
+
+
+test_that( "Clever dot notation for formula works", {
+  
+  df = make.randomized.dat( 100, beta.vec=c(-1,-1,1) )
+  head( df )
+  df = dplyr::select( df, A, B, C, Z, Yobs )
+  
+  tst = estimate_systematic( Yobs ~ Z, data = df, interaction.formula = ~ . - Z - Yobs, method = "RI")
+  summary( tst )
+  expect_equal( length( coef( tst ) ), 4 )
+
+  tst = estimate_systematic( Yobs ~ Z, data = df, interaction.formula = ~ A, 
+                             control.formula = ~ . - Z - Yobs, method = "RI")
+  summary( tst )
+  expect_equal( length( coef( tst ) ), 2 )
+  
+} )
+
 
 test_that( "Main complier methods work", {
   
@@ -86,5 +107,7 @@ test_that( "Main complier methods work", {
     expect_is( tst, "RI.regression.result" )
     
 } )
+
+
 
 

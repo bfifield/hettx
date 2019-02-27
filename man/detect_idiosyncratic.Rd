@@ -4,52 +4,73 @@
 \alias{detect_idiosyncratic}
 \title{detect_idiosyncratic}
 \usage{
-detect_idiosyncratic(formula, data, interaction.formula, control.formula,
-plugin, tau.hat, test.stat, te.vec, B, gamma, grid.gamma, grid.size,
-return.matrix, na.rm, n.cores, verbose, ...)
+detect_idiosyncratic(formula, data, interaction.formula,
+  control.formula, plugin, tau.hat, test.stat, te.vec, B, gamma, grid.gamma,
+  grid.size, return.matrix, na.rm, n.cores, verbose, ...)
 }
 \arguments{
-\item{formula}{An object of class formula, as in lm(), such as Y ~ Z with only the treatment variable on the right-hand side.}
+\item{formula}{An object of class formula, as in lm(), such as Y ~ Z with
+only the treatment variable on the right-hand side.}
 
 \item{data}{A data.frame, tbl_df, or data.table with the input data.}
 
-\item{interaction.formula}{A right-sided formula with pre-treatment covariates to model treatment effects for on the right hand side, such as ~ x1 + x2 + x3. Defaultis NULL (no interactions modeled)}
+\item{interaction.formula}{A right-sided formula with pre-treatment
+covariates to model treatment effects for on the right hand side, such as ~
+x1 + x2 + x3. Defaultis NULL (no interactions modeled)}
 
-\item{control.formula}{A right-sided formula with pre-treatment covariates to adjust for on the right hand side, such as ~ x1 + x2 + x3. Default is NULL (no variables adjusted for)}
+\item{control.formula}{A right-sided formula with pre-treatment covariates to
+adjust for on the right hand side, such as ~ x1 + x2 + x3. Default is NULL
+(no variables adjusted for)}
 
-\item{plugin}{Whether to calculate the plug-in p-value without sweeping over range of possible treatment effect magnitudes. Default is FALSE.}
+\item{plugin}{Whether to calculate the plug-in p-value without sweeping over
+range of possible treatment effect magnitudes. Default is FALSE.}
 
-\item{tau.hat}{The value of the plug-in treatment effect. Default is sample average treatment effect.}
+\item{tau.hat}{The value of the plug-in treatment effect. Default is sample
+average treatment effect.}
 
-\item{test.stat}{Test statistic function to use on the data. Default is shifted Kolmogorov-Smirnov statistic.}
+\item{test.stat}{Test statistic function to use on the data. Default is
+shifted Kolmogorov-Smirnov statistic, potentially with covariate adjustment
+depending on passed arguments.  test.stat can be a string name for a test statistic function, or the function itself.}
 
-\item{te.vec}{Vector of taus to examine if you want to override generating ones automatically. Default is NULL.}
+\item{te.vec}{Vector of taus to examine if you want to override generating
+ones automatically. Default is NULL.}
 
 \item{B}{Number of permutations to take. Default is 500.}
 
-\item{gamma}{How wide of a CI to make around tau-hat for search. Default is 0.0001.}
+\item{gamma}{How wide of a CI to make around tau-hat for search. Default is
+0.0001.}
 
-\item{grid.gamma}{Parameter to govern where the grid points are sampled.  Bigger values means more samples towards the estimated tau-hat. Default is 100*gamma.}
+\item{grid.gamma}{Parameter to govern where the grid points are sampled.
+Bigger values means more samples towards the estimated tau-hat. Default is
+100*gamma.}
 
 \item{grid.size}{Number of points in the grid. Default is 151.}
 
-\item{return.matrix}{Whether to return the matrix of all the imputed statistics.  Default is FALSE.}
+\item{return.matrix}{Whether to return the matrix of all the imputed
+statistics.  Default is FALSE.}
 
-\item{na.rm}{A logical flag indicating whether to list-wise delete missing data. The function will report an error if missing data exist. Default is FALSE.}
+\item{na.rm}{A logical flag indicating whether to list-wise delete missing
+data. The function will report an error if missing data exist. Default is
+FALSE.}
 
-\item{n.cores}{Number of cores to use to parallelize permutation step. Default is 1.}
+\item{n.cores}{Number of cores to use to parallelize permutation step.
+Default is 1.}
 
-\item{verbose}{Whether to print out progress bar when fitting and other diagnostics. Default is TRUE.}
+\item{verbose}{Whether to print out progress bar when fitting and other
+diagnostics. Default is TRUE.}
 
-\item{...}{Extra arguments passed to the generate.permutations function and test.stat functions.}
+\item{...}{Extra arguments passed to the generate.permutations function and
+test.stat functions.}
 }
 \value{
-If plug-in, the value of the test and the associated p-value. If not, a list with the value of
-the test statistic on the observed data, the value of the CI-adjusted p-value, the plug-in p-value, and other information on the test.
+If plug-in, the value of the test and the associated p-value. If not,
+  a list with the value of the test statistic on the observed data, the value
+  of the CI-adjusted p-value, the plug-in p-value, and other information on
+  the test.
 }
 \description{
-Test for systematic treatment effect heterogeneity using
-Fisherian permutation inference methods.
+Test for systematic treatment effect heterogeneity using Fisherian
+permutation inference methods.
 }
 \examples{
 Z <- rep(c(0, 1), 100)
