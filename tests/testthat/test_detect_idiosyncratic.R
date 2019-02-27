@@ -15,7 +15,12 @@ test_that("FRTCI Runs", {
     expect_false( is.null( tst ) )
     expect_is( tst, "FRTCI.test" )
     expect_equal( tst$test.stat, "SKS.stat" )
+    
+    s = summary( tst )
+    s
+    expect_equal( length( s$p.value.CI ), 2 )
 })
+
 
 test_that("Passing function for test stat works", {
   data(ToyData)

@@ -22,8 +22,11 @@ print.summary.FRTCI.test <- function(x, ...){
    }
     scat( "gamma (for CI for grid): %f\n", tst$gamma )
     cat("\n")
-    print(x$estimates)
+    print(x$estimates, row.names=FALSE )
     
+    if ( is.null( tst$W ) ) {
+      scat( "\tCI for p-value (monte carlo error) = %f - %f\n", x$p.value.CI[[1]], x$p.value.CI[[2]] )
+    }
 }
 
 #' @export

@@ -31,20 +31,18 @@ plot.FRTCI.test <- function( x, true.tau=NULL,
     
     plot( x$te.vec, x$ci.p, ylim=range(bts), type="l", xlab=xlab, ylab=ylab, ...  )
     abline( v=x$te.hat, col= ci.line.col )
-    abline( v=c(x$te.hat-x$te.MOE,x$te.hat+x$te.MOE), col= ci.line.col, lty=2 )
+    abline( v=c(x$te.hat-x$te.MOE, x$te.hat+x$te.MOE), col= ci.line.col, lty=2 )
     
     if ( plot.envelope ) {
         lines( x$te.vec, bts[1,], lty=3, col="grey" )
         lines( x$te.vec, bts[2,], lty=3, col="grey" )
         lines( lowess(x$te.vec, x$ci.p, f=1/6),lty=3,lwd=2,col="darkgray" )
-        
     }
     
     rug( x$te.vec, ticksize=0.01 )
     
     if (!is.null(true.tau) ) {
         abline( v=true.tau, lwd=2, col= true.tau.col )
-        
     }
 }
 
