@@ -14,6 +14,24 @@ test_that("FRTCI Runs", {
 
     expect_false( is.null( tst ) )
     expect_is( tst, "FRTCI.test" )
+    expect_equal( tst$test.stat, "SKS.stat" )
+})
+
+test_that("Passing function for test stat works", {
+  data(ToyData)
+  ## Set parameters
+  B <- 20
+  grid.size = 11
+  
+  ## Test for ideosyncratic treatment effect variation without covariates
+  tst = detect_idiosyncratic(Y ~ Z, data = ToyData, B=B, grid.size = grid.size, verbose=FALSE,
+                             test.stat = SKS.stat)
+  
+  expect_false( is.null( tst ) )
+  expect_is( tst, "FRTCI.test" )
+  expect_equal( tst$test.stat, "SKS.stat" )
+  
+  summary( tst )
 })
 
 
@@ -33,7 +51,7 @@ test_that( "Example code from documentation, copied over", {
     tst <- detect_idiosyncratic(Y ~ Z, data = ToyData, interaction.formula = ~ x1, B=B, verbose=FALSE )
     tst
     expect_equal( c(500,1), dim( tst$W ) )
-
+    summary( tst )
 })
 
 

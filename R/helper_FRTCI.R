@@ -39,7 +39,7 @@ FRTCI <- function(Y, Z, X = NULL, test.stat = SKS.stat, B=500,
     t = res$ks.obs
     p.value = max( ci.p )
     n=length(Y)
-    method = paste( "FRT CI Test for Treatment Effect Heterogeneity with ", substitute(test.stat), sep="" )
+    method = "FRT CI Test for Treatment Effect Heterogeneity"
     DAT = paste( n, " observations", sep="")
     
     if ( !return.matrix ) {
@@ -64,7 +64,7 @@ FRTCI <- function(Y, Z, X = NULL, test.stat = SKS.stat, B=500,
 ## Test using plug-in sample average treatment effect
 FRTplug <- function( Y, Z, test.stat=SKS.stat, tau.hat=mean(Y[Z == 1]) - mean(Y[Z == 0]), ... ){
     mth = FRTCI( Y, Z, test.stat=test.stat, te.vec=c(tau.hat), n.cores = 1, ...)
-    mth$method = paste( "FRT Plug-in Test for Treatment Effect Heterogeneity with ", substitute(test.stat), sep="" )
+    mth$method = "FRT Plug-in Test for Treatment Effect Heterogeneity"
     mth
 }
 
@@ -92,7 +92,7 @@ FRTCI.interact <- function( Y, Z, W, X=NULL, test.stat = SKS.stat.int.cov, B=500
     ci.p = res$ci.p + gamma
     p.value = max( ci.p )
     n=length(Y)
-    method = paste( "FRT CI Test for Tx Effect Heterogeneity Beyond a Systematic Model with ", substitute(test.stat), sep="" )
+    method = "FRT CI Test for Tx Effect Heterogeneity Beyond a Systematic Model"
     DAT = paste( n, " observations", sep="")
     
     if ( !return.matrix ) {

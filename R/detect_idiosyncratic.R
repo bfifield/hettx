@@ -275,8 +275,12 @@ detect_idiosyncratic <- function(formula, data,
 
     ## Add to output
     fpi_out$call <- match.call()
-    fpi_out$test.stat <- as.character( quote(test.stat) )
-
+    if ( is.character( test.stat ) ) {
+      fpi_out$test.stat <- test.stat
+    } else {
+      fpi_out$test.stat <- as.character( substitute(test.stat) )
+    }
+    
     return(fpi_out)
 
 }

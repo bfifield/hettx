@@ -73,7 +73,7 @@ get.tau.vector = function( Y, Z, X = NULL, gamma=0.001, grid.size=21, grid.gamma
 ##                  X and W can be the same for a fully interacted linear model.
 ## @return
 ##        te.grid    grid.size x p sized matrix with each row j corresponding to a different model of
-##                   effects with specific beta.  p is number of columns in W.
+##                   effects with specific beta.  p is number of columns in W (+1 for the intercept).
 ##        Y0.mat, Y1.mat   Two N x grid.size matrices.  Each column j corresponds to a specific model of 
 ##                   effects with specific beta value.  Each column j corresponds to the same row in te.grid
 ##         te.mat    N x grid.size matrix with each row i corresponding to treatment effect for 
@@ -88,7 +88,7 @@ get.testing.grid = function( Y, Z, W, X=NULL, gamma=0.0001, grid.size=150 ) {
         cof <- coef(lm.tau)[ !drp ]                
     } else {
         lm.tau <- lm( Y ~ Z + W + Z:W )
-        cof <- coef(lm.tau )
+        cof <- coef( lm.tau )
     }
     te.model = grep( "Z", names(cof) )
     
@@ -102,6 +102,7 @@ get.testing.grid = function( Y, Z, W, X=NULL, gamma=0.0001, grid.size=150 ) {
         ## sample points from our confidence region, focusing on points
         ## close to our point estimate
         te.grid <-  rbind( te.grid, rcrmtvnorm(grid.size - 1, mu = te.hat, sigma = te.cov, alpha = gamma ) )
+        colnames( te.grid ) = colnames( te.cov )
     }
     
     ## calculate individual treatment effects for different treatment impact models

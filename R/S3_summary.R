@@ -4,7 +4,7 @@ summary.FRTCI.test <- function(object, ...){
     ## Create data frame
     rng <- range(object$ci.p)
     df <- data.frame(object$statistic, object$p.value, object$p.value.plug, rng[1], rng[2])
-    names(df) <- c("Estimate", "P-Value (Sweep)", "P-Value (Plug-In)",
+    names(df) <- c("Statistic", "P-Value (Sweep)", "P-Value (Plug-In)",
                    "P-Value Lower CI", "P-Value Upper CI")
     rownames(df) <- NULL
     
@@ -15,6 +15,13 @@ summary.FRTCI.test <- function(object, ...){
     out$test.stat <- object$test.stat
     out$B <- object$B
     out$gamma <- object$gamma
+    out$method = object$method
+    out$FRTCI = object
+    
+    if ( !is.null( object$W ) ) {
+      out$grid.range = apply( object$te.grid, 2, range )
+    }
+    
     class(out) <- "summary.FRTCI.test"
     return(out)   
 }
