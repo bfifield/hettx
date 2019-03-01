@@ -2,10 +2,8 @@
 summary.FRTCI.test <- function(object, ...){
 
     ## Create data frame
-    rng <- range(object$ci.p)
-    df <- data.frame(object$statistic, object$p.value, object$p.value.plug, rng[1], rng[2])
-    names(df) <- c("Estimate", "P-Value (Sweep)", "P-Value (Plug-In)",
-                   "P-Value Lower CI", "P-Value Upper CI")
+    df <- data.frame(object$statistic, object$p.value, object$p.value.plug)
+    names(df) <- c("Statistic", "P-Value (Sweep)", "P-Value (Plug-In)" )
     rownames(df) <- NULL
     
     ## Create output
@@ -15,6 +13,24 @@ summary.FRTCI.test <- function(object, ...){
     out$test.stat <- object$test.stat
     out$B <- object$B
     out$gamma <- object$gamma
+    out$method = object$method
+    out$FRTCI = object
+    
+    if ( !is.null( object$W ) ) {
+      out$grid.range = apply( object$te.grid, 2, range )
+    } else {
+    
+    cnts = (object$ci.p - object$gamma) * object$B
+    bts = sapply( cnts, function( cnt ) {
+      bt = binom.test( cnt, object$B )
+      bt$conf.int
+    } )
+    minp = min( bts[1,] )
+    maxp = max( bts[2,] )
+    out$p.value.CI = c( minp, maxp ) + object$gamma 
+    }
+    
+    
     class(out) <- "summary.FRTCI.test"
     return(out)   
 }

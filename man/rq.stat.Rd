@@ -34,3 +34,8 @@ with covariates, with a conditional approach; see Koenker and Xiao (2002).
 rq.stat.uncond.cov implements a Kolmogorov-smirnov statistic via quantile regression with covariates,
 unconditional approach; see Firpo (2007).
 }
+\details{
+Warning: This function supresses all warnings of the `rq()` method call.
+
+Warning: This function supresses all warnings of the `rq()` method call.
+}

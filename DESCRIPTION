@@ -4,7 +4,6 @@ Title: Fisherian and Neymanian Methods for Detecting and Measuring Treatment Eff
 Version: 0.1.0
 Date: 2019-02-16
 Authors@R: c(
-  person("Masha", "Bertling", email = "mbertling@g.harvard.edu", role = "aut"),
   person("Peng", "Ding", email = "pengdingpku@berkeley.edu", role = "aut"),
   person("Avi", "Feller", email = "afeller@berkeley.edu", role = "aut"),
   person("Ben", "Fifield", email = "benfifield@gmail.com", role = c("aut", "cre")),

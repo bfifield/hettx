@@ -1,21 +1,40 @@
 #' @export
 print.summary.FRTCI.test <- function(x, ...){
     
+  tst = x$FRTCI
+  
     cat("\n")
+    cat( x$method, "\n" )
     cat("Call:\n")
     print(x$call)
     cat("\n")
+    scat( "# observations: %d\n", tst$n )
     cat("Test Statistic:", x$test.stat, "\n")
+    if ( !is.null( tst$W ) ) {
+      scat( "Grid: %d points tested with %d repititions/point\n", nrow( tst$te.grid ), tst$B )
+      cat( "Grid range:\n" )
+      prmatrix( x$grid.range, rowlab=rep("    ",nrow(x$grid.range)), collab = colnames(x$grid.range) )
+   } else {
+      rng = range( tst$te.vec )
+      scat( "Grid: %d points tested over range of %f to %f with %d repititions/point\n",
+            length( tst$te.vec ), rng[[1]], rng[[2]], tst$B )
+      scat( "Estimated ATE (grid center): %.3f\n", tst$te.hat )
+   }
+    scat( "gamma (for CI for grid): %f\n", tst$gamma )
     cat("\n")
-    cat("Estimates:\n")
-    print(x$estimates)
+    print(x$estimates, row.names=FALSE )
     
+    if ( is.null( tst$W ) ) {
+      scat( "\tCI for p-value (monte carlo error) = %f - %f\n", x$p.value.CI[[1]], x$p.value.CI[[2]] )
+    }
 }
 
 #' @export
 print.FRTCI.test <- function( x, ... ) {
-    print(summary(x)$estimates)
+  cat( x$method, "\n")
+  print(summary(x)$estimates)
 }
+
 
 #' @export
 print.RI.regression.result <- function(x, digits = max(3L, getOption("digits") - 3L), ...){

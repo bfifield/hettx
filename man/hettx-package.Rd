@@ -23,6 +23,8 @@ Department of Education, through Grant R305D150040. The opinions expressed
 are those of the authors and do not represent views of the Institute or the
 U.S. Department of Education.
 
+Special thanks to Masha Bertling for some early work on documenting this project.
+
 \tabular{ll}{ Package: \tab hettx\cr Type: \tab Package\cr Version: \tab 0.1.0-\cr
 Date: \tab 2019-02-16\cr License: \tab GPL (>= 3)\cr }
 }
@@ -31,7 +33,7 @@ Ding, Peng, Avi Feller and Luke Miratrix. (2016) "Randomization Inference for Tr
 Ding, Peng, Avi Feller and Luke Miratrix. (2019) "Decomposing Treatment Effect Variation", Journal of the American Statistical Association.
 }
 \author{
-Masha Bertling, Peng Ding, Avi Feller, Ben Fifield, and Luke Miratrix
+Peng Ding, Avi Feller, Ben Fifield, and Luke Miratrix
 
 Maintainer: Ben Fifield \email{benfifield@gmail.com}
 }
