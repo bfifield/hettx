@@ -24,7 +24,9 @@ Imports:
     parallel,
     doParallel,
     moments,
-    formula.tools
+    formula.tools,
+    purrr,
+    tidyverse
 Depends:
     R (>= 2.14.0)
 BugReports: https://github.com/bfifield/detect_heteffects/issues
