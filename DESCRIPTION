@@ -26,6 +26,7 @@ Imports:
     moments,
     formula.tools,
     purrr,
+    dplyr,
     tidyverse
 Depends:
     R (>= 2.14.0)
