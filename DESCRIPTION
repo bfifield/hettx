@@ -1,8 +1,8 @@
 Package: hettx
 Type: Package
 Title: Fisherian and Neymanian Methods for Detecting and Measuring Treatment Effect Variation
-Version: 0.1.0
-Date: 2019-02-16
+Version: 0.1.1
+Date: 2019-03-02
 Authors@R: c(
   person("Peng", "Ding", email = "pengdingpku@berkeley.edu", role = "aut"),
   person("Avi", "Feller", email = "afeller@berkeley.edu", role = "aut"),
@@ -11,9 +11,9 @@ Authors@R: c(
   ) 
 Description: Implements methods developed by Ding, Feller, and Miratrix (2016) <doi:10.1111/rssb.12124> <arXiv:1412.5000>,
     and Ding, Feller, and Miratrix (2018) <doi:10.1080/01621459.2017.1407322> <arXiv:1605.06566>
-    for testing whether there is unexplained variation in treatment effects across observations.
-    The package includes wrapper functions implementing the proposed methods, as well
-    as helper functions for analyzing and visualizing the results of the test.
+    for testing whether there is unexplained variation in treatment effects across observations, and for characterizing
+    the extent of the explained and unexplained variation in treatment effects. The package includes wrapper functions
+    implementing the proposed methods, as well as helper functions for analyzing and visualizing the results of the test.
 License: GPL (>= 3)
 Imports:
     quantreg,
@@ -24,9 +24,7 @@ Imports:
     parallel,
     doParallel,
     moments,
-    formula.tools,
-    tidyverse,
-    purrr
+    formula.tools
 Depends:
     R (>= 2.14.0)
 BugReports: https://github.com/bfifield/detect_heteffects/issues

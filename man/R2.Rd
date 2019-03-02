@@ -21,6 +21,12 @@ Bounds the R2 measure (how much of treatment variation is explained by given
 covariates) using either the OLS output for the ITT from est.beta, or the
 LATE estimation from est.beta.
 }
+\examples{
+df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+es <- estimate_systematic( Yobs ~ Z,  interaction.formula = ~ A + B, data = df )
+r2_out <- R2(es)
+
+}
 \seealso{
 print.RI.R2.result
 }

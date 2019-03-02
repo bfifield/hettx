@@ -29,6 +29,10 @@ scat <- function( str, ... ) {
 #'
 #' @param na.rm A logical flag indicating whether to list-wise delete missing data. The function will report an error if missing data exist. Default is FALSE.
 #'
+#' @examples
+#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' es <- estimate_systematic( Yobs ~ Z,  interaction.formula = ~ A + B, data = df )
+#' 
 #' @export
 #' @importFrom stats as.formula
 estimate_systematic <- function( formula, data, interaction.formula, control.formula=NULL,
@@ -78,6 +82,11 @@ estimate_systematic <- function( formula, data, interaction.formula, control.for
 #' @param rho.step Grid size for sensitivity analysis on values of rho. Default
 #'   is 0.05
 #'
+#' @examples
+#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' es <- estimate_systematic( Yobs ~ Z,  interaction.formula = ~ A + B, data = df )
+#' r2_out <- R2(es)
+#'
 #' @export
 #'
 #' @return RI.R2.result object.
@@ -103,6 +112,11 @@ is.RI.regression.result <- function( x ) {
 #' @param object A RI.regression.result object.
 #' @param ... Unused
 #'
+#' @examples
+#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' es <- estimate_systematic( Yobs ~ Z,  interaction.formula = ~ A + B, data = df )
+#' coef(es)
+#'
 #' @export
 coef.RI.regression.result <- function( object, ... ) {
     object$beta.hat
@@ -113,6 +127,11 @@ coef.RI.regression.result <- function( object, ... ) {
 #' @param object est.beta object
 #' @param ... unused
 #'
+#' @examples
+#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' es <- estimate_systematic( Yobs ~ Z,  interaction.formula = ~ A + B, data = df )
+#' vcov(es)
+#'
 #' @export
 vcov.RI.regression.result <- function( object, ... ) {
     object$cov.beta
@@ -122,6 +141,11 @@ vcov.RI.regression.result <- function( object, ... ) {
 #'
 #' @param object est.beta object
 #' @param ... unused
+#'
+#' @examples
+#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' es <- estimate_systematic( Yobs ~ Z,  interaction.formula = ~ A + B, data = df )
+#' SE(es)
 #'
 #' @export
 SE <- function( object, ... ) {
@@ -136,6 +160,11 @@ SE <- function( object, ... ) {
 #' @param Yobs  Outcome
 #' @param Z  Treatment assignment vector
 #' @param data  Dataframe with variables listed in formula and control.formula
+#'
+#' @examples
+#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' variance.ratio.test(df$Yobs, df$Z)
+#' 
 #' @export
 #' @importFrom moments kurtosis
 variance.ratio.test <- function(Yobs, Z, data= NULL)

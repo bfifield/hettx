@@ -17,3 +17,8 @@ variance.ratio.test(Yobs, Z, data = NULL)
 Given vector of observed outcomes and treatment vector, test to see if there is evidence
 the variances are different (taking kurtosis into account).
 }
+\examples{
+df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+variance.ratio.test(df$Yobs, df$Z)
+
+}

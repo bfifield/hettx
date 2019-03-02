@@ -15,3 +15,12 @@ p-value and range of p-values due to monte carlo error.
 \description{
 Give confidence bounds (from monte carlo simulation error) for the p-values returned by a test
 }
+\examples{
+Z <- rep(c(0, 1), 100)
+tau <- 4
+Y <- ifelse(Z, rnorm(100, tau), rnorm(100, 0))
+df <- data.frame(Y=Y, Z=Z)
+tst <- detect_idiosyncratic(Y ~ Z, df, B = 50, grid.size = 50)
+get.p.value( tst )
+
+}

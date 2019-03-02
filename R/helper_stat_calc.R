@@ -10,6 +10,9 @@
 #'
 #' @usage test.stat.info()
 #'
+#' @examples
+#' test.stat.info()
+#'
 #' @export
 test.stat.info <- function(){
     cat("
@@ -58,6 +61,10 @@ Test statistics when specifying interactions, without covariate adjustment:
 #' @param tau Value of treatment effect for shifting Y1. Default is NULL (Y1 not shifted).
 #' @param alternative Direction of test ("two.sided", "less", "greater")
 #'
+#' @examples
+#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' KS.stat(df$Yobs, df$Z)
+#'
 #' @return The value of the test.
 #' @export
 #' 
@@ -94,6 +101,10 @@ KS.stat <- function( Y, Z, tau = NULL, alternative = c("two.sided", "less", "gre
 #' @param Y Observed outcome vector
 #' @param Z Treatment assigment vector
 #'
+#' @examples
+#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' SKS.stat(df$Yobs, df$Z)
+#'
 #' @return The value of the test.
 #'
 #' @seealso KS.stat, SKS.stat.cov
@@ -127,6 +138,10 @@ SKS.stat <- function(Y, Z)
 #'
 #' @usage SKS.stat.cov.pool(Y, Z, X)
 #'
+#' @examples
+#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' SKS.stat.cov.pool(df$Yobs, df$Z, df$A)
+#'
 #' @rdname SKS.stat.cov
 #'
 #' @export
@@ -158,7 +173,11 @@ SKS.stat.cov.pool <- function(Y, Z, X)
 #'
 #' @param Y  Observed outcome vector
 #' @param Z  Treatment assigment vector
-#' @param X Additional pre-treatment covariates to adjust for in estimation, but not to interact with treatment. 
+#' @param X Additional pre-treatment covariates to adjust for in estimation, but not to interact with treatment.
+#'
+#' @examples
+#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' SKS.stat.cov(df$Yobs, df$Z, df$A)
 #'
 #' @return The value of the test.
 #'
@@ -192,6 +211,10 @@ SKS.stat.cov <- function(Y, Z, X)
 #'
 #'
 #' @usage SKS.stat.int.cov.pool(Y, Z, W, X)
+#'
+#' @examples
+#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' SKS.stat.int.cov.pool(Y = df$Yobs, Z = df$Z, W = df$A, X = df$B)
 #'
 #'
 #' @rdname SKS.stat.int.cov
@@ -240,6 +263,10 @@ SKS.stat.int.cov.pool <- function( Y, Z, W, X=NULL )
 #' @param W Additional pre-treatment covariates to interact with T to define
 #'   linear model of treatment effects.
 #'
+#' @examples
+#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' SKS.stat.int.cov(Y = df$Yobs, Z = df$Z, W = df$A, X = df$B)
+#'
 #' @usage SKS.stat.int.cov(Y, Z, W, X)
 #'
 #' @export
@@ -282,6 +309,11 @@ SKS.stat.int.cov <- function( Y, Z, W, X=NULL )
 #' @usage SKS.stat.cov.rq(Y, Z, X)
 #'
 #' @inheritParams SKS.stat.cov
+#'
+#' @examples
+#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' SKS.stat.cov.rq(df$Yobs, df$Z, df$A)
+#' 
 #' @return The test statistic value.
 #'
 #' @export
@@ -307,6 +339,10 @@ SKS.stat.cov.rq <- function(Y, Z, X)
 #' @param Y  Observed outcome vector
 #' @param Z  Treatment assigment vector
 #' @param rq.pts Sequence of quantile points at which to evaluate the test. Default is seq(.1, .9, by = .1). Should not go beyond 0 and 1.
+#'
+#' @examples
+#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' rq.stat(df$Yobs, df$Z)
 #'
 #' @return The value of the test.
 #' @export
@@ -337,6 +373,10 @@ rq.stat <- function(Y, Z, rq.pts = seq(0.1, 0.9, by = 0.1))
 #' @param X Additional pre-treatment covariates to adjust for in estimation, but
 #'   not to interact with treatment.
 #'
+#' @examples
+#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' rq.stat.cond.cov(df$Yobs, df$Z, df$A)
+#'
 #' @rdname rq.stat
 #' @export
 rq.stat.cond.cov <- function(Y, Z, X, rq.pts = seq(0.1, 0.9, by = 0.1))
@@ -363,6 +403,10 @@ rq.stat.cond.cov <- function(Y, Z, X, rq.pts = seq(0.1, 0.9, by = 0.1))
 #' @usage rq.stat.uncond.cov(Y, Z, X, rq.pts)
 #'
 #' @inheritParams rq.stat.cond.cov
+#'
+#' @examples
+#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' rq.stat.uncond.cov(df$Yobs, df$Z, df$A)
 #'
 #' @rdname rq.stat
 #' @export
@@ -405,6 +449,11 @@ rq.stat.uncond.cov <- function(Y, Z, X, rq.pts = seq(0.1, 0.9, by = 0.1))
 #' @param Z Treatment assigment vector
 #' @param W A a factor or categorical covariate.
 #'
+#' @examples
+#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' df$W <- sample(c("A", "B", "C"), nrow(df), replace = TRUE)
+#' WSKS.t(df$Yobs, df$Z, df$W)
+#'
 #' @return The value of the test.
 #' @export
 WSKS.t <- function( Y, Z, W ) {
@@ -425,6 +474,11 @@ WSKS.t <- function( Y, Z, W ) {
 #' shifted and centered with respect to eachother.
 #'
 #' @usage SKS.pool.t(Y, Z, W)
+#'
+#' @examples
+#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' df$W <- sample(c("A", "B", "C"), nrow(df), replace = TRUE)
+#' SKS.pool.t(df$Yobs, df$Z, df$W)
 #'
 #' @inheritParams WSKS.t
 #'
