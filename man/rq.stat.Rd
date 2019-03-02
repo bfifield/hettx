@@ -39,3 +39,14 @@ Warning: This function supresses all warnings of the `rq()` method call.
 
 Warning: This function supresses all warnings of the `rq()` method call.
 }
+\examples{
+df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+rq.stat(df$Yobs, df$Z)
+
+df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+rq.stat.cond.cov(df$Yobs, df$Z, df$A)
+
+df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+rq.stat.uncond.cov(df$Yobs, df$Z, df$A)
+
+}

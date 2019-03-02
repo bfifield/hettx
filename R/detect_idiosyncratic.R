@@ -292,6 +292,15 @@ detect_idiosyncratic <- function(formula, data,
 #' @param tst A FRTCI.test object from detect_idiosyncratic()
 #' 
 #' @return p-value and range of p-values due to monte carlo error.
+#'
+#' @examples
+#' Z <- rep(c(0, 1), 100)
+#' tau <- 4
+#' Y <- ifelse(Z, rnorm(100, tau), rnorm(100, 0))
+#' df <- data.frame(Y=Y, Z=Z)
+#' tst <- detect_idiosyncratic(Y ~ Z, df, B = 50, grid.size = 50)
+#' get.p.value( tst )
+#'
 #' @export
 get.p.value <- function( tst ) {
     cnts = (tst$ci.p - tst$gamma) * tst$B

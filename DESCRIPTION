@@ -1,20 +1,19 @@
 Package: hettx
 Type: Package
-Title: Conduct the FRT CI Method of Ding, Feller, and Miratrix (2016, JRSS-B) and the Systematic Estimation Method of Ding, Feller, and Miratrix (2019, JASA)
-Version: 0.1.0
-Date: 2019-02-16
+Title: Fisherian and Neymanian Methods for Detecting and Measuring Treatment Effect Variation
+Version: 0.1.1
+Date: 2019-03-02
 Authors@R: c(
   person("Peng", "Ding", email = "pengdingpku@berkeley.edu", role = "aut"),
   person("Avi", "Feller", email = "afeller@berkeley.edu", role = "aut"),
   person("Ben", "Fifield", email = "benfifield@gmail.com", role = c("aut", "cre")),
   person("Luke", "Miratrix", email = "lmiratrix@g.harvard.edu", role = "aut")
   ) 
-Description: Implements methods developed by Ding, Feller, and Miratrix (2016)
-    ''Randomization Inference for Treatment Effect Variation'',
-    and Ding, Feller, and Miratrix (2018) ''Decomposing Treatment Effect Variation''
-    for testing whether there is unexplained variation in treatment effects across observations.
-    The package includes wrapper functions implementing the proposed methods, as well
-    as helper functions for analyzing and visualizing the results of the test.
+Description: Implements methods developed by Ding, Feller, and Miratrix (2016) <doi:10.1111/rssb.12124> <arXiv:1412.5000>,
+    and Ding, Feller, and Miratrix (2018) <doi:10.1080/01621459.2017.1407322> <arXiv:1605.06566>
+    for testing whether there is unexplained variation in treatment effects across observations, and for characterizing
+    the extent of the explained and unexplained variation in treatment effects. The package includes wrapper functions
+    implementing the proposed methods, as well as helper functions for analyzing and visualizing the results of the test.
 License: GPL (>= 3)
 Imports:
     quantreg,
@@ -26,8 +25,9 @@ Imports:
     doParallel,
     moments,
     formula.tools,
-    tidyverse,
-    purrr
+    purrr,
+    dplyr,
+    tidyverse
 Depends:
     R (>= 2.14.0)
 BugReports: https://github.com/bfifield/detect_heteffects/issues

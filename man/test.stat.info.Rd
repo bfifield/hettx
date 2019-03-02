@@ -9,3 +9,7 @@ test.stat.info()
 \description{
 A list of test statistics for detect.idiosyncratic(), and information on use cases when each is appropriate.
 }
+\examples{
+test.stat.info()
+
+}

@@ -24,6 +24,11 @@ Calculate classic (not shifted) KS statistic; code is a modified version of R's 
 \details{
 If tau passed, Y1 will be shifted by tau.
 }
+\examples{
+df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+KS.stat(df$Yobs, df$Z)
+
+}
 \seealso{
 detect_idiosyncratic
 }

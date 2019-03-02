@@ -30,3 +30,8 @@ The OLS method differs from the RI method only by how the Sxx matrix is handled.
 In the OLS case, seperate Sxx for treatment and control are calculated for each 
 treatment arm. For RI the known Sxx based on all units is used.
 }
+\examples{
+df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+es <- estimate_systematic( Yobs ~ Z,  interaction.formula = ~ A + B, data = df )
+
+}

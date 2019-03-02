@@ -13,6 +13,14 @@
 #' @param ci.line.col Color to plot confidence interval around estimated treatment effect. Default is blue.
 #' @param ... Further arguments to be passed to \code{print.FRTCI.test()}
 #'
+#' @examples
+#' Z <- rep(c(0, 1), 100)
+#' tau <- 4
+#' Y <- ifelse(Z, rnorm(100, tau), rnorm(100, 0))
+#' df <- data.frame(Y=Y, Z=Z)
+#' tst <- detect_idiosyncratic(Y ~ Z, df, B = 50, grid.size = 50)
+#' plot(tst)
+#' 
 #' @export
 #' @method plot FRTCI.test
 plot.FRTCI.test <- function( x, true.tau=NULL, 
@@ -54,6 +62,12 @@ plot.FRTCI.test <- function( x, true.tau=NULL,
 #' @param ADD TRUE if add to existing plot. FALSE make a new plot.
 #' @param ...  Arguments to pass to plotting of points.
 #'
+#' @examples
+#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' es <- estimate_systematic( Yobs ~ Z,  interaction.formula = ~ A + B, data = df )
+#' r2_out <- R2(es)
+#' plot(r2_out)
+#' 
 #' @export
 #' @seealso calc.beta
 plot.RI.R2.result <- function( x, main=paste( "R2 for Het Tx (", x$type, ")", sep=""),

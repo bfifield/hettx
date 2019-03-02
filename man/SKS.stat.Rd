@@ -18,6 +18,11 @@ The value of the test.
 Shifted kolmogorov-smirnov statistic. Calculate KS distance between Y0 and Y1
 shifted by sample tau.
 }
+\examples{
+df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+SKS.stat(df$Yobs, df$Z)
+
+}
 \seealso{
 KS.stat, SKS.stat.cov
 
