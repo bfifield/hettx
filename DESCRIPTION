@@ -30,7 +30,7 @@ Imports:
     tidyverse
 Depends:
     R (>= 2.14.0)
-BugReports: https://github.com/bfifield/detect_heteffects/issues
+BugReports: https://github.com/bfifield/hettx/issues
 RoxygenNote: 6.1.1
 Suggests: testthat, knitr, rmarkdown
 Encoding: UTF-8
