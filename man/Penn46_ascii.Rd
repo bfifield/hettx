@@ -4,7 +4,9 @@
 \name{Penn46_ascii}
 \alias{Penn46_ascii}
 \title{Sample data set}
-\format{A dataframe containing 6384 observations and 12 columns.}
+\format{
+A dataframe containing 6384 observations and 12 columns.
+}
 \usage{
 Penn46_ascii
 }

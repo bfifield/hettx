@@ -4,8 +4,13 @@
 \alias{make.randomized.compliance.dat}
 \title{Generate fake data with noncompliance.}
 \usage{
-make.randomized.compliance.dat(n, p = 0.6,
-  science.table.generator = make.linear.data, include.POs = TRUE, ...)
+make.randomized.compliance.dat(
+  n,
+  p = 0.6,
+  science.table.generator = make.linear.data,
+  include.POs = TRUE,
+  ...
+)
 }
 \arguments{
 \item{n}{Sample size}

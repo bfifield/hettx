@@ -4,7 +4,9 @@
 \name{ToyData}
 \alias{ToyData}
 \title{Toy data set}
-\format{A dataframe containing 500 observations and 7 columns.}
+\format{
+A dataframe containing 500 observations and 7 columns.
+}
 \usage{
 ToyData
 }

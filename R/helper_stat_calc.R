@@ -14,7 +14,7 @@
 #' test.stat.info()
 #'
 #' @export
-test.stat.info <- function(){
+test.stat.info <- function() {
     cat("
 ## -----------------------------------------------------
 ## Available test statistics for detect.idiosyncratic():
@@ -46,7 +46,8 @@ Test statistics when specifying interactions, without covariate adjustment:
 \t   then aggregates together as a weighted average. Should be used when the interaction model is a single
 \t   categorical or factor covariate.
 \t2) SKS.pool.t - Subtract off group level treatment effect estimates and then look at KS statistic on residuals.
-\t   Should be used when the interaction model is a single categorical or factor covariate.\n")}
+\t   Should be used when the interaction model is a single categorical or factor covariate.\n")
+}
 
 #' KS.stat
 #'
@@ -402,7 +403,6 @@ rq.stat.cond.cov <- function(Y, Z, X, rq.pts = seq(0.1, 0.9, by = 0.1))
 #'
 #' @usage rq.stat.uncond.cov(Y, Z, X, rq.pts)
 #'
-#' @inheritParams rq.stat.cond.cov
 #'
 #' @examples
 #' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )

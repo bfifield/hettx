@@ -6,9 +6,16 @@
 \alias{make.skew.data}
 \title{Generate dataset according to a linear model.}
 \usage{
-make.linear.data(n, gamma.vec = c(1, 2, 2, 1), gamma2.vec = NULL,
-  beta.vec = c(-1, -1, 1), ideo.sd = 0, quad.tx = FALSE,
-  mu.X = FALSE, corr.X = TRUE)
+make.linear.data(
+  n,
+  gamma.vec = c(1, 2, 2, 1),
+  gamma2.vec = NULL,
+  beta.vec = c(-1, -1, 1),
+  ideo.sd = 0,
+  quad.tx = FALSE,
+  mu.X = FALSE,
+  corr.X = TRUE
+)
 
 make.quadradic.data(n, beta.vec = c(-1, -1, 1))
 
