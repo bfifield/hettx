@@ -69,6 +69,10 @@ globalVariables('b')
 #' @importFrom parallel makePSOCKcluster stopCluster
 #' @importFrom doParallel registerDoParallel
 #' @importFrom formula.tools get.vars lhs.vars rhs.vars
+#' @importFrom ggplot2 ggplot aes facet_grid geom_point geom_smooth labs
+#' @importFrom dplyr bind_rows
+#' @importFrom tidyr gather
+#' @importFrom purrr map
 detect_idiosyncratic <- function(formula, data,
                                  interaction.formula = NULL, control.formula = NULL,
                                  plugin = FALSE, tau.hat = NULL,

@@ -1,8 +1,8 @@
 Package: hettx
 Type: Package
 Title: Fisherian and Neymanian Methods for Detecting and Measuring Treatment Effect Variation
-Version: 0.1.1
-Date: 2019-03-02
+Version: 0.1.2
+Date: 2023-02-20
 Authors@R: c(
   person("Peng", "Ding", email = "pengdingpku@berkeley.edu", role = "aut"),
   person("Avi", "Feller", email = "afeller@berkeley.edu", role = "aut"),
@@ -27,7 +27,8 @@ Imports:
     formula.tools,
     purrr,
     dplyr,
-    tidyverse
+    ggplot2,
+    tidyr
 Depends:
     R (>= 2.14.0)
 BugReports: https://github.com/bfifield/hettx/issues
