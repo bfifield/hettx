@@ -16,9 +16,6 @@
 #' U.S. Department of Education.
 #' 
 #' Special thanks to Masha Bertling for some early work on documenting this project.
-#' 
-#' \tabular{ll}{ Package: \tab hettx\cr Type: \tab Package\cr Version: \tab 0.1.1-\cr
-#' Date: \tab 2019-03-02\cr License: \tab GPL (>= 3)\cr }
 #'
 #' @name hettx-package
 #' @aliases hettx-package 

@@ -22,9 +22,6 @@ are those of the authors and do not represent views of the Institute or the
 U.S. Department of Education.
 
 Special thanks to Masha Bertling for some early work on documenting this project.
-
-\tabular{ll}{ Package: \tab hettx\cr Type: \tab Package\cr Version: \tab 0.1.1-\cr
-Date: \tab 2019-03-02\cr License: \tab GPL (>= 3)\cr }
 }
 \references{
 Ding, Peng, Avi Feller and Luke Miratrix. (2016) "Randomization Inference for Treatment Effect Variation", Journal of the Royal Statistical Society-Series B.
