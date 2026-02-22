@@ -16,6 +16,7 @@ Description: Implements methods developed by Ding, Feller, and Miratrix (2016) <
     implementing the proposed methods, as well as helper functions for analyzing and visualizing the results of the test.
 License: GPL (>= 3)
 Imports:
+    generics,
     quantreg,
     plyr,
     mvtnorm,

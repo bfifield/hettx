@@ -17,6 +17,7 @@
 #' 
 #' Special thanks to Masha Bertling for some early work on documenting this project.
 #'
+#' @importFrom generics tidy glance
 #' @name hettx-package
 #' @aliases hettx-package 
 #' @docType package
