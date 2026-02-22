@@ -18,23 +18,18 @@ License: GPL (>= 3)
 Imports:
     generics,
     quantreg,
-    plyr,
     mvtnorm,
     MASS,
     foreach,
     parallel,
     doParallel,
     moments,
-    formula.tools,
-    purrr,
-    dplyr,
-    ggplot2,
-    tidyr
+    ggplot2
 Depends:
     R (>= 2.14.0)
 BugReports: https://github.com/bfifield/hettx/issues
 RoxygenNote: 7.1.2
-Suggests: testthat, knitr, rmarkdown
+Suggests: testthat, knitr, rmarkdown, dplyr, tidyr, purrr
 Encoding: UTF-8
 VignetteBuilder: knitr
 LazyData: true

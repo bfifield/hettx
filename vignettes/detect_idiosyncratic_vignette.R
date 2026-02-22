@@ -4,15 +4,18 @@ knitr::opts_chunk$set(fig.width = 8)
 
 ## ---- message=FALSE, warning=FALSE---------------------------------------
 library( mvtnorm )
-library( tidyverse )
+library( ggplot2 )
 library( hettx )
+library( dplyr )
+library( tidyr )
+library( purrr )
 data( ToyData )
 
 ## ---- echo=TRUE----------------------------------------------------------
 data( ToyData )
 head( ToyData )
-td = gather( ToyData, x1, x2, x3, x4, key="X", value="value" )
-td = gather( td, Y, tau, key="outcome", value="value2" )
+td <- pivot_longer( ToyData, cols=c(x1, x2, x3, x4), names_to="X", values_to="value" )
+td <- pivot_longer( td, cols=c(Y, tau), names_to="outcome", values_to="value2" )
 ggplot( td, aes( x=value, y=value2, col=as.factor(Z) ) ) +
         facet_grid( outcome ~ X, scales="free" ) +
         geom_point( alpha=0.5, size=0.5) + 
@@ -58,9 +61,9 @@ tests = list( no_cov=tst1, useless_cov=tst1b, all_covariates=tst2,
               het_beyond_x1_x2=tst3b, 
               het_beyond_x1_x2_with_cov=tst3c, het_beyond_all=tst3d )
 
-agg.res = purrr::map( tests, get.p.value  ) %>%
+agg.res <- purrr::map( tests, get.p.value ) %>%
   purrr::map( as.list )
-agg.res = bind_rows( agg.res, .id = "test" )
+agg.res <- bind_rows( agg.res, .id = "test" )
 agg.res
 
 ## ----cautionary_tale, echo=TRUE------------------------------------------

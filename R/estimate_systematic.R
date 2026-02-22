@@ -41,7 +41,7 @@ estimate_systematic <- function( formula, data, interaction.formula, control.for
     ## Check formula
     formula.char <- paste( deparse(formula), collapse=" " )
     method <- match.arg(method)
-    if(length(lhs.vars(formula)) == 2){
+    if(length(lhs_vars(formula)) == 2){
         if(!is.null(control.formula)){
             cat("control.formula specified, ignoring for oracle estimation.\n")
         }
@@ -55,7 +55,7 @@ estimate_systematic <- function( formula, data, interaction.formula, control.for
         eb.out <- est.beta.LATE(formula=formula, data=data,
                                 interaction.formula=interaction.formula,
                                 method=method, na.rm=na.rm)
-    }else if(length(lhs.vars(formula)) == 1 & length(rhs.vars(formula)) == 1){
+    }else if(length(lhs_vars(formula)) == 1 & length(rhs_vars(formula)) == 1){
         eb.out <- est.beta.ITT(formula=formula, data=data,
                                interaction.formula=interaction.formula,
                                control.formula=control.formula,

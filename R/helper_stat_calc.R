@@ -489,11 +489,12 @@ rq.stat.uncond.cov <- function(Y, Z, X, rq.pts = seq(0.1, 0.9, by = 0.1))
 #' @return The value of the test.
 #' @export
 WSKS.t <- function( Y, Z, W ) {
-    
-    dd = ddply( data.frame(Y=Y,Z=Z,W=W), "W", summarize, 
-               t.sks = SKS.stat( Y, Z ),
-               n.k = length(Y) )
-    n = length(Y)
+
+    dat <- data.frame(Y=Y, Z=Z, W=W)
+    dd <- do.call(rbind, lapply(split(dat, dat$W), function(d) {
+        data.frame(t.sks = SKS.stat(d$Y, d$Z), n.k = nrow(d))
+    }))
+    n <- length(Y)
     return( sum( dd$t.sks * dd$n.k / n ) )
 }
 
@@ -516,9 +517,10 @@ WSKS.t <- function( Y, Z, W ) {
 #'
 #' @export
 SKS.pool.t <- function( Y, Z, W ) {
-    
+
     dat <- data.frame( Y=Y, Z=Z, W=W )
-    mns = ddply( dat, .(W, Z), summarize, mean=mean(Y) )
-    taus = with( mns, mean[Z==1] - mean[Z==0] )
+    mean1 <- tapply(dat$Y[dat$Z == 1], dat$W[dat$Z == 1], mean)
+    mean0 <- tapply(dat$Y[dat$Z == 0], dat$W[dat$Z == 0], mean)
+    taus <- mean1 - mean0
     return( KS.stat( dat$Y - dat$Z*taus[dat$W], dat$Z ) )
 }

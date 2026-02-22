@@ -63,16 +63,11 @@ globalVariables('b')
 #'   qchisq qnorm var vcov na.omit
 #' @importFrom utils setTxtProgressBar txtProgressBar
 #' @importFrom quantreg rq
-#' @importFrom plyr ddply summarize .
 #' @importFrom mvtnorm rmvnorm
 #' @importFrom foreach "%do%" "%dopar%" foreach
 #' @importFrom parallel makePSOCKcluster stopCluster
 #' @importFrom doParallel registerDoParallel
-#' @importFrom formula.tools get.vars lhs.vars rhs.vars
 #' @importFrom ggplot2 ggplot aes facet_grid geom_point geom_smooth labs
-#' @importFrom dplyr bind_rows
-#' @importFrom tidyr gather
-#' @importFrom purrr map
 detect_idiosyncratic <- function(formula, data,
                                  interaction.formula = NULL, control.formula = NULL,
                                  plugin = FALSE, tau.hat = NULL,
@@ -92,19 +87,19 @@ detect_idiosyncratic <- function(formula, data,
         stop("The input data must be of class tbl_df, data.table, or data.frame.")
     }
     
-    if(length(lhs.vars(formula)) != 1 | length(rhs.vars(formula)) != 1){
+    if(length(lhs_vars(formula)) != 1 | length(rhs_vars(formula)) != 1){
         stop("The formula argument must be of the form outcome ~ treatment.")
     }
-    main.vars <- get.vars(formula,data=data)
+    main.vars <- get_vars(formula,data=data)
     if(any(!(main.vars %in% colnames(data)))){
         stop("Some variables in formula are not present in your data.")
     }
     
     if(!is.null(interaction.formula)){
-        if(length(lhs.vars(interaction.formula)) != 0){
+        if(length(lhs_vars(interaction.formula)) != 0){
             stop("Do not provide an outcome variable in interaction.formula.")
         }
-        interaction.vars <- get.vars(interaction.formula,data=data)
+        interaction.vars <- get_vars(interaction.formula,data=data)
         if(any(!(interaction.vars %in% colnames(data)))){
             stop("Some variables in interaction.formula are not present in your data.")
         }
@@ -116,10 +111,10 @@ detect_idiosyncratic <- function(formula, data,
     }
 
     if(!is.null(control.formula)){
-        if(length(lhs.vars(control.formula)) != 0){
+        if(length(lhs_vars(control.formula)) != 0){
             stop("Do not provide an outcome variable in control.formula.")
         }
-        control.vars <- get.vars(control.formula,data=data)
+        control.vars <- get_vars(control.formula,data=data)
         if(any(!(control.vars %in% colnames(data)))){
             stop("Some variables in control.formula are not present in your data.")
         }
