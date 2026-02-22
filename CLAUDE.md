@@ -35,7 +35,7 @@ bash builder.sh
 
 ### Two main entry points
 
-- **`detect_idiosyncratic()`** (`R/detect_idiosyncratic.R`) — Tests whether there is unexplained treatment effect variation via Fisherian Randomization Tests. Dispatches to three internal engines: `FRTplug()` (plug-in test), `FRTCI()` (confidence interval test), `FRTCI.interact()` (interaction test), all in `R/helper_frt.R` and `R/helper_FRTCI.R`.
+- **`detect_idiosyncratic()`** (`R/detect_idiosyncratic.R`) — Tests whether there is unexplained treatment effect variation via Fisherian Randomization Tests. Dispatches to three internal engines: `FRTplug()` (plug-in test), `FRTCI()` (confidence interval test), `FRTCI_interact()` (interaction test), all in `R/helper_frt.R` and `R/helper_FRTCI.R`.
 
 - **`estimate_systematic()`** (`R/estimate_systematic.R`) — Estimates systematic treatment effect heterogeneity explained by covariates. Supports ITT, LATE, and Oracle modes. Core estimation logic lives in `R/helper_est_beta.R`.
 
@@ -78,10 +78,10 @@ Tests involve randomization, so some use `set.seed()` for reproducibility. Many 
 - [x] Audit `tidyr::gather()` import — removed (unused); also removed unused `dplyr` and `purrr` imports
 
 ### Medium Priority
-- [ ] Standardize assignment operators to `<-` throughout (currently mixes `=` and `<-`)
-- [ ] Replace `class(x) %in%` with `inherits()` in `detect_idiosyncratic.R` and `helper_est_beta.R`
-- [ ] Replace `sapply()` with `vapply()` (explicit `FUN.VALUE`) across codebase
-- [ ] Rename dot-case internal functions to snake_case (e.g., `get.p.value` -> `get_p_value`)
+- [x] Standardize assignment operators to `<-` throughout (currently mixes `=` and `<-`)
+- [x] Replace `class(x) %in%` with `inherits()` in `detect_idiosyncratic.R` and `helper_est_beta.R`
+- [x] Replace `sapply()` with `vapply()` (explicit `FUN.VALUE`) across codebase
+- [x] Rename dot-case internal functions to snake_case (e.g., `get.tau.vector` -> `get_tau_vector`)
 
 ### Low Priority
 - [ ] Bump minimum R version from 2.14.0 to 4.0.0+; drop `stringsAsFactors = FALSE`

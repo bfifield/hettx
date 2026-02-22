@@ -45,18 +45,18 @@ estimate_systematic <- function( formula, data, interaction.formula, control.for
         if(!is.null(control.formula)){
             cat("control.formula specified, ignoring for oracle estimation.\n")
         }
-        eb.out <- calc.beta.oracle(formula=formula, data=data,
+        eb.out <- calc_beta_oracle(formula=formula, data=data,
                                    interaction.formula=interaction.formula,
                                    method=method, na.rm=na.rm)
     }else if(grepl("\\|", formula.char)){
         if(!is.null(control.formula)){
             cat("control.formula specified, ignoring for LATE estimation.\n")
         }
-        eb.out <- est.beta.LATE(formula=formula, data=data,
+        eb.out <- est_beta_LATE(formula=formula, data=data,
                                 interaction.formula=interaction.formula,
                                 method=method, na.rm=na.rm)
     }else if(length(lhs_vars(formula)) == 1 & length(rhs_vars(formula)) == 1){
-        eb.out <- est.beta.ITT(formula=formula, data=data,
+        eb.out <- est_beta_ITT(formula=formula, data=data,
                                interaction.formula=interaction.formula,
                                control.formula=control.formula,
                                method=method,
@@ -92,11 +92,11 @@ estimate_systematic <- function( formula, data, interaction.formula, control.for
 #' @return RI.R2.result object.
 #' @seealso print.RI.R2.result
 R2 <- function( est.beta, rho.step=0.05 ) {
-    stopifnot( is.RI.regression.result(est.beta) )
+    stopifnot( is_RI_regression_result(est.beta) )
     if( inherits(est.beta, "RI.regression.result.LATE") ){
-        r2 <- R2.LATE(RI.result=est.beta, rho.step=rho.step)
+        r2 <- R2_LATE(RI.result=est.beta, rho.step=rho.step)
     }else{
-        r2 <- R2.ITT(RI.result=est.beta, rho.step=rho.step)
+        r2 <- R2_ITT(RI.result=est.beta, rho.step=rho.step)
     }
     return(r2)
 }
@@ -104,7 +104,7 @@ R2 <- function( est.beta, rho.step=0.05 ) {
 ## ------------------------------------
 ## Clean printing of our result objects
 ## ------------------------------------
-is.RI.regression.result <- function( x ) {
+is_RI_regression_result <- function( x ) {
     inherits(x, "RI.regression.result")
 }
 
@@ -170,26 +170,26 @@ SE <- function( object, ... ) {
 variance.ratio.test <- function(Yobs, Z, data= NULL)
 {
   if (!is.null( data ) ) {
-    Yobs = eval( substitute( Yobs ), data )
-    Z = eval( substitute( Z ), data )
+    Yobs <- eval( substitute( Yobs ), data )
+    Z <- eval( substitute( Z ), data )
   }
-  Y1 = Yobs[Z==1]
-  Y0 = Yobs[Z==0]
+  Y1 <- Yobs[Z==1]
+  Y0 <- Yobs[Z==0]
 
-  N1 = length(Y1)
-  N0 = length(Y0)
+  N1 <- length(Y1)
+  N0 <- length(Y0)
 
-  log.varR = log(var(Y1)/var(Y0))
+  log.varR <- log(var(Y1)/var(Y0))
 
-  asy.se   = sqrt(  (kurtosis(Y1) - 1)/N1 + (kurtosis(Y0) - 1)/N0   )
+  asy.se   <- sqrt(  (kurtosis(Y1) - 1)/N1 + (kurtosis(Y0) - 1)/N0   )
 
-  pvalue   = as.numeric((1 - pnorm(abs(log.varR), 0, asy.se)))
+  pvalue   <- as.numeric((1 - pnorm(abs(log.varR), 0, asy.se)))
 
-  res = data.frame( pvalue = pvalue, var1 = var( Y1 ), var0 = var( Y0 ))
-  res$ratio = res$var1 / res$var0
-  res$log.ratio = log( res$ratio )
-  res$asy.se = asy.se
-  res$z = res$log.ratio / res$asy.se
+  res <- data.frame( pvalue = pvalue, var1 = var( Y1 ), var0 = var( Y0 ))
+  res$ratio <- res$var1 / res$var0
+  res$log.ratio <- log( res$ratio )
+  res$asy.se <- asy.se
+  res$z <- res$log.ratio / res$asy.se
   return( res )
 }
 

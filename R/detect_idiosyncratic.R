@@ -43,7 +43,7 @@ globalVariables('b')
 #'   Default is 1.
 #' @param verbose  Whether to print out progress bar when fitting and other
 #'   diagnostics. Default is TRUE.
-#' @param ... Extra arguments passed to the generate.permutations function and
+#' @param ... Extra arguments passed to the generate_permutations function and
 #'   test.stat functions.
 #'
 #' @return If plug-in, the value of the test and the associated p-value. If not,
@@ -81,7 +81,7 @@ detect_idiosyncratic <- function(formula, data,
     ## Get variables from formulas
     ## and check formulas
     ## ---------------------------
-    if(any(class(data) %in% c("tbl_df", "data.table", "data.frame"))) {
+    if(inherits(data, "data.frame")) {
         data <- as.data.frame(data)
     }else{
         stop("The input data must be of class tbl_df, data.table, or data.frame.")
@@ -212,8 +212,8 @@ detect_idiosyncratic <- function(formula, data,
     adj.int.funs <- c("SKS.stat.int.cov.pool", "SKS.stat.int.cov")
     int.funs <- c("WSKS.t", "SKS.pool.t")
     if ( is.function( test.stat ) ) {
-      forms.l =  formals( test.stat )
-        forms = names( forms.l )
+      forms.l <-  formals( test.stat )
+        forms <- names( forms.l )
         if ( is.null(W) ) {
           if ( "W" %in% forms && !is.null( forms.l["W"]  ) ) {
             warning( "No W passed but test.stat calls for passed W" )
@@ -264,8 +264,8 @@ detect_idiosyncratic <- function(formula, data,
                          grid.gamma = grid.gamma, grid.size = grid.size,
                          te.vec = te.vec, return.matrix = return.matrix,
                          n.cores = n.cores, verbose = verbose, ...)
-    }else{ ## FRTCI.interact (test for variation beyond covariates)
-        fpi_out <- FRTCI.interact(Y = Y, Z = Z, W = W, X = X,
+    }else{ ## FRTCI_interact (test for variation beyond covariates)
+        fpi_out <- FRTCI_interact(Y = Y, Z = Z, W = W, X = X,
                                   test.stat = match.fun(test.stat), B = B, gamma = gamma,
                                   grid.gamma = grid.gamma, grid.size = grid.size,
                                   return.matrix = return.matrix, n.cores = n.cores,
@@ -302,11 +302,11 @@ detect_idiosyncratic <- function(formula, data,
 #'
 #' @export
 get.p.value <- function( tst ) {
-    cnts = (tst$ci.p - tst$gamma) * tst$B
-    bts = sapply( cnts, function( cnt ) {
-        bt = binom.test( cnt, tst$B )
+    cnts <- (tst$ci.p - tst$gamma) * tst$B
+    bts <- vapply( cnts, function( cnt ) {
+        bt <- binom.test( cnt, tst$B )
         as.numeric( bt$conf.int )
-    } )
+    }, numeric(2) )
     stopifnot( tst$p.value == max( tst$ci.p ) )
     c( p.value=max( tst$ci.p ), min.p= min( bts[1,] ), max.p=max( bts[2,] ), plug=tst$p.value.plug )
 }

@@ -84,7 +84,7 @@ test.stat.info <- function() {
 #' KS.stat
 #'
 #' Calculate classic (not shifted) KS statistic; code is a modified version of R's ks.test().
-#' 
+#'
 #' If tau passed, Y1 will be shifted by tau.
 #'
 #' @usage KS.stat(Y, Z, tau, alternative)
@@ -100,32 +100,32 @@ test.stat.info <- function() {
 #'
 #' @return The value of the test.
 #' @export
-#' 
+#'
 #' @seealso detect_idiosyncratic
 KS.stat <- function( Y, Z, tau = NULL, alternative = c("two.sided", "less", "greater") ) {
-    x = Y[Z==1]
-    y = Y[Z==0]
+    x <- Y[Z==1]
+    y <- Y[Z==0]
     if ( !is.null( tau ) ) {
-        x = x - tau
+        x <- x - tau
     }
     alternative <- match.arg(alternative)
-    
+
     n.x <- length(x)
     n.y <- length(y)
-    
+
     w <- c(x, y)
     z <- cumsum(ifelse(order(w) <= n.x, 1/n.x, -1/n.y))
     if (length(unique(w)) < (n.x + n.y)) {
         z <- z[c(which(diff(sort(w)) != 0), n.x + n.y)]
     }
-    STATISTIC <- switch(alternative, two.sided = max(abs(z)), 
+    STATISTIC <- switch(alternative, two.sided = max(abs(z)),
                         greater = max(z), less = -min(z))
-    
+
     STATISTIC
 }
 
 #' SKS.stat
-#' 
+#'
 #' Shifted kolmogorov-smirnov statistic. Calculate KS distance between Y0 and Y1
 #' shifted by sample tau.
 #'
@@ -142,25 +142,25 @@ KS.stat <- function( Y, Z, tau = NULL, alternative = c("two.sided", "less", "gre
 #'
 #' @seealso KS.stat, SKS.stat.cov
 #' @seealso detect_idiosyncratic
-#' 
+#'
 #' @export
 SKS.stat <- function(Y, Z)
 {
-    Y1 = Y[Z==1]
-    Y0 = Y[Z==0]
-    
-    Y1.star   = Y1 - mean(Y1)
-    Y0.star   = Y0 - mean(Y0)
-    
-    unique.points = c(Y1.star, Y0.star)
-    
-    Fn1 = ecdf(Y1.star)
-    Fn0 = ecdf(Y0.star)
-    
-    difference = Fn1(unique.points) - Fn0(unique.points)
-    
+    Y1 <- Y[Z==1]
+    Y0 <- Y[Z==0]
+
+    Y1.star   <- Y1 - mean(Y1)
+    Y0.star   <- Y0 - mean(Y0)
+
+    unique.points <- c(Y1.star, Y0.star)
+
+    Fn1 <- ecdf(Y1.star)
+    Fn0 <- ecdf(Y0.star)
+
+    difference <- Fn1(unique.points) - Fn0(unique.points)
+
     return(max(abs(difference)))
-    
+
 }
 
 #' SKS.stat.cov.pool
@@ -183,23 +183,23 @@ SKS.stat.cov.pool <- function(Y, Z, X)
     this.lm <- lm(Y ~ Z + X)
     Y1.star <- this.lm$res[Z == 1]
     Y0.star <- this.lm$res[Z == 0]
-    
-    unique.points = c(Y1.star, Y0.star)
-    
-    Fn1 = ecdf(Y1.star)
-    Fn0 = ecdf(Y0.star)
-    
-    difference = Fn1(unique.points) - Fn0(unique.points)
-    
+
+    unique.points <- c(Y1.star, Y0.star)
+
+    Fn1 <- ecdf(Y1.star)
+    Fn0 <- ecdf(Y0.star)
+
+    difference <- Fn1(unique.points) - Fn0(unique.points)
+
     return(max(abs(difference)))
 }
 
 #' SKS.stat.cov
-#' 
+#'
 #' SKS.stat.cov is the shifted kolmogorov-smirnov statistic with covariates
 #' with model for outcomes calculated on control group only.
-#' This avoids "splitting" the treatment variation between tx 
-#' and co groups.  
+#' This avoids "splitting" the treatment variation between tx
+#' and co groups.
 #' We recommend this method over the "pool" method.
 #'
 #' @usage SKS.stat.cov(Y, Z, X)
@@ -218,20 +218,20 @@ SKS.stat.cov.pool <- function(Y, Z, X)
 SKS.stat.cov <- function(Y, Z, X)
 {
     this.lm <- lm(Y ~ X, subset = Z == 0)
-    
+
     Y0.hat <- predict(this.lm, newdata = as.data.frame(X))
     Y0.res <- Y - Y0.hat
-    
+
     Y1.star <- Y0.res[Z == 1] - mean(Y0.res[Z == 1])
     Y0.star <- Y0.res[Z == 0] - mean(Y0.res[Z == 0])
-    
-    unique.points = c(Y1.star, Y0.star)
-    
-    Fn1 = ecdf(Y1.star)
-    Fn0 = ecdf(Y0.star)
-    
-    difference = Fn1(unique.points) - Fn0(unique.points)
-    
+
+    unique.points <- c(Y1.star, Y0.star)
+
+    Fn1 <- ecdf(Y1.star)
+    Fn0 <- ecdf(Y0.star)
+
+    difference <- Fn1(unique.points) - Fn0(unique.points)
+
     return(max(abs(difference)))
 }
 
@@ -254,22 +254,22 @@ SKS.stat.cov <- function(Y, Z, X)
 #'
 #' @export
 SKS.stat.int.cov.pool <- function( Y, Z, W, X=NULL )
-{ 
+{
     if ( !is.null( X ) ) {
         this.lm <- lm( Y ~ Z + X + W + Z:W )
     } else {
-        this.lm <- lm( Y ~ Z + W + Z:W )        
+        this.lm <- lm( Y ~ Z + W + Z:W )
     }
     Y1.star <- this.lm$res[Z == 1]
     Y0.star <- this.lm$res[Z == 0]
-    
-    unique.points = c(Y1.star, Y0.star)
-    
-    Fn1 = ecdf(Y1.star)
-    Fn0 = ecdf(Y0.star)
-    
-    difference = Fn1(unique.points) - Fn0(unique.points)
-    
+
+    unique.points <- c(Y1.star, Y0.star)
+
+    Fn1 <- ecdf(Y1.star)
+    Fn0 <- ecdf(Y0.star)
+
+    difference <- Fn1(unique.points) - Fn0(unique.points)
+
     return(max(abs(difference)))
 }
 
@@ -304,28 +304,28 @@ SKS.stat.int.cov.pool <- function( Y, Z, W, X=NULL )
 #'
 #' @export
 SKS.stat.int.cov <- function( Y, Z, W, X=NULL )
-{ 
+{
     ## First wipe out Y0 predicted by X via linear model
     if ( !is.null( X ) ) {
         this.lm <- lm(Y ~ X, subset = Z == 0)
-        
+
         Y0.hat <- predict(this.lm, newdata = as.data.frame(X))
         Y <- Y - Y0.hat
-    }        
+    }
 
     ## now model treatment effect
-    this.lm <- lm( Y ~ Z + W + Z:W )        
+    this.lm <- lm( Y ~ Z + W + Z:W )
 
     Y1.star <- this.lm$res[Z == 1]
     Y0.star <- this.lm$res[Z == 0]
-    
-    unique.points = c(Y1.star, Y0.star)
-    
-    Fn1 = ecdf(Y1.star)
-    Fn0 = ecdf(Y0.star)
-    
-    difference = Fn1(unique.points) - Fn0(unique.points)
-    
+
+    unique.points <- c(Y1.star, Y0.star)
+
+    Fn1 <- ecdf(Y1.star)
+    Fn0 <- ecdf(Y0.star)
+
+    difference <- Fn1(unique.points) - Fn0(unique.points)
+
     return(max(abs(difference)))
 }
 
@@ -336,7 +336,7 @@ SKS.stat.int.cov <- function( Y, Z, W, X=NULL )
 ##
 
 #' SKS.stat.cov.rq
-#' 
+#'
 #' Shifted kolmogorov-smirnov statistic with covariates and quantile regression.
 #'
 #' @usage SKS.stat.cov.rq(Y, Z, X)
@@ -346,7 +346,7 @@ SKS.stat.int.cov <- function( Y, Z, W, X=NULL )
 #' @examples
 #' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
 #' SKS.stat.cov.rq(df$Yobs, df$Z, df$A)
-#' 
+#'
 #' @return The test statistic value.
 #'
 #' @export
@@ -355,16 +355,16 @@ SKS.stat.cov.rq <- function(Y, Z, X)
 
     this.lm <- lm(Y ~ Z + X)
     this.rq <- suppressWarnings(rq(Y ~ Z + X, tau = seq(0.05, 0.95, by = 0.05)))
-    
+
     z.rq <- coef(this.rq)["Z",]
     return( max(z.rq - coef(this.lm)["Z"]) )
-    
+
 }
 
 #' rq.stat
-#' 
+#'
 #' rq.stat is the Kolmogorov-smirnov statistic via quantile regression with covariates without further adjustment.
-#' 
+#'
 #' Warning: This function supresses all warnings of the `rq()` method call.
 #'
 #' @usage rq.stat(Y, Z, rq.pts)
@@ -385,13 +385,13 @@ rq.stat <- function(Y, Z, rq.pts = seq(0.1, 0.9, by = 0.1))
     if(min(rq.pts) <= 0 | max(rq.pts) >= 1){
         stop("All values of rq.pts must be strictly greater than 0 and strictly less than 1.")
     }
-    
+
     this.lm <- lm(Y ~ Z)
     this.rq <- suppressWarnings(rq(Y ~ Z, tau = rq.pts))
-    
+
     z.rq <- coef(this.rq)["Z",]
     return( max(z.rq - coef(this.lm)["Z"]) )
-    
+
 }
 
 #' rq.stat.cond.cov
@@ -418,18 +418,18 @@ rq.stat.cond.cov <- function(Y, Z, X, rq.pts = seq(0.1, 0.9, by = 0.1))
     if(min(rq.pts) <= 0 | max(rq.pts) >= 1){
         stop("All values of rq.pts must be strictly greater than 0 and strictly less than 1.")
     }
-    
+
     this.lm <- lm(Y ~ Z + X)
     this.rq <- suppressWarnings(rq(Y ~ Z + X, tau = rq.pts))
-    
+
     z.rq <- coef(this.rq)["Z",]
     return( max(z.rq - coef(this.lm)["Z"]) )
-    
+
 }
 
 
 #' rq.stat.uncond.cov
-#' 
+#'
 #' rq.stat.uncond.cov implements a Kolmogorov-smirnov statistic via quantile regression with covariates,
 #' unconditional approach; see Firpo (2007).
 #'
@@ -448,20 +448,20 @@ rq.stat.uncond.cov <- function(Y, Z, X, rq.pts = seq(0.1, 0.9, by = 0.1))
     if(min(rq.pts) <= 0 | max(rq.pts) >= 1){
         stop("All values of rq.pts must be strictly greater than 0 and strictly less than 1.")
     }
-    
+
     ## propensity score model
     this.glm <- glm(Z ~ X, family = binomial(link = logit))
-    
+
     pscore <- predict(this.glm, type = "response")
     ipw.weights <- ifelse(Z, 1/pscore, 1/(1 - pscore))
-    
-    
+
+
     this.lm <- lm(Y ~ Z, weights = ipw.weights)
     this.rq <- suppressWarnings(rq(Y ~ Z, tau = rq.pts, weights = ipw.weights))
-    
+
     z.rq <- coef(this.rq)["Z",]
     return( max(z.rq - coef(this.lm)["Z"]) )
-    
+
 }
 
 
@@ -499,9 +499,9 @@ WSKS.t <- function( Y, Z, W ) {
 }
 
 #' SKS.pool.t
-#' 
+#'
 #' Subtract off group level treatment effect estimates and then look
-#' at KS statistic on residuals.  
+#' at KS statistic on residuals.
 #'
 #' Distinct from the interacted lm in that the control units are not
 #' shifted and centered with respect to eachother.

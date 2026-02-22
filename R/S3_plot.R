@@ -31,11 +31,11 @@ plot.FRTCI.test <- function( x, true.tau=NULL,
     stop( "No default plot for test results beyond a systematic model" )
   }
   
-    cnts = (x$ci.p - x$gamma) * x$B
-    bts = sapply( cnts, function( cnt ) {
-        bt = binom.test( cnt, x$B )
-        bt$conf.int
-    } )
+    cnts <- (x$ci.p - x$gamma) * x$B
+    bts <- vapply( cnts, function( cnt ) {
+        bt <- binom.test( cnt, x$B )
+        as.numeric( bt$conf.int )
+    }, numeric(2) )
     
     plot( x$te.vec, x$ci.p, ylim=range(bts), type="l", xlab=xlab, ylab=ylab, ...  )
     abline( v=x$te.hat, col= ci.line.col )
@@ -69,7 +69,7 @@ plot.FRTCI.test <- function( x, true.tau=NULL,
 #' plot(r2_out)
 #' 
 #' @export
-#' @seealso calc.beta
+#' @seealso calc_beta_oracle
 plot.RI.R2.result <- function( x, main=paste( "R2 for Het Tx (", x$type, ")", sep=""),
                               ADD=FALSE, ... ) {
     with( x, {

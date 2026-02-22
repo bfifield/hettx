@@ -49,7 +49,7 @@ test_that( "Main methods run without crashing", {
 
     df = make.randomized.dat( 100, beta.vec=c(-1,-1,1) )
 
-    ## calc.beta.oracle
+    ## calc_beta_oracle
     tst = estimate_systematic(Y.1 + Y.0 ~ Z, data = df, interaction.formula = ~ A + B,
                    method = "RI")
     r2.tst <- R2(tst)
@@ -93,7 +93,7 @@ test_that( "Clever dot notation for formula works", {
 
 test_that( "Main complier methods work", {
   
-    ## calc.beta.LATE
+    ## est_beta_LATE
     df = make.randomized.compliance.dat( 100 )
 
     tst = estimate_systematic(Yobs ~ D | Z, data = df, interaction.formula = ~ A + B,

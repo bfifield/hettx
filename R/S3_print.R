@@ -1,7 +1,7 @@
 #' @export
 print.summary.FRTCI.test <- function(x, ...){
     
-  tst = x$FRTCI
+  tst <- x$FRTCI
   
     cat("\n")
     cat( x$method, "\n" )
@@ -15,7 +15,7 @@ print.summary.FRTCI.test <- function(x, ...){
       cat( "Grid range:\n" )
       prmatrix( x$grid.range, rowlab=rep("    ",nrow(x$grid.range)), collab = colnames(x$grid.range) )
    } else {
-      rng = range( tst$te.vec )
+      rng <- range( tst$te.vec )
       scat( "Grid: %d points tested over range of %f to %f with %d repititions/point\n",
             length( tst$te.vec ), rng[[1]], rng[[2]], tst$B )
       scat( "Estimated ATE (grid center): %.3f\n", tst$te.hat )
