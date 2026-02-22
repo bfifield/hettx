@@ -5,10 +5,6 @@ globalVariables('b')
 #'
 #' Test for systematic treatment effect heterogeneity using Fisherian
 #' permutation inference methods.
-#' @usage detect_idiosyncratic(formula, data, interaction.formula,
-#'   control.formula, plugin, tau.hat, test.stat, te.vec, B, gamma, grid.gamma,
-#'   grid.size, return.matrix, na.rm, n.cores, verbose, ...)
-#'
 #' @param formula An object of class formula, as in lm(), such as Y ~ Z with
 #'   only the treatment variable on the right-hand side.
 #' @param data A data.frame, tbl_df, or data.table with the input data.

@@ -16,8 +16,7 @@ tidy.FRTCI.test <- function(x, ...) {
         method = x$method,
         test.stat = x$test.stat,
         estimate = x$te.hat,
-        std.error = x$te.SE,
-        stringsAsFactors = FALSE
+        std.error = x$te.SE
     )
 }
 
@@ -39,8 +38,7 @@ glance.FRTCI.test <- function(x, ...) {
         std.error = x$te.SE,
         B = x$B,
         gamma = x$gamma,
-        n = x$n,
-        stringsAsFactors = FALSE
+        n = x$n
     )
 }
 
@@ -60,8 +58,7 @@ tidy.RI.regression.result <- function(x, ...) {
     data.frame(
         term = names(co),
         estimate = unname(co),
-        std.error = unname(se),
-        stringsAsFactors = FALSE
+        std.error = unname(se)
     )
 }
 
@@ -82,8 +79,7 @@ glance.RI.regression.result <- function(x, ...) {
         chisq.stat = as.numeric(x$chisq.stat),
         p.value = as.numeric(x$p.value),
         SD.Y0 = x$SD.Y0,
-        SD.Y1 = x$SD.Y1,
-        stringsAsFactors = FALSE
+        SD.Y1 = x$SD.Y1
     )
 }
 
@@ -106,7 +102,6 @@ tidy.RI.R2.result <- function(x, ...) {
         R2.lower = r2[[1]],
         R2.lower.sharp = r2[[2]],
         R2.upper = r2[[3]],
-        stringsAsFactors = FALSE,
         row.names = NULL
     )
 }
@@ -125,8 +120,7 @@ glance.RI.R2.result <- function(x, ...) {
     if (s$method == "ITT") {
         data.frame(
             type = s$method,
-            Sdd = s$hte_variance_systematic,
-            stringsAsFactors = FALSE
+            Sdd = s$hte_variance_systematic
         )
     } else {
         data.frame(
@@ -134,8 +128,7 @@ glance.RI.R2.result <- function(x, ...) {
             Sdd = s$hte_variance_systematic_compliers,
             LATE = s$LATE,
             ITT = s$ITT,
-            prop_compliers = s$prop_compliers,
-            stringsAsFactors = FALSE
+            prop_compliers = s$prop_compliers
         )
     }
 }

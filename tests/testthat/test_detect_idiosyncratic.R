@@ -13,7 +13,7 @@ test_that("FRTCI Runs", {
     tst = detect_idiosyncratic(Y ~ Z, data = ToyData, B=B, grid.size = grid.size, verbose=FALSE)
 
     expect_false( is.null( tst ) )
-    expect_is( tst, "FRTCI.test" )
+    expect_s3_class( tst, "FRTCI.test" )
     expect_equal( tst$test.stat, "SKS.stat" )
     
     s = summary( tst )
@@ -33,7 +33,7 @@ test_that("Passing function for test stat works", {
                              test.stat = SKS.stat)
   
   expect_false( is.null( tst ) )
-  expect_is( tst, "FRTCI.test" )
+  expect_s3_class( tst, "FRTCI.test" )
   expect_equal( tst$test.stat, "SKS.stat" )
   
   summary( tst )
@@ -161,6 +161,6 @@ test_that( "rq test statistic works", {
                                test.stat="SKS.stat.cov.rq", B=B,
                                grid.size=grid.size, verbose=FALSE)   
     
-    expect_is( tst, "FRTCI.test" )
+    expect_s3_class( tst, "FRTCI.test" )
 })
 

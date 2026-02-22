@@ -8,8 +8,6 @@
 #'
 #' A list of test statistics for detect.idiosyncratic(), and information on use cases when each is appropriate.
 #'
-#' @usage test.stat.info()
-#'
 #' @examples
 #' test.stat.info()
 #'
@@ -87,8 +85,6 @@ test.stat.info <- function() {
 #'
 #' If tau passed, Y1 will be shifted by tau.
 #'
-#' @usage KS.stat(Y, Z, tau, alternative)
-#'
 #' @param Y Observed outcome vector
 #' @param Z Treatment assigment vector
 #' @param tau Value of treatment effect for shifting Y1. Default is NULL (Y1 not shifted).
@@ -129,8 +125,6 @@ KS.stat <- function( Y, Z, tau = NULL, alternative = c("two.sided", "less", "gre
 #' Shifted kolmogorov-smirnov statistic. Calculate KS distance between Y0 and Y1
 #' shifted by sample tau.
 #'
-#' @usage SKS.stat(Y, Z)
-#'
 #' @param Y Observed outcome vector
 #' @param Z Treatment assigment vector
 #'
@@ -169,8 +163,6 @@ SKS.stat <- function(Y, Z)
 #' to increase precision.  This is the test statistic used Ding, Feller, and
 #' Miratrix (2016), JRSS-B.
 #'
-#' @usage SKS.stat.cov.pool(Y, Z, X)
-#'
 #' @examples
 #' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
 #' SKS.stat.cov.pool(df$Yobs, df$Z, df$A)
@@ -201,8 +193,6 @@ SKS.stat.cov.pool <- function(Y, Z, X)
 #' This avoids "splitting" the treatment variation between tx
 #' and co groups.
 #' We recommend this method over the "pool" method.
-#'
-#' @usage SKS.stat.cov(Y, Z, X)
 #'
 #' @param Y  Observed outcome vector
 #' @param Z  Treatment assigment vector
@@ -242,8 +232,6 @@ SKS.stat.cov <- function(Y, Z, X)
 #' variation corresponding to W and then return a SKS statistic on the residuals
 #' to measure any variation "left over".
 #'
-#'
-#' @usage SKS.stat.int.cov.pool(Y, Z, W, X)
 #'
 #' @examples
 #' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
@@ -300,8 +288,6 @@ SKS.stat.int.cov.pool <- function( Y, Z, W, X=NULL )
 #' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
 #' SKS.stat.int.cov(Y = df$Yobs, Z = df$Z, W = df$A, X = df$B)
 #'
-#' @usage SKS.stat.int.cov(Y, Z, W, X)
-#'
 #' @export
 SKS.stat.int.cov <- function( Y, Z, W, X=NULL )
 {
@@ -339,8 +325,6 @@ SKS.stat.int.cov <- function( Y, Z, W, X=NULL )
 #'
 #' Shifted kolmogorov-smirnov statistic with covariates and quantile regression.
 #'
-#' @usage SKS.stat.cov.rq(Y, Z, X)
-#'
 #' @inheritParams SKS.stat.cov
 #'
 #' @examples
@@ -366,8 +350,6 @@ SKS.stat.cov.rq <- function(Y, Z, X)
 #' rq.stat is the Kolmogorov-smirnov statistic via quantile regression with covariates without further adjustment.
 #'
 #' Warning: This function supresses all warnings of the `rq()` method call.
-#'
-#' @usage rq.stat(Y, Z, rq.pts)
 #'
 #' @param Y  Observed outcome vector
 #' @param Z  Treatment assigment vector
@@ -401,8 +383,6 @@ rq.stat <- function(Y, Z, rq.pts = seq(0.1, 0.9, by = 0.1))
 #'
 #' Warning: This function supresses all warnings of the `rq()` method call.
 #'
-#' @usage rq.stat.cond.cov(Y, Z, X, rq.pts)
-#'
 #' @param X Additional pre-treatment covariates to adjust for in estimation, but
 #'   not to interact with treatment.
 #'
@@ -432,9 +412,6 @@ rq.stat.cond.cov <- function(Y, Z, X, rq.pts = seq(0.1, 0.9, by = 0.1))
 #'
 #' rq.stat.uncond.cov implements a Kolmogorov-smirnov statistic via quantile regression with covariates,
 #' unconditional approach; see Firpo (2007).
-#'
-#' @usage rq.stat.uncond.cov(Y, Z, X, rq.pts)
-#'
 #'
 #' @examples
 #' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
@@ -475,8 +452,6 @@ rq.stat.uncond.cov <- function(Y, Z, X, rq.pts = seq(0.1, 0.9, by = 0.1))
 #' Weighted average of the group-level SKS statistics.  This is useful for a
 #' blocked experiment.
 #'
-#' @usage WSKS.t(Y, Z, W)
-#'
 #' @param Y Observed outcome vector
 #' @param Z Treatment assigment vector
 #' @param W A a factor or categorical covariate.
@@ -505,8 +480,6 @@ WSKS.t <- function( Y, Z, W ) {
 #'
 #' Distinct from the interacted lm in that the control units are not
 #' shifted and centered with respect to eachother.
-#'
-#' @usage SKS.pool.t(Y, Z, W)
 #'
 #' @examples
 #' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )

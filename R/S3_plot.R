@@ -2,8 +2,6 @@
 #' 
 #' Plot curve from FRTCI.test object.
 #'
-#' @usage \method{plot}{FRTCI.test}(x, true.tau, xlab, ylab, true.tau.col, plot.envelope, ci.line.col, ...)
-#'
 #' @param x An object of class \code{FRTCI.test}
 #' @param true.tau The true value of tau, if known. Default is NULL.
 #' @param xlab X-axis label. Default is tau.

@@ -1,5 +1,16 @@
-## Generate truncated multivariate normal draws
-## where we don't return anything in the tails defined by alpha.
+#' Generate truncated multivariate normal draws
+#'
+#' Draws from a multivariate normal distribution, rejecting any samples
+#' outside the confidence region defined by alpha.
+#'
+#' @param n Number of draws to generate.
+#' @param mu Mean vector.
+#' @param sigma Covariance matrix.
+#' @param alpha Tail probability to exclude (defines the chi-squared confidence region).
+#'
+#' @return An n x K matrix of draws from the truncated distribution.
+#'
+#' @keywords internal
 rcrmtvnorm <- function(n, mu, sigma, alpha)  {
     ## dimension
     K <- length(mu)
@@ -31,8 +42,22 @@ rcrmtvnorm <- function(n, mu, sigma, alpha)  {
     return(Mat)
 }
 
-## Generate a sequence of tau values in the confidence interval of
-## effects to search over with the permutation test.
+#' Generate a grid of treatment effect values to test
+#'
+#' Creates a sequence of tau values spanning a confidence interval around
+#' the estimated treatment effect, with oversampling near the point estimate.
+#'
+#' @param Y Outcome vector.
+#' @param Z Treatment assignment vector (0/1).
+#' @param X Optional covariate matrix for regression-adjusted estimation.
+#' @param gamma Width of the confidence interval. Default is 0.001.
+#' @param grid.size Number of grid points. Default is 21.
+#' @param grid.gamma Controls oversampling density near the estimate. Default is 100*gamma.
+#'
+#' @return A numeric vector of tau values with attributes \code{te.hat},
+#'   \code{te.se}, and \code{te.MOE}.
+#'
+#' @keywords internal
 get_tau_vector <- function( Y, Z, X = NULL, gamma=0.001, grid.size=21, grid.gamma = 100*gamma ) {
 
     if ( is.null( X ) ) {
@@ -59,25 +84,29 @@ get_tau_vector <- function( Y, Z, X = NULL, gamma=0.001, grid.size=21, grid.gamm
     te.vec
 }
 
-## Calculate a set of different models for effects based on a linear model of W, controlling
-## for X (and W).  These models all correspond to estimated nusiance parameters beta.
-## Each possible beta gives a collection of different models of effects.
-##
-## I.e., estimate the coefficients a, d for
-## Y ~ a Z + b X + c W + d W:Z
-##
-## Then for each model, calculate individual imputed treatment effects for all observations and the
-## associated science tables of imputed potential outcomes.
-##
-## @param  Y, Z, X, W: outcome, treatment assignment, covariates, and treatment varying covariates
-##                  X and W can be the same for a fully interacted linear model.
-## @return
-##        te.grid    grid.size x p sized matrix with each row j corresponding to a different model of
-##                   effects with specific beta.  p is number of columns in W (+1 for the intercept).
-##        Y0.mat, Y1.mat   Two N x grid.size matrices.  Each column j corresponds to a specific model of
-##                   effects with specific beta value.  Each column j corresponds to the same row in te.grid
-##         te.mat    N x grid.size matrix with each row i corresponding to treatment effect for
-##                   unit i under model of effects j.
+#' Build a grid of treatment effect models for interaction testing
+#'
+#' Estimates a linear model \code{Y ~ Z + W + Z:W (+X)} and samples from
+#' the confidence region of the Z-related coefficients. For each sampled
+#' model, computes individual imputed treatment effects and science tables
+#' of imputed potential outcomes.
+#'
+#' @param Y Outcome vector.
+#' @param Z Treatment assignment vector (0/1).
+#' @param W Covariate matrix for treatment effect interactions.
+#' @param X Optional covariate matrix for additional adjustment.
+#' @param gamma Tail probability for the confidence region. Default is 0.0001.
+#' @param grid.size Number of models to sample. Default is 150.
+#'
+#' @return A list with components:
+#'   \describe{
+#'     \item{te.grid}{grid.size x p matrix, each row a different effect model.}
+#'     \item{te.mat}{N x grid.size matrix of individual treatment effects.}
+#'     \item{Y0.mat}{N x grid.size matrix of imputed control potential outcomes.}
+#'     \item{Y1.mat}{N x grid.size matrix of imputed treated potential outcomes.}
+#'   }
+#'
+#' @keywords internal
 get_testing_grid <- function( Y, Z, W, X=NULL, gamma=0.0001, grid.size=150 ) {
 
     ## get sample of treatment effect models to calculate p-values for
@@ -115,8 +144,32 @@ get_testing_grid <- function( Y, Z, W, X=NULL, gamma=0.0001, grid.size=150 ) {
     list( te.grid=te.grid, te.mat=te.mat, Y0.mat=Y0.mat, Y1.mat=Y1.mat )
 }
 
-## Utility function used by FRTCI and FRTCI_interact to actually generate the
-## permutations.  Don't use directly.
+#' Generate permutation distributions for FRT tests
+#'
+#' Core engine used by \code{FRTCI} and \code{FRTCI_interact} to compute
+#' the randomization distribution of a test statistic under permuted
+#' treatment assignments.
+#'
+#' @param Y Outcome vector.
+#' @param Z Treatment assignment vector (0/1).
+#' @param test.stat Test statistic function taking (Y, Z, ...).
+#' @param Y0.mat N x grid.size matrix of imputed control potential outcomes.
+#' @param Y1.mat N x grid.size matrix of imputed treated potential outcomes.
+#' @param B Number of permutations.
+#' @param n.cores Number of cores for parallel computation.
+#' @param get.z.star Optional function to generate permuted Z vectors.
+#'   If NULL, uses \code{sample(Z)}.
+#' @param verbose Whether to display a progress bar. Default is TRUE.
+#' @param ... Additional arguments passed to \code{test.stat}.
+#'
+#' @return A list with components:
+#'   \describe{
+#'     \item{ks.obs}{Observed test statistic.}
+#'     \item{ks.mat}{B x grid.size matrix of permuted test statistics.}
+#'     \item{ci.p}{Vector of p-values for each grid point.}
+#'   }
+#'
+#' @keywords internal
 generate_permutations <- function( Y, Z, test.stat, Y0.mat, Y1.mat, B, n.cores, get.z.star=NULL, verbose = TRUE, ... ) {
 
     ## SET UP STORAGE MATRICES

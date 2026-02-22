@@ -68,7 +68,7 @@ test_that( "Main methods run without crashing", {
     tst = estimate_systematic(Yobs ~ Z, data = df, interaction.formula = ~ A,
                    control.formula = ~ B + C, method = "OLS")
     r2.tst <- R2(tst)
-    expect_is( tst, "RI.regression.result" )
+    expect_s3_class( tst, "RI.regression.result" )
 } )
 
 
@@ -104,7 +104,7 @@ test_that( "Main complier methods work", {
                    method = "2SLS")
     
     r2.tst <- R2(tst)
-    expect_is( tst, "RI.regression.result" )
+    expect_s3_class( tst, "RI.regression.result" )
     
 } )
 

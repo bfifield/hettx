@@ -18,9 +18,6 @@ scat <- function( str, ... ) {
 #' In the OLS case, seperate Sxx for treatment and control are calculated for each 
 #' treatment arm. For RI the known Sxx based on all units is used.
 #' 
-#' @usage estimate_systematic(formula, data, interaction.formula, control.formula,
-#' method, na.rm)
-#'
 #' @param formula An object of class formula, as in lm(). For ITT estimation, specify as Y ~ Z with only the treatment variable on the right-hand side. For LATE estimation, specify as Y ~ D | Z with only the endogenous variable (D) and the instrument (Z) on the right-hand side separated by a vertical bar (|). For oracle estimation (where full potential outcome schedule is known), specify as Y(1) + Y(0) ~ Z with only the treatment variable on the right-hand side and the variables indicating the outcome under treatment and the outcome under control on the left-hand-side. The first variable on the left-hand-side will be treated as the outcome under treatment, and the second variable on the right-hand-side will be treated as the outcome under control.
 #' @param data A data.frame, tbl_df, or data.table with the input data.
 #' @param interaction.formula A right-sided formula with pre-treatment covariates to model treatment effects for on the right hand side, such as ~ x1 + x2 + x3. 
@@ -74,8 +71,6 @@ estimate_systematic <- function( formula, data, interaction.formula, control.for
 #' Bounds the R2 measure (how much of treatment variation is explained by given
 #' covariates) using either the OLS output for the ITT from est.beta, or the
 #' LATE estimation from est.beta.
-#'
-#' @usage R2(est.beta, rho.step)
 #'
 #' @param est.beta The output from `est.beta()`. Either an estimate of overall
 #'   systematic effect variation, or systematic effect variation for compliers.
