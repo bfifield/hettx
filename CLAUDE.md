@@ -85,8 +85,8 @@ Tests involve randomization, so some use `set.seed()` for reproducibility. Many 
 
 ### Remaining
 - [x] Rename user-facing dot-case functions to snake_case with backward-compatible aliases + deprecation warnings (e.g., `get.p.value` → `get_p_value`, `make.randomized.dat` → `make_randomized_dat`, test stat functions, etc.). Do NOT rename S3 methods.
-- [ ] Write cross-branch equivalence tests: install from master, capture numeric results (test stats, p-values, coefficients, R2 bounds) on fixed seeds, then install from modernize-codebase and assert results match. Confirms all changes are behavioral no-ops.
-- [ ] Audit vapply FUN.VALUE types: verify all sapply→vapply conversions use the correct return type. Some may use `numeric(1)` where the function returns a vector (e.g., confidence intervals). Trace each inner function and fix mismatches.
+- [x] Write cross-branch equivalence tests: install from master, capture numeric results (test stats, p-values, coefficients, R2 bounds) on fixed seeds, then install from modernize-codebase and assert results match. Confirms all changes are behavioral no-ops.
+- [x] Audit vapply FUN.VALUE types: all 6 vapply calls verified correct (3x `numeric(2)` for binom.test conf.int, 2x `numeric(length(Y))` for potential outcomes, 1x `numeric(1)` for test stat scalar).
 
 ### Low Priority
 - [x] Bump minimum R version from 2.14.0 to 4.0.0+; drop `stringsAsFactors = FALSE`
