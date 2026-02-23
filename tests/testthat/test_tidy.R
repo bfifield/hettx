@@ -33,7 +33,7 @@ test_that("glance.FRTCI.test returns one-row data.frame", {
 
 test_that("tidy.RI.regression.result returns one row per coefficient", {
     set.seed(42)
-    df <- make.randomized.dat(100, beta.vec = c(-1, -1, 1))
+    df <- make_randomized_dat(100, beta.vec = c(-1, -1, 1))
     es <- estimate_systematic(Yobs ~ Z, data = df,
                               interaction.formula = ~ A + B)
 
@@ -47,7 +47,7 @@ test_that("tidy.RI.regression.result returns one row per coefficient", {
 
 test_that("glance.RI.regression.result returns one-row data.frame", {
     set.seed(42)
-    df <- make.randomized.dat(100, beta.vec = c(-1, -1, 1))
+    df <- make_randomized_dat(100, beta.vec = c(-1, -1, 1))
     es <- estimate_systematic(Yobs ~ Z, data = df,
                               interaction.formula = ~ A + B)
 
@@ -62,7 +62,7 @@ test_that("glance.RI.regression.result returns one-row data.frame", {
 
 test_that("tidy.RI.R2.result works for ITT", {
     set.seed(42)
-    df <- make.randomized.dat(100, beta.vec = c(-1, -1, 1))
+    df <- make_randomized_dat(100, beta.vec = c(-1, -1, 1))
     es <- estimate_systematic(Yobs ~ Z, data = df,
                               interaction.formula = ~ A + B)
     r2 <- R2(es)
@@ -75,7 +75,7 @@ test_that("tidy.RI.R2.result works for ITT", {
 
 test_that("glance.RI.R2.result works for ITT", {
     set.seed(42)
-    df <- make.randomized.dat(100, beta.vec = c(-1, -1, 1))
+    df <- make_randomized_dat(100, beta.vec = c(-1, -1, 1))
     es <- estimate_systematic(Yobs ~ Z, data = df,
                               interaction.formula = ~ A + B)
     r2 <- R2(es)
@@ -89,7 +89,7 @@ test_that("glance.RI.R2.result works for ITT", {
 
 test_that("tidy.RI.R2.result works for LATE", {
     set.seed(42)
-    df <- make.randomized.compliance.dat(100)
+    df <- make_randomized_compliance_dat(100)
     es <- estimate_systematic(Yobs ~ D | Z, data = df,
                               interaction.formula = ~ A + B)
     r2 <- R2(es)
@@ -102,7 +102,7 @@ test_that("tidy.RI.R2.result works for LATE", {
 
 test_that("glance.RI.R2.result works for LATE", {
     set.seed(42)
-    df <- make.randomized.compliance.dat(100)
+    df <- make_randomized_compliance_dat(100)
     es <- estimate_systematic(Yobs ~ D | Z, data = df,
                               interaction.formula = ~ A + B)
     r2 <- R2(es)

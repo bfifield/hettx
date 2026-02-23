@@ -43,7 +43,7 @@
 #' @export
 #' @importFrom MASS mvrnorm
 #' @importFrom stats cov median model.matrix pchisq pnorm quantile rexp rnorm sd
-make.linear.data <- function( n, gamma.vec = c( 1, 2, 2, 1 ),
+make_linear_data <- function( n, gamma.vec = c( 1, 2, 2, 1 ),
                              gamma2.vec = NULL,
                              beta.vec = c(-1,-1,1),
                              ideo.sd = 0,
@@ -132,9 +132,9 @@ make.linear.data <- function( n, gamma.vec = c( 1, 2, 2, 1 ),
 
 
 
-#' @describeIn make.linear.data Generate dataset according to a quadratic model
+#' @describeIn make_linear_data Generate dataset according to a quadratic model
 #' @export
-make.quadradic.data <- function( n, beta.vec = c(-1,-1,1) ) {
+make_quadradic_data <- function( n, beta.vec = c(-1,-1,1) ) {
   X <- mvrnorm( n, mu=c(1,2), Sigma = matrix( c(1,0.5,0.5,1), nrow=2 ) )
   colnames(X) <- LETTERS[1:ncol(X)]
   Y.0 <- 1 + 2 * X[,1]^2 + 3*sqrt(abs(X[,2])) + rnorm( n )
@@ -148,9 +148,9 @@ make.quadradic.data <- function( n, beta.vec = c(-1,-1,1) ) {
 
 
 
-#' @describeIn make.linear.data Generate dataset with a skew
+#' @describeIn make_linear_data Generate dataset with a skew
 #' @export
-make.skew.data <- function( n, beta.vec = c(-1,-1,1) ) {
+make_skew_data <- function( n, beta.vec = c(-1,-1,1) ) {
   X <- mvrnorm( n, mu=c(1,2), Sigma = matrix( c(1,0.5,0.5,1), nrow=2 ) )
   X[,1] <- X[,1] + rexp( n )
   colnames(X) <- LETTERS[1:ncol(X)]
@@ -186,7 +186,7 @@ make.skew.data <- function( n, beta.vec = c(-1,-1,1) ) {
 #'
 #' @return Either a list of elements or a dataframe.
 #' @export
-make.randomized.dat <- function( n, p = 0.6, science.table.generator = make.linear.data, include.POs = TRUE, as.data.frame=TRUE, ... ) {
+make_randomized_dat <- function( n, p = 0.6, science.table.generator = make_linear_data, include.POs = TRUE, as.data.frame=TRUE, ... ) {
 
   dat <- science.table.generator( n=n, ... )
 
@@ -217,11 +217,11 @@ make.randomized.dat <- function( n, p = 0.6, science.table.generator = make.line
 #'
 #' @return Data frame with data randomized to tx and control, and compliers, etc.
 #' @export
-#' @seealso make.randomized.dat
-make.randomized.compliance.dat <- function( n, p = 0.6, science.table.generator = make.linear.data,
+#' @seealso make_randomized_dat
+make_randomized_compliance_dat <- function( n, p = 0.6, science.table.generator = make_linear_data,
                                            include.POs = TRUE, ... ) {
 
-  dat <- make.randomized.dat( n, p, science.table.generator, include.POs = TRUE, as.data.frame = TRUE, ... )
+  dat <- make_randomized_dat( n, p, science.table.generator, include.POs = TRUE, as.data.frame = TRUE, ... )
 
   # will take treatment
   S <- ifelse( dat$A > quantile( dat$A, 0.15 ), "C", "NT" )
@@ -251,12 +251,12 @@ make.randomized.compliance.dat <- function( n, p = 0.6, science.table.generator 
 
 ## if ( FALSE ) {
 
-##     dat = make.linear.data( 10 )
+##     dat = make_linear_data( 10 )
 ##     dat
 ##     str(dat)
 
 
-##     dat = make.skew.data( 500 )
+##     dat = make_skew_data( 500 )
 ##     hist( dat$Y.0 )
 ##     hist( dat$Y.1 )
 ##     plot( Y.1 - Y.0 ~ Y.0, data=dat )
@@ -264,15 +264,15 @@ make.randomized.compliance.dat <- function( n, p = 0.6, science.table.generator 
 ##     plot( data.frame( dat$X ) )
 
 
-##     make.randomized.dat( 10 )
-##     dt = make.randomized.dat( 10, as.data.frame=TRUE )
+##     make_randomized_dat( 10 )
+##     dt = make_randomized_dat( 10, as.data.frame=TRUE )
 ##     str( dt )
 
-##     dt = make.randomized.dat( 10, as.data.frame=TRUE, include.POs = FALSE)
+##     dt = make_randomized_dat( 10, as.data.frame=TRUE, include.POs = FALSE)
 ##     dt
 
 
-##     make.randomized.dat( 10, gamma.vec=c(1,1,1,1,1,1), beta.vec=c(1,-1,1) )
+##     make_randomized_dat( 10, gamma.vec=c(1,1,1,1,1,1), beta.vec=c(1,-1,1) )
 
 ## }
 

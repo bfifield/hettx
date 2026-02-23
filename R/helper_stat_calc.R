@@ -4,50 +4,50 @@
 
 
 
-#' test.stat.info
+#' test_stat_info
 #'
 #' A list of test statistics for detect.idiosyncratic(), and information on use cases when each is appropriate.
 #'
 #' @examples
-#' test.stat.info()
+#' test_stat_info()
 #'
 #' @export
-test.stat.info <- function() {
+test_stat_info <- function() {
 
     stats <- list(
         "No covariate adjustment or interactions" = list(
-            KS.stat = "Calculate classic (not shifted) KS statistic. If tau passed, Y1 will be shifted by tau.",
-            SKS.stat = "Shifted KS statistic. Calculate KS distance between Y0 and Y1 shifted by tau.",
-            rq.stat = "Classic KS statistic via quantile regression with covariates."
+            KS_stat = "Calculate classic (not shifted) KS statistic. If tau passed, Y1 will be shifted by tau.",
+            SKS_stat = "Shifted KS statistic. Calculate KS distance between Y0 and Y1 shifted by tau.",
+            rq_stat = "Classic KS statistic via quantile regression with covariates."
         ),
         "Covariate adjustment, no interactions" = list(
-            SKS.stat.cov.pool = "Shifted KS statistic with covariates to increase precision.",
-            SKS.stat.cov = paste("Shifted KS statistic with covariates with model for outcomes calculated on",
+            SKS_stat_cov_pool = "Shifted KS statistic with covariates to increase precision.",
+            SKS_stat_cov = paste("Shifted KS statistic with covariates with model for outcomes calculated on",
                                  "control group only. This avoids 'splitting' the treatment variation between",
                                  "treatment and control groups. We recommend this method over the 'pool' method",
-                                 "in SKS.stat.cov.pool."),
-            SKS.stat.cov.rq = "Shifted KS statistic via quantile regression with covariates.",
-            rq.stat.cond.cov = paste("KS statistic via quantile regression with covariates. Conditional approach;",
+                                 "in SKS_stat_cov_pool."),
+            SKS_stat_cov_rq = "Shifted KS statistic via quantile regression with covariates.",
+            rq_stat_cond_cov = paste("KS statistic via quantile regression with covariates. Conditional approach;",
                                      "see Koenker and Xiao (2002) for more information."),
-            rq.stat.uncond.cov = paste("KS statistic via quantile regression with covariates. Unconditional",
+            rq_stat_uncond_cov = paste("KS statistic via quantile regression with covariates. Unconditional",
                                        "approach; see Firpo (2007) for more information.")
         ),
         "Interactions, with or without covariate adjustment" = list(
-            SKS.stat.int.cov.pool = paste("Shifted KS statistic with a linear treatment effect model and optional",
+            SKS_stat_int_cov_pool = paste("Shifted KS statistic with a linear treatment effect model and optional",
                                           "covariate adjustment. This will attempt to remove any systematic variation",
                                           "corresponding to the specified interaction model and then return an SKS",
                                           "statistic on the residuals to measure any variation 'left over'. This is",
                                           "the test statistic used in Ding, Feller, and Miratrix (2016), JRSS-B."),
-            SKS.stat.int.cov = paste("Similar to SKS.stat.int.cov.pool, but this method first adjusts for baseline",
+            SKS_stat_int_cov = paste("Similar to SKS_stat_int_cov_pool, but this method first adjusts for baseline",
                                      "and then models treatment effects on the residuals to not split treatment",
                                      "effects. We recommend this method over the 'pool' method in",
-                                     "SKS.stat.int.cov.pool.")
+                                     "SKS_stat_int_cov_pool.")
         ),
         "Interactions, no covariate adjustment" = list(
-            WSKS.t = paste("Calculates the shifted KS statistic within each group specified in the interaction",
+            WSKS_t = paste("Calculates the shifted KS statistic within each group specified in the interaction",
                            "model, and then aggregates together as a weighted average. Should be used when the",
                            "interaction model is a single categorical or factor covariate."),
-            SKS.pool.t = paste("Subtract off group level treatment effect estimates and then look at KS statistic",
+            SKS_pool_t = paste("Subtract off group level treatment effect estimates and then look at KS statistic",
                                "on residuals. Should be used when the interaction model is a single categorical",
                                "or factor covariate.")
         )
@@ -79,7 +79,7 @@ test.stat.info <- function() {
     invisible(stats)
 }
 
-#' KS.stat
+#' KS_stat
 #'
 #' Calculate classic (not shifted) KS statistic; code is a modified version of R's ks.test().
 #'
@@ -91,14 +91,14 @@ test.stat.info <- function() {
 #' @param alternative Direction of test ("two.sided", "less", "greater")
 #'
 #' @examples
-#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
-#' KS.stat(df$Yobs, df$Z)
+#' df <- make_randomized_dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' KS_stat(df$Yobs, df$Z)
 #'
 #' @return The value of the test.
 #' @export
 #'
 #' @seealso detect_idiosyncratic
-KS.stat <- function( Y, Z, tau = NULL, alternative = c("two.sided", "less", "greater") ) {
+KS_stat <- function( Y, Z, tau = NULL, alternative = c("two.sided", "less", "greater") ) {
     x <- Y[Z==1]
     y <- Y[Z==0]
     if ( !is.null( tau ) ) {
@@ -120,7 +120,7 @@ KS.stat <- function( Y, Z, tau = NULL, alternative = c("two.sided", "less", "gre
     STATISTIC
 }
 
-#' SKS.stat
+#' SKS_stat
 #'
 #' Shifted kolmogorov-smirnov statistic. Calculate KS distance between Y0 and Y1
 #' shifted by sample tau.
@@ -129,16 +129,16 @@ KS.stat <- function( Y, Z, tau = NULL, alternative = c("two.sided", "less", "gre
 #' @param Z Treatment assigment vector
 #'
 #' @examples
-#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
-#' SKS.stat(df$Yobs, df$Z)
+#' df <- make_randomized_dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' SKS_stat(df$Yobs, df$Z)
 #'
 #' @return The value of the test.
 #'
-#' @seealso KS.stat, SKS.stat.cov
+#' @seealso KS_stat, SKS_stat_cov
 #' @seealso detect_idiosyncratic
 #'
 #' @export
-SKS.stat <- function(Y, Z)
+SKS_stat <- function(Y, Z)
 {
     Y1 <- Y[Z==1]
     Y0 <- Y[Z==0]
@@ -157,20 +157,20 @@ SKS.stat <- function(Y, Z)
 
 }
 
-#' SKS.stat.cov.pool
+#' SKS_stat_cov_pool
 #'
-#' SKS.stat.cov.pool is the shifted kolmogorov-smirnov statistic with covariates
+#' SKS_stat_cov_pool is the shifted kolmogorov-smirnov statistic with covariates
 #' to increase precision.  This is the test statistic used Ding, Feller, and
 #' Miratrix (2016), JRSS-B.
 #'
 #' @examples
-#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
-#' SKS.stat.cov.pool(df$Yobs, df$Z, df$A)
+#' df <- make_randomized_dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' SKS_stat_cov_pool(df$Yobs, df$Z, df$A)
 #'
-#' @rdname SKS.stat.cov
+#' @rdname SKS_stat_cov
 #'
 #' @export
-SKS.stat.cov.pool <- function(Y, Z, X)
+SKS_stat_cov_pool <- function(Y, Z, X)
 {
     this.lm <- lm(Y ~ Z + X)
     Y1.star <- this.lm$res[Z == 1]
@@ -186,9 +186,9 @@ SKS.stat.cov.pool <- function(Y, Z, X)
     return(max(abs(difference)))
 }
 
-#' SKS.stat.cov
+#' SKS_stat_cov
 #'
-#' SKS.stat.cov is the shifted kolmogorov-smirnov statistic with covariates
+#' SKS_stat_cov is the shifted kolmogorov-smirnov statistic with covariates
 #' with model for outcomes calculated on control group only.
 #' This avoids "splitting" the treatment variation between tx
 #' and co groups.
@@ -199,13 +199,13 @@ SKS.stat.cov.pool <- function(Y, Z, X)
 #' @param X Additional pre-treatment covariates to adjust for in estimation, but not to interact with treatment.
 #'
 #' @examples
-#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
-#' SKS.stat.cov(df$Yobs, df$Z, df$A)
+#' df <- make_randomized_dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' SKS_stat_cov(df$Yobs, df$Z, df$A)
 #'
 #' @return The value of the test.
 #'
 #' @export
-SKS.stat.cov <- function(Y, Z, X)
+SKS_stat_cov <- function(Y, Z, X)
 {
     this.lm <- lm(Y ~ X, subset = Z == 0)
 
@@ -225,23 +225,23 @@ SKS.stat.cov <- function(Y, Z, X)
     return(max(abs(difference)))
 }
 
-#' SKS.stat.int.cov.pool
+#' SKS_stat_int_cov_pool
 #'
-#' SKS.stat.int.cov.pool is a shifted kolmogorov-smirnov statistic with a linear
+#' SKS_stat_int_cov_pool is a shifted kolmogorov-smirnov statistic with a linear
 #' treatment effect model defined by W. It will attempt to remove any systematic
 #' variation corresponding to W and then return a SKS statistic on the residuals
 #' to measure any variation "left over".
 #'
 #'
 #' @examples
-#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
-#' SKS.stat.int.cov.pool(Y = df$Yobs, Z = df$Z, W = df$A, X = df$B)
+#' df <- make_randomized_dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' SKS_stat_int_cov_pool(Y = df$Yobs, Z = df$Z, W = df$A, X = df$B)
 #'
 #'
-#' @rdname SKS.stat.int.cov
+#' @rdname SKS_stat_int_cov
 #'
 #' @export
-SKS.stat.int.cov.pool <- function( Y, Z, W, X=NULL )
+SKS_stat_int_cov_pool <- function( Y, Z, W, X=NULL )
 {
     if ( !is.null( X ) ) {
         this.lm <- lm( Y ~ Z + X + W + Z:W )
@@ -261,9 +261,9 @@ SKS.stat.int.cov.pool <- function( Y, Z, W, X=NULL )
     return(max(abs(difference)))
 }
 
-#' SKS.stat.int.cov
+#' SKS_stat_int_cov
 #'
-#' SKS.stat.int.cov() is a Shifted kolmogorov-smirnov statistic with a linear
+#' SKS_stat_int_cov() is a Shifted kolmogorov-smirnov statistic with a linear
 #' treatment effect model defined by W. It will attempt to remove any systematic
 #' variation corresponding to W and then return a SKS statistic on the residuals
 #' to measure any variation "left over".
@@ -274,22 +274,22 @@ SKS.stat.int.cov.pool <- function( Y, Z, W, X=NULL )
 #'
 #' This is the test statistic used in Ding, Feller, and Miratrix (2016), JRSS-B.
 #'
-#' SKS.stat.int.cov first adjusts for baseline and then models treatment effect
+#' SKS_stat_int_cov first adjusts for baseline and then models treatment effect
 #' on the residuals to not split treatment effects (see the vignette for more
 #' information on this).
 #'
-#' We recommend SKS.stat.int.cov over the "pool" method.
+#' We recommend SKS_stat_int_cov over the "pool" method.
 #'
-#' @inheritParams SKS.stat.cov
+#' @inheritParams SKS_stat_cov
 #' @param W Additional pre-treatment covariates to interact with T to define
 #'   linear model of treatment effects.
 #'
 #' @examples
-#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
-#' SKS.stat.int.cov(Y = df$Yobs, Z = df$Z, W = df$A, X = df$B)
+#' df <- make_randomized_dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' SKS_stat_int_cov(Y = df$Yobs, Z = df$Z, W = df$A, X = df$B)
 #'
 #' @export
-SKS.stat.int.cov <- function( Y, Z, W, X=NULL )
+SKS_stat_int_cov <- function( Y, Z, W, X=NULL )
 {
     ## First wipe out Y0 predicted by X via linear model
     if ( !is.null( X ) ) {
@@ -321,20 +321,20 @@ SKS.stat.int.cov <- function( Y, Z, W, X=NULL )
 ## Other possible test statistics
 ##
 
-#' SKS.stat.cov.rq
+#' SKS_stat_cov_rq
 #'
 #' Shifted kolmogorov-smirnov statistic with covariates and quantile regression.
 #'
-#' @inheritParams SKS.stat.cov
+#' @inheritParams SKS_stat_cov
 #'
 #' @examples
-#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
-#' SKS.stat.cov.rq(df$Yobs, df$Z, df$A)
+#' df <- make_randomized_dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' SKS_stat_cov_rq(df$Yobs, df$Z, df$A)
 #'
 #' @return The test statistic value.
 #'
 #' @export
-SKS.stat.cov.rq <- function(Y, Z, X)
+SKS_stat_cov_rq <- function(Y, Z, X)
 {
 
     this.lm <- lm(Y ~ Z + X)
@@ -345,9 +345,9 @@ SKS.stat.cov.rq <- function(Y, Z, X)
 
 }
 
-#' rq.stat
+#' rq_stat
 #'
-#' rq.stat is the Kolmogorov-smirnov statistic via quantile regression with covariates without further adjustment.
+#' rq_stat is the Kolmogorov-smirnov statistic via quantile regression with covariates without further adjustment.
 #'
 #' Warning: This function supresses all warnings of the `rq()` method call.
 #'
@@ -356,12 +356,12 @@ SKS.stat.cov.rq <- function(Y, Z, X)
 #' @param rq.pts Sequence of quantile points at which to evaluate the test. Default is seq(.1, .9, by = .1). Should not go beyond 0 and 1.
 #'
 #' @examples
-#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
-#' rq.stat(df$Yobs, df$Z)
+#' df <- make_randomized_dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' rq_stat(df$Yobs, df$Z)
 #'
 #' @return The value of the test.
 #' @export
-rq.stat <- function(Y, Z, rq.pts = seq(0.1, 0.9, by = 0.1))
+rq_stat <- function(Y, Z, rq.pts = seq(0.1, 0.9, by = 0.1))
 {
 
     if(min(rq.pts) <= 0 | max(rq.pts) >= 1){
@@ -376,9 +376,9 @@ rq.stat <- function(Y, Z, rq.pts = seq(0.1, 0.9, by = 0.1))
 
 }
 
-#' rq.stat.cond.cov
+#' rq_stat_cond_cov
 #'
-#' rq.stat.cond.cov does Kolmogorov-smirnov statistic via quantile regression
+#' rq_stat_cond_cov does Kolmogorov-smirnov statistic via quantile regression
 #' with covariates, with a conditional approach; see Koenker and Xiao (2002).
 #'
 #' Warning: This function supresses all warnings of the `rq()` method call.
@@ -387,12 +387,12 @@ rq.stat <- function(Y, Z, rq.pts = seq(0.1, 0.9, by = 0.1))
 #'   not to interact with treatment.
 #'
 #' @examples
-#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
-#' rq.stat.cond.cov(df$Yobs, df$Z, df$A)
+#' df <- make_randomized_dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' rq_stat_cond_cov(df$Yobs, df$Z, df$A)
 #'
-#' @rdname rq.stat
+#' @rdname rq_stat
 #' @export
-rq.stat.cond.cov <- function(Y, Z, X, rq.pts = seq(0.1, 0.9, by = 0.1))
+rq_stat_cond_cov <- function(Y, Z, X, rq.pts = seq(0.1, 0.9, by = 0.1))
 {
 
     if(min(rq.pts) <= 0 | max(rq.pts) >= 1){
@@ -408,18 +408,18 @@ rq.stat.cond.cov <- function(Y, Z, X, rq.pts = seq(0.1, 0.9, by = 0.1))
 }
 
 
-#' rq.stat.uncond.cov
+#' rq_stat_uncond_cov
 #'
-#' rq.stat.uncond.cov implements a Kolmogorov-smirnov statistic via quantile regression with covariates,
+#' rq_stat_uncond_cov implements a Kolmogorov-smirnov statistic via quantile regression with covariates,
 #' unconditional approach; see Firpo (2007).
 #'
 #' @examples
-#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
-#' rq.stat.uncond.cov(df$Yobs, df$Z, df$A)
+#' df <- make_randomized_dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' rq_stat_uncond_cov(df$Yobs, df$Z, df$A)
 #'
-#' @rdname rq.stat
+#' @rdname rq_stat
 #' @export
-rq.stat.uncond.cov <- function(Y, Z, X, rq.pts = seq(0.1, 0.9, by = 0.1))
+rq_stat_uncond_cov <- function(Y, Z, X, rq.pts = seq(0.1, 0.9, by = 0.1))
 {
 
     if(min(rq.pts) <= 0 | max(rq.pts) >= 1){
@@ -447,7 +447,7 @@ rq.stat.uncond.cov <- function(Y, Z, X, rq.pts = seq(0.1, 0.9, by = 0.1))
 ## JRSS B Paper.
 ##
 
-#' WSKS.t
+#' WSKS_t
 #'
 #' Weighted average of the group-level SKS statistics.  This is useful for a
 #' blocked experiment.
@@ -457,23 +457,23 @@ rq.stat.uncond.cov <- function(Y, Z, X, rq.pts = seq(0.1, 0.9, by = 0.1))
 #' @param W A a factor or categorical covariate.
 #'
 #' @examples
-#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' df <- make_randomized_dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
 #' df$W <- sample(c("A", "B", "C"), nrow(df), replace = TRUE)
-#' WSKS.t(df$Yobs, df$Z, df$W)
+#' WSKS_t(df$Yobs, df$Z, df$W)
 #'
 #' @return The value of the test.
 #' @export
-WSKS.t <- function( Y, Z, W ) {
+WSKS_t <- function( Y, Z, W ) {
 
     dat <- data.frame(Y=Y, Z=Z, W=W)
     dd <- do.call(rbind, lapply(split(dat, dat$W), function(d) {
-        data.frame(t.sks = SKS.stat(d$Y, d$Z), n.k = nrow(d))
+        data.frame(t.sks = SKS_stat(d$Y, d$Z), n.k = nrow(d))
     }))
     n <- length(Y)
     return( sum( dd$t.sks * dd$n.k / n ) )
 }
 
-#' SKS.pool.t
+#' SKS_pool_t
 #'
 #' Subtract off group level treatment effect estimates and then look
 #' at KS statistic on residuals.
@@ -482,18 +482,18 @@ WSKS.t <- function( Y, Z, W ) {
 #' shifted and centered with respect to eachother.
 #'
 #' @examples
-#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' df <- make_randomized_dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
 #' df$W <- sample(c("A", "B", "C"), nrow(df), replace = TRUE)
-#' SKS.pool.t(df$Yobs, df$Z, df$W)
+#' SKS_pool_t(df$Yobs, df$Z, df$W)
 #'
-#' @inheritParams WSKS.t
+#' @inheritParams WSKS_t
 #'
 #' @export
-SKS.pool.t <- function( Y, Z, W ) {
+SKS_pool_t <- function( Y, Z, W ) {
 
     dat <- data.frame( Y=Y, Z=Z, W=W )
     mean1 <- tapply(dat$Y[dat$Z == 1], dat$W[dat$Z == 1], mean)
     mean0 <- tapply(dat$Y[dat$Z == 0], dat$W[dat$Z == 0], mean)
     taus <- mean1 - mean0
-    return( KS.stat( dat$Y - dat$Z*taus[dat$W], dat$Z ) )
+    return( KS_stat( dat$Y - dat$Z*taus[dat$W], dat$Z ) )
 }

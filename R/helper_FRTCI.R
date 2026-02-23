@@ -1,5 +1,5 @@
 ## Test sweeping over range of plausibe taus for conservative p-value
-FRTCI <- function(Y, Z, X = NULL, test.stat = SKS.stat, B=500,
+FRTCI <- function(Y, Z, X = NULL, test.stat = SKS_stat, B=500,
                   gamma=0.0001, grid.gamma=100*gamma,
                   grid.size=151,
                   te.vec=NULL, return.matrix=FALSE,
@@ -62,14 +62,14 @@ FRTCI <- function(Y, Z, X = NULL, test.stat = SKS.stat, B=500,
 }
 
 ## Test using plug-in sample average treatment effect
-FRTplug <- function( Y, Z, test.stat=SKS.stat, tau.hat=mean(Y[Z == 1]) - mean(Y[Z == 0]), ... ){
+FRTplug <- function( Y, Z, test.stat=SKS_stat, tau.hat=mean(Y[Z == 1]) - mean(Y[Z == 0]), ... ){
     mth <- FRTCI( Y, Z, test.stat=test.stat, te.vec=c(tau.hat), n.cores = 1, ...)
     mth$method <- "FRT Plug-in Test for Treatment Effect Heterogeneity"
     mth
 }
 
 ## Test with treatment-covariate interactions to adjust for known heterogeneity
-FRTCI_interact <- function( Y, Z, W, X=NULL, test.stat = SKS.stat.int.cov, B=500,
+FRTCI_interact <- function( Y, Z, W, X=NULL, test.stat = SKS_stat_int_cov, B=500,
                             gamma=0.0001, grid.gamma=100*gamma,
                             grid.size=151, return.matrix=FALSE,
                             n.cores=1, verbose=TRUE, ... ) {

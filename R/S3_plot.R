@@ -61,7 +61,7 @@ plot.FRTCI.test <- function( x, true.tau=NULL,
 #' @param ...  Arguments to pass to plotting of points.
 #'
 #' @examples
-#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' df <- make_randomized_dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
 #' es <- estimate_systematic( Yobs ~ Z,  interaction.formula = ~ A + B, data = df )
 #' r2_out <- R2(es)
 #' plot(r2_out)

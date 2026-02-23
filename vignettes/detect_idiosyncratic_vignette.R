@@ -47,12 +47,12 @@ grid.size = 11
 tst3c <- detect_idiosyncratic( Y ~ Z, data=ToyData,
                          interaction.formula = ~ x1 + x2, 
                        control.formula = ~ x3 + x4,
-                       B=B, test.stat="SKS.stat.int.cov", 
+                       B=B, test.stat="SKS_stat_int_cov", 
                        verbose=FALSE )
 summary( tst3c )
 
 ## ------------------------------------------------------------------------
-get.p.value( tst1b )
+get_p_value( tst1b )
 
 ## ----display, echo=TRUE--------------------------------------------------
 tests = list( no_cov=tst1, useless_cov=tst1b, all_covariates=tst2, 
@@ -61,7 +61,7 @@ tests = list( no_cov=tst1, useless_cov=tst1b, all_covariates=tst2,
               het_beyond_x1_x2=tst3b, 
               het_beyond_x1_x2_with_cov=tst3c, het_beyond_all=tst3d )
 
-agg.res <- purrr::map( tests, get.p.value ) %>%
+agg.res <- purrr::map( tests, get_p_value ) %>%
   purrr::map( as.list )
 agg.res <- bind_rows( agg.res, .id = "test" )
 agg.res
@@ -75,8 +75,8 @@ plot( ecdf( resid(ll1)[ToyData$Z==1] ), pch=".", main="Residual CDFs of treatmen
 plot( ecdf( resid(ll1)[ToyData$Z==0] ), pch=".", col="red", add=TRUE )
 
 ## ------------------------------------------------------------------------
-variance.ratio.test( ToyData$Y, ToyData$Z )
+variance_ratio_test( ToyData$Y, ToyData$Z )
 
 ## ------------------------------------------------------------------------
-test.stat.info()
+test_stat_info()
 

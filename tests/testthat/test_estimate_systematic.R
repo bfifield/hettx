@@ -6,7 +6,7 @@ context("estimate_systematic() functions test.")
 
 test_that("estimate oracle", {
 
-  df = make.randomized.dat( 100, beta.vec=c(-1,-1,1) )
+  df = make_randomized_dat( 100, beta.vec=c(-1,-1,1) )
 
   orc = estimate_systematic(Y.1 + Y.0 ~ Z, data=df, interaction.formula = ~ A + B)
   expect_equivalent( coef( orc ), c(-1, -1, 1) )
@@ -28,7 +28,7 @@ test_that("estimate oracle", {
 
 test_that( "OLS estimation corresponds to lm", {
 
-  df = make.randomized.dat( 100, beta.vec=c(-1,-1,1) )
+  df = make_randomized_dat( 100, beta.vec=c(-1,-1,1) )
 
 
   # The simple interaction approach using OLS
@@ -47,7 +47,7 @@ test_that( "OLS estimation corresponds to lm", {
 
 test_that( "Main methods run without crashing", {
 
-    df = make.randomized.dat( 100, beta.vec=c(-1,-1,1) )
+    df = make_randomized_dat( 100, beta.vec=c(-1,-1,1) )
 
     ## calc_beta_oracle
     tst = estimate_systematic(Y.1 + Y.0 ~ Z, data = df, interaction.formula = ~ A + B,
@@ -75,7 +75,7 @@ test_that( "Main methods run without crashing", {
 
 test_that( "Clever dot notation for formula works", {
   
-  df = make.randomized.dat( 100, beta.vec=c(-1,-1,1) )
+  df = make_randomized_dat( 100, beta.vec=c(-1,-1,1) )
   head( df )
   df = dplyr::select( df, A, B, C, Z, Yobs )
   
@@ -94,7 +94,7 @@ test_that( "Clever dot notation for formula works", {
 test_that( "Main complier methods work", {
   
     ## est_beta_LATE
-    df = make.randomized.compliance.dat( 100 )
+    df = make_randomized_compliance_dat( 100 )
 
     tst = estimate_systematic(Yobs ~ D | Z, data = df, interaction.formula = ~ A + B,
                    method = "RI")

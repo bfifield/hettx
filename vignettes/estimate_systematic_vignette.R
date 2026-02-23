@@ -2,7 +2,7 @@
 library( hettx )
 
 ## ------------------------------------------------------------------------
-df = make.randomized.dat( 10000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+df = make_randomized_dat( 10000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
 str( df )
 
 ## ------------------------------------------------------------------------
@@ -53,13 +53,13 @@ summary(Moracle)
 SE( Moracle )
 
 ## ------------------------------------------------------------------------
-df = make.randomized.dat( 1000, beta.vec=c(-1,1,1) )
+df = make_randomized_dat( 1000, beta.vec=c(-1,1,1) )
 rs = estimate_systematic( Yobs ~ Z, ~ A + B, data=df, method="OLS" )
 r2 = R2( rs )
 r2
 
 ## ------------------------------------------------------------------------
-df = make.randomized.dat( 1000, beta.vec=c(-1,1,1), ideo.sd=3 )
+df = make_randomized_dat( 1000, beta.vec=c(-1,1,1), ideo.sd=3 )
 rs = estimate_systematic( Yobs ~ Z, ~ A + B, data=df, method="OLS" )
 r2b = R2( rs )
 r2b    
@@ -69,7 +69,7 @@ plot( r2 )
 plot( r2b, ADD=TRUE, col="green" )
 
 ## ------------------------------------------------------------------------
-df = make.randomized.dat( 1000, beta.vec=c(-1,1,0) )
+df = make_randomized_dat( 1000, beta.vec=c(-1,1,0) )
 rs = estimate_systematic( Yobs ~ Z, ~ A + B, data=df, method="OLS" )
 r2 = R2( rs )
 r2    
@@ -80,7 +80,7 @@ plot( df$tau ~ df$A )
 
 ## ------------------------------------------------------------------------
 set.seed( 1020 )
-df = make.randomized.dat( 1000, beta.vec=c(-1,1,1), 
+df = make_randomized_dat( 1000, beta.vec=c(-1,1,1), 
                           gamma.vec = c( 1, 2, 2, 1 ),
                           ideo.sd=1 )
 
@@ -102,7 +102,7 @@ plot( r2, ADD=TRUE, col="blue" )
 beta = c(-1,6,0)
 n = 10000
 
-data = make.randomized.compliance.dat( n, beta.vec=beta )
+data = make_randomized_compliance_dat( n, beta.vec=beta )
 names(data)
 
 ## ----observed_subgroups--------------------------------------------------

@@ -27,7 +27,7 @@ scat <- function( str, ... ) {
 #' @param na.rm A logical flag indicating whether to list-wise delete missing data. The function will report an error if missing data exist. Default is FALSE.
 #'
 #' @examples
-#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' df <- make_randomized_dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
 #' es <- estimate_systematic( Yobs ~ Z,  interaction.formula = ~ A + B, data = df )
 #' 
 #' @export
@@ -78,7 +78,7 @@ estimate_systematic <- function( formula, data, interaction.formula, control.for
 #'   is 0.05
 #'
 #' @examples
-#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' df <- make_randomized_dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
 #' es <- estimate_systematic( Yobs ~ Z,  interaction.formula = ~ A + B, data = df )
 #' r2_out <- R2(es)
 #'
@@ -108,7 +108,7 @@ is_RI_regression_result <- function( x ) {
 #' @param ... Unused
 #'
 #' @examples
-#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' df <- make_randomized_dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
 #' es <- estimate_systematic( Yobs ~ Z,  interaction.formula = ~ A + B, data = df )
 #' coef(es)
 #'
@@ -123,7 +123,7 @@ coef.RI.regression.result <- function( object, ... ) {
 #' @param ... unused
 #'
 #' @examples
-#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' df <- make_randomized_dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
 #' es <- estimate_systematic( Yobs ~ Z,  interaction.formula = ~ A + B, data = df )
 #' vcov(es)
 #'
@@ -138,7 +138,7 @@ vcov.RI.regression.result <- function( object, ... ) {
 #' @param ... unused
 #'
 #' @examples
-#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' df <- make_randomized_dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
 #' es <- estimate_systematic( Yobs ~ Z,  interaction.formula = ~ A + B, data = df )
 #' SE(es)
 #'
@@ -157,12 +157,12 @@ SE <- function( object, ... ) {
 #' @param data  Dataframe with variables listed in formula and control.formula
 #'
 #' @examples
-#' df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
-#' variance.ratio.test(df$Yobs, df$Z)
+#' df <- make_randomized_dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+#' variance_ratio_test(df$Yobs, df$Z)
 #' 
 #' @export
 #' @importFrom moments kurtosis
-variance.ratio.test <- function(Yobs, Z, data= NULL)
+variance_ratio_test <- function(Yobs, Z, data= NULL)
 {
   if (!is.null( data ) ) {
     Yobs <- eval( substitute( Yobs ), data )

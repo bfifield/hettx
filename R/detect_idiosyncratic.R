@@ -67,7 +67,7 @@ globalVariables('b')
 detect_idiosyncratic <- function(formula, data,
                                  interaction.formula = NULL, control.formula = NULL,
                                  plugin = FALSE, tau.hat = NULL,
-                                 test.stat = ifelse( is.null(W) & is.null(X), "SKS.stat", ifelse( is.null(W), "SKS.stat.cov", "SKS.stat.int.cov" ) ),
+                                 test.stat = ifelse( is.null(W) & is.null(X), "SKS_stat", ifelse( is.null(W), "SKS_stat_cov", "SKS_stat_int_cov" ) ),
                                  te.vec = NULL,
                                  B = 500, gamma = 0.0001, grid.gamma = 100*gamma,
                                  grid.size = 151, return.matrix = FALSE, na.rm = FALSE,
@@ -177,9 +177,9 @@ detect_idiosyncratic <- function(formula, data,
         warning("Adjusting for existing heterogeneity but treatment effect vector provided, ignoring provided treatment effect vector.")
     }
     if(!is.null(W)){
-        if(!is.function(test.stat) && test.stat %in% c("WSKS.t", "SKS.pool.t")){
+        if(!is.function(test.stat) && test.stat %in% c("WSKS_t", "SKS_pool_t", "WSKS.t", "SKS.pool.t")){
             if(ncol(W) > 1){
-                stop("Can only adjust for a single (categorical) covariate when using WSKS.t or SKS.pool.t as test statistics.")
+                stop("Can only adjust for a single (categorical) covariate when using WSKS_t or SKS_pool_t as test statistics.")
             }
             W <- as.factor(W)
         }
@@ -203,17 +203,22 @@ detect_idiosyncratic <- function(formula, data,
     }
 
     ## Checks on functions
-    no.adj.funs <- c("KS.stat", "SKS.stat", "rq.stat")
-    adj.funs <- c("SKS.stat.cov.pool", "SKS.stat.cov", "SKS.stat.cov.rq", "rq.stat.cond.cov", "rq.stat.uncond.cov")
-    adj.int.funs <- c("SKS.stat.int.cov.pool", "SKS.stat.int.cov")
-    int.funs <- c("WSKS.t", "SKS.pool.t")
+    ## Accept both old dot-case and new snake_case names
+    no.adj.funs <- c("KS_stat", "SKS_stat", "rq_stat",
+                     "KS.stat", "SKS.stat", "rq.stat")
+    adj.funs <- c("SKS_stat_cov_pool", "SKS_stat_cov", "SKS_stat_cov_rq", "rq_stat_cond_cov", "rq_stat_uncond_cov",
+                  "SKS.stat.cov.pool", "SKS.stat.cov", "SKS.stat.cov.rq", "rq.stat.cond.cov", "rq.stat.uncond.cov")
+    adj.int.funs <- c("SKS_stat_int_cov_pool", "SKS_stat_int_cov",
+                      "SKS.stat.int.cov.pool", "SKS.stat.int.cov")
+    int.funs <- c("WSKS_t", "SKS_pool_t",
+                  "WSKS.t", "SKS.pool.t")
     if ( is.function( test.stat ) ) {
       forms.l <-  formals( test.stat )
         forms <- names( forms.l )
         if ( is.null(W) ) {
           if ( "W" %in% forms && !is.null( forms.l["W"]  ) ) {
             warning( "No W passed but test.stat calls for passed W" )
-          } 
+          }
         } else {
           if ( !( "W" %in% forms ) ) {
             warning( "W passed, but test.stat does not provide for W" )
@@ -222,7 +227,7 @@ detect_idiosyncratic <- function(formula, data,
         if ( is.null(X) ) {
           if ( "X" %in% forms && !is.null( forms.l["X"]  ) ) {
             warning( "No X passed but test.stat calls for passed X" )
-          } 
+          }
         } else {
           if ( !( "X" %in% forms ) ) {
             warning( "X passed, but test.stat does not provide for X" )
@@ -230,20 +235,20 @@ detect_idiosyncratic <- function(formula, data,
         }
     } else if(is.null(W) & is.null(X)){
         if(!(test.stat %in% no.adj.funs)){
-            stop("You have provided an invalid test statistic when not adjusting for covariates or specifying interactions. Must provide one of KS.stat, SKS.stat, or rq.stat. Please see test.stat.info() for more information.")
+            stop("You have provided an invalid test statistic when not adjusting for covariates or specifying interactions. Must provide one of KS_stat, SKS_stat, or rq_stat. Please see test_stat_info() for more information.")
         }
     } else if(is.null(W)){
         if(!(test.stat %in% adj.funs)){
-            stop("You have provided an invalid test statistic when adjusting for covariates in control.formula but not specifying interactions. Must provide one of SKS.stat.cov.pool, SKS.stat.cov, SKS.stat.cov.rq, rq.stat.cond.cov, or rq.stat.uncond.cov. Please see test.stat.info() for more information.")
+            stop("You have provided an invalid test statistic when adjusting for covariates in control.formula but not specifying interactions. Must provide one of SKS_stat_cov_pool, SKS_stat_cov, SKS_stat_cov_rq, rq_stat_cond_cov, or rq_stat_uncond_cov. Please see test_stat_info() for more information.")
         }
     } else if(is.null(X)){
         just.int.funs <- c(adj.int.funs, int.funs)
         if(!(test.stat %in% just.int.funs)){
-            stop("You have provided an invalid test statistic when specifying interactions in interaction.formula but not adjusting for covariates. Must provide one of SKS.stat.int.cov.pool, SKS.stat.int.cov, WSKS.t, or SKS.pool.t. Please see test.stat.info() for more information.")
+            stop("You have provided an invalid test statistic when specifying interactions in interaction.formula but not adjusting for covariates. Must provide one of SKS_stat_int_cov_pool, SKS_stat_int_cov, WSKS_t, or SKS_pool_t. Please see test_stat_info() for more information.")
         }
     } else{
         if(!(test.stat %in% adj.int.funs)){
-            stop("You have provided an invalid test statistic when specifying interactions in interaction.formula and adjusting for covariates in control.formula. Must provide one of SKS.stat.int.cov.pool or SKS.stat.int.cov. Please see test.stat.info() for more information.")
+            stop("You have provided an invalid test statistic when specifying interactions in interaction.formula and adjusting for covariates in control.formula. Must provide one of SKS_stat_int_cov_pool or SKS_stat_int_cov. Please see test_stat_info() for more information.")
         }
     }
     
@@ -294,10 +299,10 @@ detect_idiosyncratic <- function(formula, data,
 #' Y <- ifelse(Z, rnorm(100, tau), rnorm(100, 0))
 #' df <- data.frame(Y=Y, Z=Z)
 #' tst <- detect_idiosyncratic(Y ~ Z, df, B = 50, grid.size = 50)
-#' get.p.value( tst )
+#' get_p_value( tst )
 #'
 #' @export
-get.p.value <- function( tst ) {
+get_p_value <- function( tst ) {
     cnts <- (tst$ci.p - tst$gamma) * tst$B
     bts <- vapply( cnts, function( cnt ) {
         bt <- binom.test( cnt, tst$B )
