@@ -4,9 +4,26 @@
 \alias{detect_idiosyncratic}
 \title{detect_idiosyncratic}
 \usage{
-detect_idiosyncratic(formula, data, interaction.formula,
-  control.formula, plugin, tau.hat, test.stat, te.vec, B, gamma, grid.gamma,
-  grid.size, return.matrix, na.rm, n.cores, verbose, ...)
+detect_idiosyncratic(
+  formula,
+  data,
+  interaction.formula = NULL,
+  control.formula = NULL,
+  plugin = FALSE,
+  tau.hat = NULL,
+  test.stat = ifelse(is.null(W) & is.null(X), "SKS_stat", ifelse(is.null(W),
+    "SKS_stat_cov", "SKS_stat_int_cov")),
+  te.vec = NULL,
+  B = 500,
+  gamma = 1e-04,
+  grid.gamma = 100 * gamma,
+  grid.size = 151,
+  return.matrix = FALSE,
+  na.rm = FALSE,
+  n.cores = 1,
+  verbose = TRUE,
+  ...
+)
 }
 \arguments{
 \item{formula}{An object of class formula, as in lm(), such as Y ~ Z with
@@ -59,7 +76,7 @@ Default is 1.}
 \item{verbose}{Whether to print out progress bar when fitting and other
 diagnostics. Default is TRUE.}
 
-\item{...}{Extra arguments passed to the generate.permutations function and
+\item{...}{Extra arguments passed to the generate_permutations function and
 test.stat functions.}
 }
 \value{

@@ -28,9 +28,8 @@ Imports:
 Depends:
     R (>= 4.0.0)
 BugReports: https://github.com/bfifield/hettx/issues
-RoxygenNote: 7.1.2
+RoxygenNote: 7.3.3
 Suggests: testthat, knitr, rmarkdown, dplyr, tidyr, purrr
 Encoding: UTF-8
 VignetteBuilder: knitr
 LazyData: true
-

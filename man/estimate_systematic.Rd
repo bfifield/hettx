@@ -4,8 +4,14 @@
 \alias{estimate_systematic}
 \title{Calculate systematic effects model using LATE, ITT, or full potential outcomes.}
 \usage{
-estimate_systematic(formula, data, interaction.formula, control.formula,
-method, na.rm)
+estimate_systematic(
+  formula,
+  data,
+  interaction.formula,
+  control.formula = NULL,
+  method = c("RI", "OLS", "2SLS"),
+  na.rm = FALSE
+)
 }
 \arguments{
 \item{formula}{An object of class formula, as in lm(). For ITT estimation, specify as Y ~ Z with only the treatment variable on the right-hand side. For LATE estimation, specify as Y ~ D | Z with only the endogenous variable (D) and the instrument (Z) on the right-hand side separated by a vertical bar (|). For oracle estimation (where full potential outcome schedule is known), specify as Y(1) + Y(0) ~ Z with only the treatment variable on the right-hand side and the variables indicating the outcome under treatment and the outcome under control on the left-hand-side. The first variable on the left-hand-side will be treated as the outcome under treatment, and the second variable on the right-hand-side will be treated as the outcome under control.}
@@ -31,7 +37,7 @@ In the OLS case, seperate Sxx for treatment and control are calculated for each
 treatment arm. For RI the known Sxx based on all units is used.
 }
 \examples{
-df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+df <- make_randomized_dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
 es <- estimate_systematic( Yobs ~ Z,  interaction.formula = ~ A + B, data = df )
 
 }
