@@ -8,3 +8,5 @@ README.Rmd
 builder.sh
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^tests/generate_benchmarks\.R$
+^tests/master_benchmarks\.rds$
