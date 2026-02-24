@@ -20,13 +20,13 @@ summary.FRTCI.test <- function(object, ...){
       out$grid.range = apply( object$te.grid, 2, range )
     } else {
     
-    cnts = (object$ci.p - object$gamma) * object$B
-    bts = sapply( cnts, function( cnt ) {
-      bt = binom.test( cnt, object$B )
-      bt$conf.int
-    } )
-    minp = min( bts[1,] )
-    maxp = max( bts[2,] )
+    cnts <- (object$ci.p - object$gamma) * object$B
+    bts <- vapply( cnts, function( cnt ) {
+      bt <- binom.test( cnt, object$B )
+      as.numeric( bt$conf.int )
+    }, numeric(2) )
+    minp <- min( bts[1,] )
+    maxp <- max( bts[2,] )
     out$p.value.CI = c( minp, maxp ) + object$gamma 
     }
     
@@ -124,7 +124,7 @@ summary.RI.R2.result <- function(object, ...){
         ## Variances
         out$hte_variance_systematic_compliers <- object$Sdd
         out$hte_variance_systematic_strata <- object$Stautau.U
-        totsys = object$pi.c * object$Sdd + object$Stautau.U
+        totsys <- object$pi.c * object$Sdd + object$Stautau.U
         out$hte_variance_systematic_total <- totsys
 
         ## Variance Data frames

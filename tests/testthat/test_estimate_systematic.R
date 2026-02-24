@@ -6,7 +6,7 @@ context("estimate_systematic() functions test.")
 
 test_that("estimate oracle", {
 
-  df = make.randomized.dat( 100, beta.vec=c(-1,-1,1) )
+  df = make_randomized_dat( 100, beta.vec=c(-1,-1,1) )
 
   orc = estimate_systematic(Y.1 + Y.0 ~ Z, data=df, interaction.formula = ~ A + B)
   expect_equivalent( coef( orc ), c(-1, -1, 1) )
@@ -28,7 +28,7 @@ test_that("estimate oracle", {
 
 test_that( "OLS estimation corresponds to lm", {
 
-  df = make.randomized.dat( 100, beta.vec=c(-1,-1,1) )
+  df = make_randomized_dat( 100, beta.vec=c(-1,-1,1) )
 
 
   # The simple interaction approach using OLS
@@ -47,9 +47,9 @@ test_that( "OLS estimation corresponds to lm", {
 
 test_that( "Main methods run without crashing", {
 
-    df = make.randomized.dat( 100, beta.vec=c(-1,-1,1) )
+    df = make_randomized_dat( 100, beta.vec=c(-1,-1,1) )
 
-    ## calc.beta.oracle
+    ## calc_beta_oracle
     tst = estimate_systematic(Y.1 + Y.0 ~ Z, data = df, interaction.formula = ~ A + B,
                    method = "RI")
     r2.tst <- R2(tst)
@@ -68,14 +68,14 @@ test_that( "Main methods run without crashing", {
     tst = estimate_systematic(Yobs ~ Z, data = df, interaction.formula = ~ A,
                    control.formula = ~ B + C, method = "OLS")
     r2.tst <- R2(tst)
-    expect_is( tst, "RI.regression.result" )
+    expect_s3_class( tst, "RI.regression.result" )
 } )
 
 
 
 test_that( "Clever dot notation for formula works", {
   
-  df = make.randomized.dat( 100, beta.vec=c(-1,-1,1) )
+  df = make_randomized_dat( 100, beta.vec=c(-1,-1,1) )
   head( df )
   df = dplyr::select( df, A, B, C, Z, Yobs )
   
@@ -93,8 +93,8 @@ test_that( "Clever dot notation for formula works", {
 
 test_that( "Main complier methods work", {
   
-    ## calc.beta.LATE
-    df = make.randomized.compliance.dat( 100 )
+    ## est_beta_LATE
+    df = make_randomized_compliance_dat( 100 )
 
     tst = estimate_systematic(Yobs ~ D | Z, data = df, interaction.formula = ~ A + B,
                    method = "RI")
@@ -104,7 +104,7 @@ test_that( "Main complier methods work", {
                    method = "2SLS")
     
     r2.tst <- R2(tst)
-    expect_is( tst, "RI.regression.result" )
+    expect_s3_class( tst, "RI.regression.result" )
     
 } )
 

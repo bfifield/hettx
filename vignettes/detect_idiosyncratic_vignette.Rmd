@@ -34,10 +34,10 @@ We first load our package along with some other useful packages.
 ```{r, message=FALSE, warning=FALSE}
 library( mvtnorm )
 library( ggplot2 )
-library( dplyr )
 library( hettx )
-library( tidyr ) 
-library( purrr ) 
+library( dplyr )
+library( tidyr )
+library( purrr )
 data( ToyData )
 ```
 
@@ -61,8 +61,8 @@ As we generated these data, we know the true individual treatment effects.
 ```{r, echo=TRUE}
 data( ToyData )
 head( ToyData )
-td = gather( ToyData, x1, x2, x3, x4, key="X", value="value" )
-td = gather( td, Y, tau, key="outcome", value="value2" )
+td <- pivot_longer( ToyData, cols=c(x1, x2, x3, x4), names_to="X", values_to="value" )
+td <- pivot_longer( td, cols=c(Y, tau), names_to="outcome", values_to="value2" )
 ggplot( td, aes( x=value, y=value2, col=as.factor(Z) ) ) +
         facet_grid( outcome ~ X, scales="free" ) +
         geom_point( alpha=0.5, size=0.5) + 
@@ -126,7 +126,7 @@ We specify a `control.formula` which will be used to generate a matrix to hand t
 
 ```{r, echo=TRUE, cache=FALSE}
 tst2 = detect_idiosyncratic( Y ~ Z, data=ToyData, control.formula = ~ x1 + x2 + x3 + x4, B=B, 
-                             test.stat="SKS.stat.cov",  verbose=FALSE )
+                             test.stat="SKS_stat_cov",  verbose=FALSE )
 summary( tst2 )
 ```
 
@@ -134,7 +134,7 @@ Let's explore how the results might differ when non-treatment covariates are use
 
 ```{r, echo=TRUE, cache=FALSE}
 tst2b = detect_idiosyncratic( Y ~ Z, data=ToyData, control.formula = ~ x3 + x4, B=B, 
-                              test.stat="SKS.stat.cov", verbose=FALSE )
+                              test.stat="SKS_stat_cov", verbose=FALSE )
 summary( tst2b )
 ```
 
@@ -144,7 +144,7 @@ We can compare to when we correct for some useless covariates not related to out
 N = nrow(ToyData)
 ToyData$x4 = rnorm( N )
 tst1b = detect_idiosyncratic( Y ~ Z, data=ToyData, control.formula = ~ x4, B=B, 
-                              test.stat="SKS.stat.cov", verbose=FALSE )
+                              test.stat="SKS_stat_cov", verbose=FALSE )
 summary( tst1b )
 ```
 
@@ -159,7 +159,7 @@ We first test for ideosyncratic variation beyond x1 (and we should get high $p$-
 B = 20 
 
 tst3a1 = detect_idiosyncratic( Y ~ Z, data=ToyData, interaction.formula = ~ x1, B=B, 
-                               test.stat="SKS.stat.int.cov", verbose=FALSE )
+                               test.stat="SKS_stat_int_cov", verbose=FALSE )
 summary( tst3a1 )
 ```
 
@@ -168,7 +168,7 @@ Include additional terms to increase power.  We are correcting for x3 and x4.
 tst3a2 <- detect_idiosyncratic( Y ~ Z, data=ToyData, 
                         interaction.formula = ~ x1, 
                         control.formula = ~ x3 + x4,
-                        B=B, test.stat="SKS.stat.int.cov", 
+                        B=B, test.stat="SKS_stat_int_cov", 
                         verbose=FALSE )
 summary( tst3a2 )
 ```
@@ -176,7 +176,7 @@ summary( tst3a2 )
 For comparison, we next include all terms.
 ```{r, echo=TRUE, cache=FALSE}
 tst3a2b <- detect_idiosyncratic( Y ~ Z, data=ToyData, control.formula = ~ x2 + x3 + x4, 
-                         interaction.formula = ~ x1, B=B, test.stat="SKS.stat.int.cov", 
+                         interaction.formula = ~ x1, B=B, test.stat="SKS_stat_int_cov", 
                          verbose=FALSE )
 summary( tst3a2b )
 ```
@@ -189,7 +189,7 @@ Now correct for the other covariates as well, but still have correct heterogeneo
 Start testing for variation beyond x1 and x2. 
 ```{r beyond_x1_x2, echo=TRUE, cache=FALSE}
 tst3b <- detect_idiosyncratic( Y ~ Z, data=ToyData,
-                         interaction.formula = ~ x1 + x2, B=B, test.stat="SKS.stat.int.cov", 
+                         interaction.formula = ~ x1 + x2, B=B, test.stat="SKS_stat_int_cov", 
                          verbose=FALSE )
 summary( tst3b )
 ```
@@ -201,7 +201,7 @@ Continue to test for ideosyncratic variation beyond x1 and x2, adjusting for x3 
 tst3c <- detect_idiosyncratic( Y ~ Z, data=ToyData,
                          interaction.formula = ~ x1 + x2, 
                        control.formula = ~ x3 + x4,
-                       B=B, test.stat="SKS.stat.int.cov", 
+                       B=B, test.stat="SKS_stat_int_cov", 
                        verbose=FALSE )
 summary( tst3c )
 ```
@@ -212,17 +212,17 @@ Finally, test for ideosyncratic variation beyond all covariates, even irrelevant
 ```{r full_correction, echo=TRUE, cache=FALSE}
 tst3d <- detect_idiosyncratic( Y ~ Z, data=ToyData,
                          interaction.formula = ~ x1 + x2 + x3 + x4, 
-                       B=B, test.stat="SKS.stat.int.cov", 
+                       B=B, test.stat="SKS_stat_int_cov", 
               verbose=FALSE )
 summary( tst3d )
 ```
 
 # Comparing the tests
 
-We can easily compare the results by simultaneously displaying the outputs from all tested models by using the `get.p.value()` method.
+We can easily compare the results by simultaneously displaying the outputs from all tested models by using the `get_p_value()` method.
 This method extracts some core summary statistics:
 ```{r}
-get.p.value( tst1b )
+get_p_value( tst1b )
 ```
 
 We can thus collect all our models from above, and make a dataframe of the overall results:
@@ -233,9 +233,9 @@ tests = list( no_cov=tst1, useless_cov=tst1b, all_covariates=tst2,
               het_beyond_x1_x2=tst3b, 
               het_beyond_x1_x2_with_cov=tst3c, het_beyond_all=tst3d )
 
-agg.res = purrr::map( tests, get.p.value  ) %>%
+agg.res <- purrr::map( tests, get_p_value ) %>%
   purrr::map( as.list )
-agg.res = bind_rows( agg.res, .id = "test" )
+agg.res <- bind_rows( agg.res, .id = "test" )
 agg.res
 ```
 
@@ -267,7 +267,7 @@ This is why the choice of test statistic is delicate, and why for the covariate 
 
 We also offer an adjusted variance ratio test:
 ```{r}
-variance.ratio.test( ToyData$Y, ToyData$Z )
+variance_ratio_test( ToyData$Y, ToyData$Z )
 ```
 
 This does not use permutation inference.
@@ -276,5 +276,5 @@ This does not use permutation inference.
 
 We offer several test statistics one might use.  We also have a method to print out some info on what is available:
 ```{r}
-test.stat.info()
+test_stat_info()
 ```

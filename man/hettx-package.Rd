@@ -2,6 +2,7 @@
 % Please edit documentation in R/hettx-package.R
 \docType{package}
 \name{hettx-package}
+\alias{hettx}
 \alias{hettx-package}
 \title{Fisherian and Neymanian Methods for Detecting and Measuring Treatment Effect Variation}
 \description{
@@ -26,6 +27,13 @@ Special thanks to Masha Bertling for some early work on documenting this project
 \references{
 Ding, Peng, Avi Feller and Luke Miratrix. (2016) "Randomization Inference for Treatment Effect Variation", Journal of the Royal Statistical Society-Series B.
 Ding, Peng, Avi Feller and Luke Miratrix. (2019) "Decomposing Treatment Effect Variation", Journal of the American Statistical Association.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item Report bugs at \url{https://github.com/bfifield/hettx/issues}
+}
+
 }
 \author{
 Peng Ding, Avi Feller, Ben Fifield, and Luke Miratrix

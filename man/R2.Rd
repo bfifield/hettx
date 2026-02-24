@@ -4,7 +4,7 @@
 \alias{R2}
 \title{Estimate treatment variation R2}
 \usage{
-R2(est.beta, rho.step)
+R2(est.beta, rho.step = 0.05)
 }
 \arguments{
 \item{est.beta}{The output from `est.beta()`. Either an estimate of overall
@@ -22,7 +22,7 @@ covariates) using either the OLS output for the ITT from est.beta, or the
 LATE estimation from est.beta.
 }
 \examples{
-df <- make.randomized.dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+df <- make_randomized_dat( 1000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
 es <- estimate_systematic( Yobs ~ Z,  interaction.formula = ~ A + B, data = df )
 r2_out <- R2(es)
 

@@ -20,7 +20,7 @@ library( hettx )
 
 This package includes code to make synthetic data, which can be useful for simulation studies and illustrations.  Here we make a dataset with 3 covariates that we will use to illustrate the function calls.  For this dataset, the first two variables have a systematic relationship with treatment impact, and the third is good for adjustment for increasing power:
 ```{r}
-df = make.randomized.dat( 10000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
+df = make_randomized_dat( 10000, gamma.vec=c(1,1,1,2), beta.vec=c(-1,-1,1,0) )
 str( df )
 ```
 
@@ -120,7 +120,7 @@ It will give the same results regardless of $Z$ assuming the total number of uni
 
 We can look at treatment effect explained.  We will look at two scenarios, one with no ideosyncratic variation on top of the systematic variation, and one with a substantial amount.  We will plot the R2 sensitivity curves for each on top of each other.
 ```{r}
-df = make.randomized.dat( 1000, beta.vec=c(-1,1,1) )
+df = make_randomized_dat( 1000, beta.vec=c(-1,1,1) )
 rs = estimate_systematic( Yobs ~ Z, ~ A + B, data=df, method="OLS" )
 r2 = R2( rs )
 r2
@@ -128,7 +128,7 @@ r2
 
 And now our DGP with lots of idiosyncratic variation:
 ```{r}
-df = make.randomized.dat( 1000, beta.vec=c(-1,1,1), ideo.sd=3 )
+df = make_randomized_dat( 1000, beta.vec=c(-1,1,1), ideo.sd=3 )
 rs = estimate_systematic( Yobs ~ Z, ~ A + B, data=df, method="OLS" )
 r2b = R2( rs )
 r2b    
@@ -141,7 +141,7 @@ plot( r2b, ADD=TRUE, col="green" )
 
 And here is a case where we have 100% systematic variation along a single variable.
 ```{r}
-df = make.randomized.dat( 1000, beta.vec=c(-1,1,0) )
+df = make_randomized_dat( 1000, beta.vec=c(-1,1,0) )
 rs = estimate_systematic( Yobs ~ Z, ~ A + B, data=df, method="OLS" )
 r2 = R2( rs )
 r2    
@@ -158,7 +158,7 @@ Here we look at how our ability to capture $R^2_\tau$ differs across different e
 We have systematic effects for both $A$ and $B$, and $C$ is related to baseline outcomes but not impacts.
 ```{r}
 set.seed( 1020 )
-df = make.randomized.dat( 1000, beta.vec=c(-1,1,1), 
+df = make_randomized_dat( 1000, beta.vec=c(-1,1,1), 
                           gamma.vec = c( 1, 2, 2, 1 ),
                           ideo.sd=1 )
 
@@ -189,7 +189,7 @@ This method takes a complier treatment heterogeniety model defined by `beta`:
 beta = c(-1,6,0)
 n = 10000
 
-data = make.randomized.compliance.dat( n, beta.vec=beta )
+data = make_randomized_compliance_dat( n, beta.vec=beta )
 names(data)
 ```
 

@@ -4,7 +4,16 @@
 \alias{plot.FRTCI.test}
 \title{plot.FRTCI.test}
 \usage{
-\method{plot}{FRTCI.test}(x, true.tau, xlab, ylab, true.tau.col, plot.envelope, ci.line.col, ...)
+\method{plot}{FRTCI.test}(
+  x,
+  true.tau = NULL,
+  xlab = expression(tau),
+  ylab = "p-value",
+  true.tau.col = "red",
+  plot.envelope = TRUE,
+  ci.line.col = "blue",
+  ...
+)
 }
 \arguments{
 \item{x}{An object of class \code{FRTCI.test}}
