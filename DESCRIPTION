@@ -2,7 +2,7 @@ Package: hettx
 Type: Package
 Title: Fisherian and Neymanian Methods for Detecting and Measuring Treatment Effect Variation
 Version: 1.0.0
-Date: 2023-08-19
+Date: 2026-02-23
 Authors@R: c(
   person("Peng", "Ding", email = "pengdingpku@berkeley.edu", role = "aut"),
   person("Avi", "Feller", email = "afeller@berkeley.edu", role = "aut"),

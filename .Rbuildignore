@@ -9,5 +9,6 @@ builder.sh
 ^.*\.Rproj$
 ^\.Rproj\.user$
 CLAUDE\.md
+^\.claude$
 ^tests/generate_benchmarks\.R$
 ^tests/master_benchmarks\.rds$
