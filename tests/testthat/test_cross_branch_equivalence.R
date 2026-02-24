@@ -15,8 +15,10 @@ library(hettx)
 context("Cross-branch equivalence with master")
 
 # These tests compare against benchmarks captured on a specific platform.
-# RNG output differs across R versions and platforms, so skip on CI.
+# RNG output differs across R versions and platforms, so skip on CI and CRAN.
+# The benchmark RDS file is also excluded from the package build via .Rbuildignore.
 skip_on_ci()
+skip_on_cran()
 
 benchmark_path <- file.path(
   testthat::test_path(), "..", "master_benchmarks.rds"
