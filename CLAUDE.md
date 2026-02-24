@@ -92,5 +92,5 @@ Tests involve randomization, so some use `set.seed()` for reproducibility. Many 
 - [x] Bump minimum R version from 2.14.0 to 4.0.0+; drop `stringsAsFactors = FALSE`
 - [x] Remove manual `@usage` roxygen tags (17 instances)
 - [x] Replace `expect_is()` with `expect_s3_class()` in tests
-- [ ] Consider `future`/`furrr` to replace `foreach`/`doParallel`
+- [~] ~~Consider `future`/`furrr` to replace `foreach`/`doParallel`~~ — not planned; current implementation works well, no user-facing benefit
 - [x] Add roxygen docs to internal helpers in `helper_frt.R`
