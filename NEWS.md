@@ -1,3 +1,8 @@
+# hettx 1.0.1
+
+* Fixed CRAN submission NOTEs (excluded `cran-comments.md` and
+  `CRAN-SUBMISSION` from package build).
+
 # hettx 1.0.0
 
 ## New features

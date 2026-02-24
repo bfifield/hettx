@@ -13,3 +13,4 @@ CLAUDE\.md
 ^tests/generate_benchmarks\.R$
 ^tests/master_benchmarks\.rds$
 ^CRAN-SUBMISSION$
+^cran-comments\.md$
